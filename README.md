@@ -1,4 +1,5 @@
-Bill Mate es una plataforma pensada para llevar un registro de gastos de mercado este aún no es el código definitivo, he identificado oportunidades de mejores en el código.
+Bill Mate es una plataforma pensada para llevar el registro de gastos de mercado. 
+-Este aún no es el código definitivo, he identificado oportunidades de mejores en el código.
 
 -Se recomienda tener la configuración de colores del sistema operativo en Oscuro
 
