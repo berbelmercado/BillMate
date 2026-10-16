@@ -838,3 +838,66 @@ dicConfigFrameTotal = {
     ,"etTotalCompraWidht":110
 
 }
+
+
+#Pantalla de compra (nuevaCompra.py): distribución con grid, cabe en 1366x768
+dicConfigNuevaCompra = {
+    #Ventana
+    "vnWidth":1100
+    ,"vnHeight":640
+    ,"vnMinWidth":900
+    ,"vnMinHeight":540
+    ,"vnX":120
+    ,"vnY":20
+
+    #Espaciado general
+    ,"padX":8
+    ,"padY":6
+
+    #Fuente y alto de los campos
+    ,"fuente":'Helvetica'
+    ,"tamanoFuente":14
+    ,"altoCampo":32
+
+    #Encabezado: anchos de los campos
+    ,"campoCompraWidth":330
+    ,"campoFacturaWidth":200
+    ,"etTotalFacturaWidth":140
+    ,"etFechaFacturaWidth":130
+    ,"btnCalendarioWidth":40
+    ,"campoComercioWidth":330
+
+    #Línea de ingreso: anchos de los campos
+    ,"campoProductoWidth":340
+    ,"etCantidadWidth":90
+    ,"etPrecioWidth":130
+    ,"etTotalItemWidth":130
+    ,"btnAgregarWidth":150
+    ,"btnCancelarEdicionWidth":110
+
+    #Tabla de ítems: ancho de las columnas
+    ,"colProductoWidth":420
+    ,"colCantidadWidth":110
+    ,"colPrecioWidth":170
+    ,"colTotalWidth":170
+    ,"tablaTamanoFuente":12
+    ,"tablaAltoFila":26
+
+    #Pie
+    ,"btnPieWidth":200
+
+    #Lista desplegable del autocompletado
+    ,"listaMaxOpciones":50
+    ,"listaMaxVisibles":8
+    ,"listaTamanoFuente":12
+    ,"listaFondo":'#C8ACD6'
+    ,"listaLetra":'black'
+    ,"listaSeleccion":'#576CBC'
+
+    #Colores de la diferencia del cuadre
+    ,"colorCuadreBien":'#7FD18B'
+    ,"colorCuadreMal":'#FF6B6B'
+
+    #Calendario
+    ,"vcPady":10
+}

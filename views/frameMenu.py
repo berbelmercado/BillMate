@@ -6,7 +6,7 @@ from views.vwImgConfig import leerImagen
 from views.ventanasSecundarias import registrarFactura as rf
 from views.ventanasSecundarias import registrarComercio as rc
 from views.ventanasSecundarias import registrarProductos as rp
-from views.ventanasSecundarias import agregarMercados as am
+from views.ventanasSecundarias import nuevaCompra as nc
 from views.ventanasSecundarias import consultarProductos as cp
 from views.ventanasSecundarias import consultarMercados as cm
 from views.ventanasSecundarias import consultarFacturas as cf
@@ -45,7 +45,7 @@ class FrameMenu(CTkFrame):
 
     def mostrarVentanaAgregarMercado(self):
         #ventana secundaria registrar mercado
-        ventanaAgregarMercado=am.AgregarMercados(self.master)
+        ventanaAgregarMercado=nc.NuevaCompra(self.master)
 
     def mostrarVentanaconsultarProductos(self):
         #ventana secundaria consultar productos
