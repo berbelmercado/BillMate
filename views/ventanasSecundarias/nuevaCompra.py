@@ -265,33 +265,41 @@ class NuevaCompra(CTkToplevel):
     # --- Línea de ingreso: producto, cantidad, precio y total ---
 
     def crearLineaIngreso(self):
+        #Dos filas para que todo quepa en el ancho mínimo de la ventana: el producto ocupa la primera
+        #y crece con la ventana; cantidad, precio, total y botones van en la segunda
         marco = CTkFrame(self, fg_color=conColor["fg_color"])
         marco.grid(row=1, column=0, sticky='ew', padx=conNC["padX"], pady=conNC["padY"])
+        marco.grid_columnconfigure(0, weight=1)
 
-        self.grid_(self.etiqueta(marco, ' Producto '), 0, 0)
-        self.campoProducto = CampoAutocompletar(marco
+        filaProducto = CTkFrame(marco, fg_color=conColor["fg_color"])
+        filaProducto.grid(row=0, column=0, sticky='ew')
+        filaProducto.grid_columnconfigure(1, weight=1)
+        self.grid_(self.etiqueta(filaProducto, ' Producto '), 0, 0)
+        self.campoProducto = CampoAutocompletar(filaProducto
                                                 ,opciones=self.opcionesProductos
                                                 ,crear=self.crearProducto
                                                 ,alElegir=lambda i, t: self.enfocar(self.etCantidad)
                                                 ,width=conNC["campoProductoWidth"]
                                                 ,**self.estiloEntry())
-        self.grid_(self.campoProducto, 0, 1)
+        self.grid_(self.campoProducto, 0, 1, sticky='ew')
 
-        self.grid_(self.etiqueta(marco, ' Cant '), 0, 2)
-        self.etCantidad = CTkEntry(marco, width=conNC["etCantidadWidth"], justify='center', **self.estiloEntry())
-        self.grid_(self.etCantidad, 0, 3)
+        filaNumeros = CTkFrame(marco, fg_color=conColor["fg_color"])
+        filaNumeros.grid(row=1, column=0, sticky='w')
+        self.grid_(self.etiqueta(filaNumeros, ' Cant '), 0, 0)
+        self.etCantidad = CTkEntry(filaNumeros, width=conNC["etCantidadWidth"], justify='center', **self.estiloEntry())
+        self.grid_(self.etCantidad, 0, 1)
 
-        self.grid_(self.etiqueta(marco, ' Precio '), 0, 4)
-        self.etPrecio = CTkEntry(marco, width=conNC["etPrecioWidth"], justify='right', **self.estiloEntry())
-        self.grid_(self.etPrecio, 0, 5)
+        self.grid_(self.etiqueta(filaNumeros, ' Precio '), 0, 2)
+        self.etPrecio = CTkEntry(filaNumeros, width=conNC["etPrecioWidth"], justify='right', **self.estiloEntry())
+        self.grid_(self.etPrecio, 0, 3)
 
-        self.grid_(self.etiqueta(marco, ' Total '), 0, 6)
-        self.etTotalItem = CTkEntry(marco, width=conNC["etTotalItemWidth"], justify='right', **self.estiloEntry())
-        self.grid_(self.etTotalItem, 0, 7)
+        self.grid_(self.etiqueta(filaNumeros, ' Total '), 0, 4)
+        self.etTotalItem = CTkEntry(filaNumeros, width=conNC["etTotalItemWidth"], justify='right', **self.estiloEntry())
+        self.grid_(self.etTotalItem, 0, 5)
 
-        self.btnAgregar = self.boton(marco, 'Agregar', self.guardarItem, conNC["btnAgregarWidth"], self.imagenAgregar)
-        self.grid_(self.btnAgregar, 0, 8)
-        self.btnCancelarEdicion = self.boton(marco, 'Cancelar', self.limpiarLinea, conNC["btnCancelarEdicionWidth"], self.imagenCancelar)
+        self.btnAgregar = self.boton(filaNumeros, 'Agregar', self.guardarItem, conNC["btnAgregarWidth"], self.imagenAgregar)
+        self.grid_(self.btnAgregar, 0, 6)
+        self.btnCancelarEdicion = self.boton(filaNumeros, 'Cancelar', self.limpiarLinea, conNC["btnCancelarEdicionWidth"], self.imagenCancelar)
 
         #Enter pasa al siguiente campo; en Total agrega el ítem
         self.etCantidad.bind('<Return>', lambda evento: self.enterEn(evento, self.etPrecio))
@@ -471,7 +479,7 @@ class NuevaCompra(CTkToplevel):
         self.etPrecio.insert(0, formatearNumero(fila[3]))
         self.etTotalItem.insert(0, formatearNumero(fila[4]))
         self.btnAgregar.configure(text='Guardar cambio', image=self.imagenGuardar)
-        self.grid_(self.btnCancelarEdicion, 0, 9)
+        self.grid_(self.btnCancelarEdicion, 0, 7)
         self.enfocar(self.etCantidad)
 
     def borrarItem(self):

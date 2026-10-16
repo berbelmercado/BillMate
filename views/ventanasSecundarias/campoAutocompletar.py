@@ -1,4 +1,5 @@
 """Campo de texto con lista desplegable de coincidencias y opción de crear lo que no existe."""
+import sys
 import tkinter as tk
 from customtkinter import CTkFrame, CTkEntry
 from views.ventanasSecundarias.configuracionVentanasSecundarias import dicConfigNuevaCompra as conNC
@@ -6,6 +7,22 @@ from views.ventanasSecundarias.configuracionVentanasSecundarias import dicConfig
 #Teclas que no cambian el texto: no deben volver a filtrar la lista
 TECLAS_SIN_TEXTO = {'Up', 'Down', 'Return', 'KP_Enter', 'Escape', 'Tab', 'ISO_Left_Tab', 'Shift_L', 'Shift_R'
                     ,'Control_L', 'Control_R', 'Alt_L', 'Alt_R', 'Left', 'Right', 'Home', 'End'}
+
+
+def ventanaSinActivar(ventana):
+    """En Windows, evita que la ventana de la lista se active al mostrarla o al hacer clic en ella.
+
+    Si se activaba, al cerrarla Windows podía dejar activa otra ventana (por ejemplo la principal)
+    y lo que se escribía no llegaba al campo siguiente hasta hacer clic en la pantalla de compra.
+    """
+    if sys.platform != 'win32':
+        return
+    import ctypes
+    GWL_EXSTYLE, WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW = -20, 0x08000000, 0x00000080
+    ventana.update_idletasks()
+    hwnd = int(ventana.wm_frame(), 16)
+    user32 = ctypes.windll.user32
+    user32.SetWindowLongW(hwnd, GWL_EXSTYLE, user32.GetWindowLongW(hwnd, GWL_EXSTYLE) | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW)
 
 
 class CampoAutocompletar(CTkFrame):
@@ -106,8 +123,10 @@ class CampoAutocompletar(CTkFrame):
 
         if self.ventanaLista is None:
             self.ventanaLista = tk.Toplevel(self)
+            self.ventanaLista.withdraw()
             self.ventanaLista.overrideredirect(True)
             self.ventanaLista.transient(self.winfo_toplevel())
+            ventanaSinActivar(self.ventanaLista)
             self.lista = tk.Listbox(self.ventanaLista
                                     ,font=(conNC['fuente'], conNC['listaTamanoFuente'])
                                     ,bg=conNC['listaFondo']
@@ -147,12 +166,15 @@ class CampoAutocompletar(CTkFrame):
         return self.ventanaLista is not None
 
     def _quizasCerrar(self):
-        #Al perder el foco se cierra la lista, salvo que el foco haya pasado a la propia lista
+        #Al perder el foco se cierra la lista, salvo que el foco siga en el campo o haya pasado a la propia lista.
+        #En Windows, mostrar la lista genera un FocusOut aunque el foco no se mueva; sin esta comprobación
+        #la lista se cerraba sola a los 200 ms y el siguiente Enter solo la volvía a abrir
         try:
-            if self.listaAbierta() and self.focus_get() is self.lista:
-                return
+            foco = self.focus_get()
         except KeyError:
-            pass
+            foco = None
+        if foco is not None and (foco is self.entry._entry or (self.listaAbierta() and foco is self.lista)):
+            return
         self.cerrarLista()
         self.resolverExacto()
 
@@ -208,6 +230,8 @@ class CampoAutocompletar(CTkFrame):
     def _elegir(self, opcion):
         idOpcion, textoOpcion = opcion
         self.cerrarLista()
+        #La pantalla vuelve a ser la ventana activa, para que lo que se escriba llegue al campo siguiente
+        self.entry._entry.focus_force()
         if idOpcion == 'crear':
             nuevoId = self.crear(textoOpcion)
             if nuevoId is None:

@@ -654,7 +654,7 @@ dicConfigNuevaCompra = {
     #Ventana
     "vnWidth":1100
     ,"vnHeight":640
-    ,"vnMinWidth":900
+    ,"vnMinWidth":960
     ,"vnMinHeight":540
     ,"vnX":120
     ,"vnY":20
