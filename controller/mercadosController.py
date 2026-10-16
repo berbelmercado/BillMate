@@ -2,179 +2,62 @@ import sqlite3
 from model.mercados import Mercados
 from controller.validaciones import esNumero, convertirNumero
 
-class MercadosController():
-    def __init__(self
-                 ,mercadoId
-                 ,compraId
-                 ,descCompra
-                 ,facturaId
-                 ,numeroFactura
-                 ,productoId
-                 ,nombreProducto
-                 ,comercioId
-                 ,cantidad
-                 ,precioUnidad
-                 ,precioTotal
-                 ,opcion):
-        
-        self.mercadoId = mercadoId
-        self.compraId = compraId
-        self.descCompra = descCompra
-        self.facturaId = facturaId
-        self.numeroFactura = numeroFactura
-        self.productoId = productoId
-        self.nombreProducto = nombreProducto
-        self.comercioId = comercioId
-        self.cantidad = cantidad
-        self.precioUnidad = precioUnidad
-        self.precioTotal = precioTotal
-        self.opcion = opcion
-    
-    def consultarMercadosController(self):
-        #Consultamos los productos de la base de datos dependiendo la opción escogida 
-        mensaje=[]
-        
-        listaMercado=[]
-        if self.opcion != None:
+#Opciones de búsqueda de Consultar Mercados (índices de Mercados.sqlOpciones)
+OPCION_PRODUCTO, OPCION_FACTURA, OPCION_COMPRA = 0, 1, 2
 
-            try:
-                objMercadosModel = Mercados(self.mercadoId
-                                            ,self.compraId
-                                            ,self.descCompra
-                                            ,self.facturaId
-                                            ,self.numeroFactura
-                                            ,self.productoId
-                                            ,self.nombreProducto
-                                            ,self.comercioId
-                                            ,self.cantidad
-                                            ,self.precioUnidad
-                                            ,self.precioTotal
-                                            ,self.opcion
-                                            )
-                listaMercado = objMercadosModel.consultarMercadosModel()
-                mensaje =[1]
-            except sqlite3.Error as ex:
-                mensaje = [0, f'No se pudo realizar la consulta: {ex}']
-        else:
-            mensaje = [0, 'Por favor seleccione una opción']
-        return mensaje, listaMercado 
-    
-    def actualizarProductosController(self):
 
-        mensaje = []
+def mercado(mercadoId=None, compraId=None, facturaId=None, productoId=None, comercioId=None
+            ,cantidad=None, precioUnidad=None, precioTotal=None, opcion=None, texto=None):
+    #Objeto del modelo; el texto buscado ocupa el campo de las tres opciones de búsqueda
+    return Mercados(mercadoId, compraId, texto, facturaId, texto, productoId, texto
+                    ,comercioId, cantidad, precioUnidad, precioTotal, opcion)
 
-        #Validamos los precios antes de actualizar
-        if not esNumero(self.precioUnidad):
-            return [0, 'El campo "Precio unidad" no es válido']
-        if not esNumero(self.precioTotal):
-            return [0, 'El campo "Precio Total" no es válido']
 
-        self.precioUnidad = convertirNumero(self.precioUnidad)
-        self.precioTotal = convertirNumero(self.precioTotal)
+def consultarMercados(opcion, texto):
+    #Mercados cuyo producto, factura o compra (según la opción) contiene el texto buscado
+    if opcion not in (OPCION_PRODUCTO, OPCION_FACTURA, OPCION_COMPRA):
+        return [], [0, 'Por favor seleccione una opción']
+    try:
+        return mercado(opcion=opcion, texto=texto).consultarMercadosModel(), [1]
+    except sqlite3.Error as ex:
+        return [], [0, f'No se pudo realizar la consulta: {ex}']
 
-        try:
-            #Objeto
-            objActualizarProductosController = Mercados(self.mercadoId
-                                            ,self.compraId
-                                            ,self.descCompra
-                                            ,self.facturaId
-                                            ,self.numeroFactura
-                                            ,self.productoId
-                                            ,self.nombreProducto
-                                            ,self.comercioId
-                                            ,self.cantidad
-                                            ,self.precioUnidad
-                                            ,self.precioTotal
-                                            ,self.opcion
-                                            )
-            objActualizarProductosController.actualizarMercadosModel()#Ejecutamos función del modelo
 
-            mensaje =[1,'']
+def consultarUltimoMercado():
+    #Ítems de la compra más reciente, para la tabla de la ventana principal
+    try:
+        return mercado().consultarUltimoMercado(), [1]
+    except sqlite3.Error as ex:
+        return [], [0, f'No fue posible realizar la consulta: {ex}']
 
-        except sqlite3.Error as ex:
 
-            mensaje = [0,f'No se pudo actualizar el producto: {ex}']
+def actualizarMercado(mercadoId, compraId, facturaId, productoId, comercioId, cantidad, precioUnidad, precioTotal):
+    #Modifica un ítem ya cargado en mercados
+    if not esNumero(precioUnidad):
+        return [0, 'El campo "Precio unidad" no es válido']
+    if not esNumero(precioTotal):
+        return [0, 'El campo "Precio Total" no es válido']
 
-        return mensaje
+    try:
+        mercado(mercadoId, compraId, facturaId, productoId, comercioId, cantidad
+                ,convertirNumero(precioUnidad), convertirNumero(precioTotal)).actualizarMercadosModel()
+        return [1,'']
+    except sqlite3.Error as ex:
+        return [0,f'No se pudo actualizar el producto: {ex}']
 
-    def consultarKeysMercadosController(self):
-        #consultamos las llaves primaris desde la base de datos
 
-        listaLaves = []
+def consultarLlavesMercado(mercadoId):
+    #compraId, facturaId, productoId y comercioId del ítem
+    try:
+        return mercado(mercadoId).consultarKeysMercadosModel(), [1,'']
+    except sqlite3.Error as ex:
+        return [], [0,f'Error al consultar llaves: {ex}']
 
-        mensaje = []
 
-        try:
-            #Creamos objeto e instanciamos la clase
-            objConsultaLavesMercadosTemp = Mercados( self.mercadoId
-                                                    ,None
-                                                    ,None
-                                                    ,None
-                                                    ,None
-                                                    ,None
-                                                    ,None
-                                                    ,None
-                                                    ,None
-                                                    ,None
-                                                    ,None
-                                                    ,None
-                                                    )
-            listaLaves = objConsultaLavesMercadosTemp.consultarKeysMercadosModel()#Traemos la lista de llaves
-            
-            mensaje= [1,'']
-            
-
-        except sqlite3.Error as ex:
-
-            mensaje= [0,f'Error al consultar llaves: {ex}']
-        
-        return listaLaves, mensaje
-    
-    def eliminarProductosController(self):
-
-        try:
-            objEliminarProductosController = Mercados(self.mercadoId
-                                            ,self.compraId
-                                            ,self.descCompra
-                                            ,self.facturaId
-                                            ,self.numeroFactura
-                                            ,self.productoId
-                                            ,self.nombreProducto
-                                            ,self.comercioId
-                                            ,self.cantidad
-                                            ,self.precioUnidad
-                                            ,self.precioTotal
-                                            ,self.opcion)
-            objEliminarProductosController.eliminarProductosModel()
-
-            mensaje = [1,'Fue eliminado el producto']
-        except sqlite3.Error as ex:
-            mensaje = [0,f'No es posible eliminar el producto: {ex}']
-        return mensaje
-    
-    
-    def consultarUltimosMercadosController(self):
-        #Consultamos los productos de la base de datos dependiendo la opción escogida 
-        mensaje=[]
-        
-        listaMercado=[]
-
-        try:
-            objMercadosModel = Mercados(self.mercadoId
-                                        ,self.compraId
-                                        ,self.descCompra
-                                        ,self.facturaId
-                                        ,self.numeroFactura
-                                        ,self.productoId
-                                        ,self.nombreProducto
-                                        ,self.comercioId
-                                        ,self.cantidad
-                                        ,self.precioUnidad
-                                        ,self.precioTotal
-                                        ,self.opcion
-                                        )
-            listaMercado = objMercadosModel.consultarUltimoMercado()
-            mensaje =[1]
-        except sqlite3.Error as ex:
-            mensaje = [0, f'No fue posible realizar la consulta: {ex}']
-        return mensaje, listaMercado 
+def eliminarMercado(mercadoId):
+    #Borra un ítem de mercados
+    try:
+        mercado(mercadoId).eliminarProductosModel()
+        return [1,'Fue eliminado el producto']
+    except sqlite3.Error as ex:
+        return [0,f'No es posible eliminar el producto: {ex}']

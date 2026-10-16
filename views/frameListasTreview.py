@@ -1,7 +1,7 @@
 from tkinter import ttk
 from customtkinter import CTkLabel,CTkFrame,set_appearance_mode,set_default_color_theme,CTkScrollbar,CTkScrollableFrame
 from views import configuracionesGenerales as conGen
-from controller.mercadosController import MercadosController
+from controller import mercadosController
 from views.frameTotal import WidgetsDatos
 
 class TreviewUltimoMercado(CTkFrame):
@@ -45,21 +45,7 @@ class TreviewUltimoMercado(CTkFrame):
                                    , foreground=[('selected',conGen.dicConfiguracionGeneralColores["bgGeneral"])])
 
     def crearTreview(self): 
-        objConsultarUltimoMercado = MercadosController( None
-                                                        ,None
-                                                        ,None
-                                                        ,None
-                                                        ,None
-                                                        ,None
-                                                        ,None
-                                                        ,None
-                                                        ,None
-                                                        ,None
-                                                        ,None
-                                                        ,None
-                                                        )
-
-        mensaje, self.listaProductos =  objConsultarUltimoMercado.consultarUltimosMercadosController()
+        self.listaProductos, mensaje = mercadosController.consultarUltimoMercado()
         
         self.fmPrincipal=CTkFrame(self
                                   ,fg_color=conGen.dicConfiguracionGeneralColores["fg_color"]

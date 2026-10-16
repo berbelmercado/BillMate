@@ -4,7 +4,7 @@ import sqlite3
 import pytest
 
 from controller import crearBdController
-from controller.mercadoTempController import MercadoTempController, fnCargarCompraController
+from controller import mercadoTempController
 from model import migraciones
 from model.crearTablasBd import CreacionBbBillMate
 from model.rutas import ruta_base_datos
@@ -155,10 +155,10 @@ def test_migrar_dos_veces_no_cambia_nada(bd_v0):
 
 def test_ids_temporales_siguen_reiniciandose_tras_migrar(bd_v0):
     crearBdController.existeBase()
-    agregar = lambda: MercadoTempController(None, 1, 1, 1, 1, '1', '100', '100').insertarMercadosTempController()
+    agregar = lambda: mercadoTempController.insertarMercadoTemp(1, 1, 1, 1, '1', '100', '100')
     agregar()
     agregar()
-    assert fnCargarCompraController()[0] == 1
+    assert mercadoTempController.cargarCompra()[0] == 1
 
     agregar()
 
@@ -168,7 +168,7 @@ def test_ids_temporales_siguen_reiniciandose_tras_migrar(bd_v0):
 
 def test_claves_foraneas_activas_en_la_app(bd):
     #El producto 99 no existe: SQLite rechaza la fila y el controlador devuelve el error
-    mensaje = MercadoTempController(None, 1, 1, 99, 1, '1', '100', '100').insertarMercadosTempController()
+    mensaje = mercadoTempController.insertarMercadoTemp(1, 1, 99, 1, '1', '100', '100')
     assert mensaje[0] == 0
     assert 'FOREIGN KEY constraint failed' in mensaje[1]
 

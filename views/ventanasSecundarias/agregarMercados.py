@@ -12,8 +12,7 @@ from views.ventanasSecundarias import consultarFacturas as conFacturas
 from views.ventanasSecundarias import consultarComercios as conCom
 from views.ventanasSecundarias import consultarCompras as conComp
 from views.frameTotal import WidgetsDatos
-from controller.mercadoTempController import MercadoTempController
-from controller.mercadoTempController import fnCargarCompraController
+from controller import mercadoTempController
 from controller.validaciones import convertirNumero, formatearNumero
 from views.messagebox import mensajesEmergentes as mss
 from views.vwImgConfig import leerImagen
@@ -124,17 +123,14 @@ class AgregarMercados(CTkToplevel):
             else:
                 cambioComercioId = i[3]
         
-        objEditarProductos = MercadoTempController(self.vrIdeMercadoTemp
-                                                   ,cambioCompraId
-                                                   ,cambioFacturaId
-                                                   ,cambioProductoId
-                                                   ,cambioComercioId
-                                                   ,self.etCantidadProducto.get()
-                                                   ,self.etPrecioUnidad.get()
-                                                   ,self.etPrecioTotal.get() 
-                                                   )
-
-        mensaje = objEditarProductos.actualizarProductosController()
+        mensaje = mercadoTempController.actualizarMercadoTemp(self.vrIdeMercadoTemp
+                                                              ,cambioCompraId
+                                                              ,cambioFacturaId
+                                                              ,cambioProductoId
+                                                              ,cambioComercioId
+                                                              ,self.etCantidadProducto.get()
+                                                              ,self.etPrecioUnidad.get()
+                                                              ,self.etPrecioTotal.get())
         
         if mensaje[0]==1:
             #Modificamos los checks buttons para que se limpien todos los campos 
@@ -307,18 +303,13 @@ class AgregarMercados(CTkToplevel):
     def execInsertarProductos(self):
         #Agrega la compra a tabla mercado temporal
         
-        mensaje= []
-        #print(f"compra {self.compraId} \n Factura {self.idFactura} \n producto {self.idProducto} \n comercio {self.comercioId}")
-        objInsertarProducto = MercadoTempController(None
-                                                    ,self.compraId
-                                                    ,self.idFactura
-                                                    ,self.idProducto
-                                                    ,self.comercioId
-                                                    ,self.etCantidadProducto.get()
-                                                    ,self.etPrecioUnidad.get()
-                                                    ,self.etPrecioTotal.get()
-                                                    )
-        mensaje = objInsertarProducto.insertarMercadosTempController()
+        mensaje = mercadoTempController.insertarMercadoTemp(self.compraId
+                                                            ,self.idFactura
+                                                            ,self.idProducto
+                                                            ,self.comercioId
+                                                            ,self.etCantidadProducto.get()
+                                                            ,self.etPrecioUnidad.get()
+                                                            ,self.etPrecioTotal.get())
 
         if mensaje[0]==1:
             self.obj_frame_total.destruirFrameTotal()
@@ -331,17 +322,7 @@ class AgregarMercados(CTkToplevel):
     
     def eliminarProductosTbTemporal(self):
         #Elimina los productos de la tabla temporal
-        objEliminarProductosTemp = MercadoTempController(self.vrIdeMercadoTemp
-                                                        ,None
-                                                        ,None
-                                                        ,None
-                                                        ,None
-                                                        ,None
-                                                        ,None
-                                                        ,None
-                                                        )
-        
-        mensaje = objEliminarProductosTemp.eliminarProductosTempController()
+        mensaje = mercadoTempController.eliminarMercadoTemp(self.vrIdeMercadoTemp)
 
 
         if mensaje[0] == 0:
@@ -355,11 +336,11 @@ class AgregarMercados(CTkToplevel):
 
     def execCargarCompra(self):
         #Cargamos el consolidado de la compra en la tabla mercados
-        estado = fnCargarCompraController()
+        estado = mercadoTempController.cargarCompra()
         if estado[0] ==1:
             mss.mensajeInformativo(estado[1])
             self.obj_frame_total.destruirFrameTotal()
-            self.fnLimpiar
+            self.fnLimpiar()
             self.productosAgregados()
 
             #Actualizamos frame ultimo mercado en la ventana principal
@@ -796,17 +777,8 @@ class AgregarMercados(CTkToplevel):
         mensaje = []
         self.listaProductos = []
 
-        #Creamos objeto para traer los productos que se van agregando
-        objConsultarProductosAgregados = MercadoTempController(None
-                                                               ,None
-                                                               ,None
-                                                               ,None
-                                                               ,None
-                                                               ,None
-                                                               ,None
-                                                               ,None
-                                                               )
-        self.listaProductos, mensaje = objConsultarProductosAgregados.consultarMercadoTempController()
+        #Traemos los productos que se van agregando
+        self.listaProductos, mensaje = mercadoTempController.consultarMercadoTemp()
 
         if mensaje[0]==0:
             mss.mensajeError(mensaje[1])
@@ -953,17 +925,7 @@ class AgregarMercados(CTkToplevel):
         self.listaLlaves = []
 
         #Funcionalidad para consultar las llaves
-        objConsultarLlaves = MercadoTempController(mercadoId
-                                                   ,None
-                                                   ,None
-                                                   ,None
-                                                   ,None
-                                                   ,None
-                                                   ,None
-                                                   ,None
-                                                   )
-
-        self.listaLlaves, mensaje = objConsultarLlaves.consultarKeysMercadosTempController()
+        self.listaLlaves, mensaje = mercadoTempController.consultarLlavesMercadoTemp(mercadoId)
 
         if mensaje[0]==0:
             mss.mensajeError(mensaje[1])

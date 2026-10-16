@@ -11,7 +11,7 @@ from views.ventanasSecundarias import consultarComercios as conCom
 from views.ventanasSecundarias import consultarCompras as conComp
 from views.frameTotal import WidgetsDatos
 from views.messagebox import mensajesEmergentes as msbx
-from controller.mercadosController import MercadosController
+from controller import mercadosController
 from views.vwImgConfig import  leerImagen
 from views.frameListasTreview import TreviewUltimoMercado
 
@@ -132,20 +132,7 @@ class ConsultarMercados(CTkToplevel):
         self.capturarDatos() #capturamos el dato según nuestra elección
         #instanciamos la clase
         try:
-            objConsultas = MercadosController(None
-                                            ,None
-                                            ,self.vrDescCompra
-                                            ,None
-                                            ,self.vrNumeroFactura
-                                            ,None
-                                            ,self.vrNombreProducto
-                                            ,None
-                                            ,None
-                                            ,None
-                                            ,None
-                                            ,self.opcion
-                                            )
-            mensaje,self.listaProductos = objConsultas.consultarMercadosController()
+            self.listaProductos, mensaje = mercadosController.consultarMercados(self.opcion, self.etIngresoDatos.get())
             
             if mensaje[0]==1:
                 for i in self.twConsultarProductos.get_children():
@@ -341,20 +328,14 @@ class ConsultarMercados(CTkToplevel):
             else:
                 cambioComercioId = i[3]
             
-        objEditarProductos = MercadosController(self.vrMercadoIdSelect
-                                                   ,cambioCompraId
-                                                   ,None
-                                                   ,cambioFacturaId
-                                                   ,None
-                                                   ,cambioProductoId
-                                                   ,None
-                                                   ,cambioComercioId
-                                                   ,self.etCantidadProducto.get()
-                                                   ,self.etPrecioUnidadProducto.get()
-                                                   ,self.etPrecioTotalProducto.get()
-                                                   ,None
-                                                   )
-        mensaje = objEditarProductos.actualizarProductosController()
+        mensaje = mercadosController.actualizarMercado(self.vrMercadoIdSelect
+                                                       ,cambioCompraId
+                                                       ,cambioFacturaId
+                                                       ,cambioProductoId
+                                                       ,cambioComercioId
+                                                       ,self.etCantidadProducto.get()
+                                                       ,self.etPrecioUnidadProducto.get()
+                                                       ,self.etPrecioTotalProducto.get())
         
         if mensaje[0]==1:
 
@@ -365,24 +346,11 @@ class ConsultarMercados(CTkToplevel):
 
     def fnEliminarProductos(self):
         #Función para eliminar los productos que seleccionemos en el entry
-        objEliminarProductos = MercadosController(self.vrMercadoIdSelect
-                                                  ,None
-                                                  ,None
-                                                  ,None
-                                                  ,None
-                                                  ,None
-                                                  ,None
-                                                  ,None
-                                                  ,None
-                                                  ,None
-                                                  ,None
-                                                  ,None
-                                                  )
-        mensaje = objEliminarProductos.eliminarProductosController()
+        mensaje = mercadosController.eliminarMercado(self.vrMercadoIdSelect)
 
         if mensaje[0]==1:
             msbx.mensajeInformativo(mensaje[1])
-            self.limpiarentrys
+            self.limpiarentrys()
             self.fnConsultas()
             #Actualizamos frame ultimo mercado en la ventana principal
             objActualizarUltimoMercado = TreviewUltimoMercado(self.master)
@@ -892,22 +860,9 @@ class ConsultarMercados(CTkToplevel):
     def consultarLaves(self, mercadoId):
         #Función que sonsulta las llaves para permitir la acutualización de los productos
 
-        #Instanciamos la clase 
-        objConsultarLaves = MercadosController( mercadoId
-                                                ,None
-                                                ,None
-                                                ,None
-                                                ,None
-                                                ,None
-                                                ,None
-                                                ,None
-                                                ,None
-                                                ,None
-                                                ,None
-                                                ,None
-                                              )
-        
-        self.listaKeys, mensaje = objConsultarLaves.consultarKeysMercadosController()
+        self.listaKeys, mensaje = mercadosController.consultarLlavesMercado(mercadoId)
+        if mensaje[0]==0:
+            msbx.mensajeError(mensaje[1])
 
 
     def seleccionarProductos(self,event):

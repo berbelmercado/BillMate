@@ -2,7 +2,7 @@ import pytest
 
 from controller.validaciones import esNumero, convertirNumero, formatearNumero
 from controller import facturasController
-from controller.mercadoTempController import MercadoTempController
+from controller import mercadoTempController
 
 
 @pytest.mark.parametrize('texto, esperado', [
@@ -46,16 +46,13 @@ def test_validar_campos_facturas(numero, valor, fecha, esperado):
     assert facturasController.validarCamposFactura(numero, valor, fecha) == esperado
 
 
-def mercado_temp(precioUnidad, precioTotal, compraId=1):
-    return MercadoTempController(None, compraId, 1, 1, 1, '1', precioUnidad, precioTotal)
-
-
-@pytest.mark.parametrize('precioUnidad, precioTotal, compraId, esperado', [
-    ('3500', '7000', 1, 1),
-    ('3500', '7000', None, 0),
-    ('12abc', '7000', 1, 2),
-    ('', '7000', 1, 2),
-    ('3500', '   ', 1, 3),
+@pytest.mark.parametrize('precioUnidad, precioTotal, compraId, productoId, esperado', [
+    ('3500', '7000', 1, 1, 1),
+    ('3500', '7000', None, 1, 0),
+    ('3500', '7000', 1, None, 0),
+    ('12abc', '7000', 1, 1, 2),
+    ('', '7000', 1, 1, 2),
+    ('3500', '   ', 1, 1, 3),
 ])
-def test_validacion_campos_mercado_temporal(precioUnidad, precioTotal, compraId, esperado):
-    assert mercado_temp(precioUnidad, precioTotal, compraId).validacionCamposMercadosController() == esperado
+def test_validacion_campos_mercado_temporal(precioUnidad, precioTotal, compraId, productoId, esperado):
+    assert mercadoTempController.validarCamposMercadoTemp(compraId, 1, productoId, 1, precioUnidad, precioTotal) == esperado
