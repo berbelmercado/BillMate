@@ -32,80 +32,32 @@ Opcional: crear un Release en GitHub desde la etiqueta `v1.9` y adjuntar `BillMa
 
 ---
 
-## Siguiente gran paso: rediseño de la pantalla de compra
+## Hecho después de la 1.9 (para la próxima versión)
 
-### Cómo funciona hoy (`views/ventanasSecundarias/agregarMercados.py`)
+### Rediseño de la pantalla de compra
 
-1. Antes de agregar ítems, la compra, la factura y los comercios o productos nuevos se registran por separado, cada uno en su ventana del menú principal.
-2. "Agregar Mercados" es una ventana fija de 1345×590, posicionada con `place()`.
-3. Por cada producto:
-   - el botón "Agregar Productos" abre una ventana de búsqueda;
-   - se busca el producto, se selecciona y se presiona "Cargar Producto";
-   - se escriben cantidad y precio, y Enter en el precio calcula el total;
-   - se presiona "Agregar".
-4. La factura, el comercio y la compra se eligen igual, con ventanas de búsqueda. Existen las casillas "Fijar Factura / Compra / Comercio" para no repetirlos.
-5. "Cargar Compra" pasa los ítems de `mercadosTemp` a `mercados`.
+"Agregar Mercados" abre ahora una sola ventana (`views/ventanasSecundarias/nuevaCompra.py`).
 
-Son unos 5 clics y una ventana extra por producto. Si el producto no existe, hay que salir a registrarlo.
+- Encabezado con compra, factura y comercio. Se eligen una vez con autocompletado y se pueden crear ahí mismo.
+- Línea de ingreso que se maneja con Enter, con el total sugerido.
+- Tabla con precios `$ 12.500`, edición con doble clic y borrado con Supr.
+- Cuadre con la factura en el pie.
+- Carga de la compra con Ctrl+Enter.
+- Distribución con `grid`; la ventana es redimensionable y cabe en 1366×768.
 
-### Propuesta
+| Fase | Commit |
+|---|---|
+| 1. Ids de lo creado, `formatearMoneda`, `cantidadNumerica`, `cuadreFacturas`, `preguntar` | `4044a74` |
+| 2. Pantalla nueva con `CampoAutocompletar`, línea de ingreso, tabla y carga | `ba41d05` |
+| 3. Cuadre en el pie, confirmación al cargar, retiro de `agregarMercados.py` | `3d70f5b` |
 
-```
-┌─ Nueva compra ───────────────────────────────────────────────┐
-│ Compra: [Quincena octubre    ]  Fecha: [2026-10-16]          │
-│ Comercio: [Éxito Cent▾]  Factura: [FE-1234]  Total: [$ 152.300]│
-├──────────────────────────────────────────────────────────────┤
-│ Producto: [arr▾        ] Cant: [2 ] Precio: [3.500 ] = $ 7.000 [+]│
-│           │ Arroz Diana   │                                  │
-│           │ Arroz Roa     │   ← autocompleta mientras escribe  │
-│           │ + Crear "arr" │   ← o lo crea ahí mismo            │
-├──────────────────────────────────────────────────────────────┤
-│ Producto        Cant   Precio unidad   Total                 │
-│ Arroz Diana     2      $ 3.500         $ 7.000               │
-│ Leche Alquería  6      $ 4.200         $ 25.200              │
-├──────────────────────────────────────────────────────────────┤
-│ Suma ítems: $ 148.900   Factura: $ 152.300   Faltan: $ 3.400 │
-│                                      [Cargar compra (Ctrl+↵)]│
-└──────────────────────────────────────────────────────────────┘
-```
+Decisiones tomadas:
 
-1. **Encabezado que se llena una vez:** compra, comercio y factura se eligen arriba al empezar. Tienen autocompletado y se pueden crear ahí mismo si no existen. La fecha viene con la de hoy. Reemplaza las casillas "Fijar" y las ventanas de búsqueda.
-2. **Línea de ingreso rápida:**
-   - el producto se autocompleta, con opción "Crear" si no existe;
-   - el total se recalcula solo;
-   - Enter pasa de campo en campo y, en el último, agrega el ítem y vuelve a "Producto".
-
-   Así una factura completa se registra sin mouse.
-3. **Tabla legible:**
-   - precios como `$ 12.500`;
-   - doble clic para editar y `Supr` para borrar, con confirmación;
-   - sin las columnas de factura, comercio y compra, que ya están en el encabezado.
-4. **Cuadre con la factura:** compara la suma de los ítems con `facturas.valorTotalFactura` y muestra la diferencia antes de cargar. Hoy ese total se guarda pero no se usa.
-5. **Ventana adaptable:** `grid()` con `weight` en lugar de `place()`, redimensionable. Debe funcionar en 1366×768 (la pantalla del autor) y con el escalado de Windows.
-
-### Cambios internos previstos
-
-- **Vistas:** casi todo el trabajo está aquí. El flujo `mercadosTemp` → `mercados` y sus pruebas no cambian.
-- **Modelos y controladores:** los `insertar...` de productos, comercios, facturas y compras deben devolver el id creado (`cursor.lastrowid`), para usarlo de inmediato en la compra.
-- **Búsquedas para el autocompletado:** ya existen (`consultarProductos`, `consultarComercioModel`, etc., con `LIKE`).
-- **Formato de moneda:** se puede apoyar en `controller/validaciones.py`, que ya tiene `convertirNumero` y `formatearNumero`.
-
-### Decisiones abiertas (definir antes de programar)
-
-- ¿El cuadre con la factura solo avisa o impide cargar la compra?
-- ¿Una compra puede tener varias facturas, por ejemplo de distintos comercios? Esto cambia el encabezado.
-- ¿"Agregar Mercados" se reemplaza o convive un tiempo con la pantalla nueva?
-- ¿Crear productos o comercios desde el autocompletado pide confirmación?
-- ¿Cómo se maneja la cantidad con unidades ("2 kg")? Hoy es texto libre y el total solo se calcula si es un número.
-
-### Forma de trabajo sugerida
-
-1. Escribir la especificación con las decisiones anteriores (Spec Kit o modo plan de Claude Code).
-2. Implementar en fases, cada una usable por sí sola:
-   1. Encabezado y autocompletado.
-   2. Teclado, formato de precios y cuadre con la factura.
-   3. Distribución adaptable con `grid()`.
-3. Después de cada fase: `python -m pytest`, prueba manual, commit y push.
+- El cuadre con la factura solo avisa: si no cuadra, al cargar pregunta "¿Cargar de todas formas?".
+- Se trabaja una factura por vez en el encabezado. Cada ítem conserva su factura, y el cuadre es por factura.
+- La pantalla nueva reemplazó a la anterior.
+- Crear productos, comercios, facturas o compras desde el autocompletado no pide confirmación. El comercio pide la dirección.
+- La cantidad sigue siendo texto libre. Si empieza con un número ("2", "0.8k"), el total sugerido es ese número × el precio. El total siempre se puede escribir a mano.
 
 ---
 
