@@ -36,7 +36,7 @@ Opcional: crear un Release en GitHub desde la etiqueta `v1.9` y adjuntar `BillMa
 
 ### Rediseño de la pantalla de compra
 
-"Agregar Mercados" abre ahora una sola ventana (`views/ventanasSecundarias/nuevaCompra.py`).
+"Agregar Mercados" es ahora una sola pantalla (hoy la página `views/paginas/compra.py`).
 
 - Encabezado con compra, factura y comercio. Se eligen una vez con autocompletado y se pueden crear ahí mismo.
 - Línea de ingreso que se maneja con Enter, con el total sugerido.
@@ -58,6 +58,28 @@ Decisiones tomadas:
 - La pantalla nueva reemplazó a la anterior.
 - Crear productos, comercios, facturas o compras desde el autocompletado no pide confirmación. El comercio pide la dirección.
 - La cantidad sigue siendo texto libre. Si empieza con un número ("2", "0.8k"), el total sugerido es ese número × el precio. El total siempre se puede escribir a mano.
+
+### Rediseño moderno de toda la aplicación
+
+Toda la aplicación funciona en una sola ventana. Una barra lateral fija muestra las páginas a la derecha:
+
+- **Inicio:** tarjetas de resumen (última compra, total, productos, gasto del mes) y la tabla de la última compra.
+- **Productos, Facturas, Comercios y Compras:** una página por dato que une lo que antes eran "Registrar" y "Consultar". Tiene buscador, tabla y un panel que crea un registro nuevo o edita el seleccionado.
+- **Mercados:** búsqueda por producto, factura o compra, edición con autocompletado y eliminación con confirmación.
+- **Agregar Mercados:** la pantalla de compra como página, con el selector de fecha nuevo; el calendario se abre con el botón o con un clic en el campo.
+
+| Cambio | Commit |
+|---|---|
+| Autocompletado sin demoras (la lista se cerraba sola y la ventana perdía la activación) y botón "Agregar" visible | `142c8ec` |
+| Pantalla de inicio rediseñada | `74c57d0` |
+| Resto de pantallas como páginas, componentes comunes y retiro de las ventanas viejas | `a2d42b8` |
+
+Decisiones tomadas:
+
+- Las pantallas se abren dentro de la ventana principal, no en ventanas aparte.
+- Registrar y consultar cada dato se hace en la misma página.
+
+Pendiente: el instalador todavía es la 1.9. Para llevar estos cambios a la app instalada hay que generar uno nuevo; por la magnitud del cambio se propone la versión 2.0.
 
 ---
 
