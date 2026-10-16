@@ -204,7 +204,6 @@ class AgregarMercados(CTkToplevel):
             self.etNumeroFactura.delete(0,'end')
             self.etNumeroFactura.insert(0, self.numeroFactura)
             self.etNumeroFactura.configure(state='disabled')
-            self.grab_set()
             self.focus()
             self.objConsultarFacura.destroy()#se destruye la ventana
 
@@ -245,7 +244,6 @@ class AgregarMercados(CTkToplevel):
             self.etNombreComercio.delete(0,'end')
             self.etNombreComercio.insert(0, self.nombreComercio)
             self.etNombreComercio.configure(state='disabled')
-            self.grab_set()
             self.focus()
             self.objConsutarComercios.destroy()#se destruye la ventana
 

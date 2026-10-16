@@ -86,7 +86,7 @@ class RegistrarFactura(CTkToplevel):
 
         if insertarFactura[0]==0 or insertarFactura[0]==2:
             mss.mensajeError(insertarFactura[1])
-            self.grab_set()
+            self.focus()
 
         if insertarFactura[0]==1:
             mss.mensajeInformativo(insertarFactura[1])

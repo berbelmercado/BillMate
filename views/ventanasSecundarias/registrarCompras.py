@@ -20,7 +20,8 @@ class RegistrarCompras(CTkToplevel):
 
         #definimos alto ancho y posición de la ventana
         self.geometry(f"{reCom['vnRegistrarCompraWidth']}x{reCom['vnRegistrarCompraHeight']}+{pos['vnRegistrarCompraX']}+{pos['vnRegistrarCompraY']}")
-        
+        self.title("Registrar Compras")
+
         #Importamos imagenes
         self.imgGuardar = CTkImage(dark_image=Image.open(leerImagen('Guardar')),size=(28,28))
         self.imgCancelar = CTkImage(dark_image=Image.open(leerImagen('Cancelar')),size=(28,28))
