@@ -149,6 +149,27 @@ def test_campos_vacios(bd):
     assert ProductosController(None, '   ').insertarProducto() == [0, 'No se admiten campos vacíos']
     assert ComprasController(None, '', None).insertarCompras()[0] == 0
     assert FacturaController(None, 'A1', '12abc', '2026/10/15').insertarFacturas()[0] == 2
+    assert ComerciosController(None, ' ', 'Calle 1').insertarComercios() == [0, 'No se admiten campos vacíos']
+    assert ComerciosController(1, 'Otro', '').modificarComerciosController() == [0, 'No se admiten campos vacíos']
+
+
+def test_listados_completos(bd):
+    registrar_datos_base()
+
+    assert ComerciosController(None, None, None).consultarListaComercios() == ([(1, "Tienda D'Luis", 'Calle 5 #3-2')], [1, ''])
+    assert FacturaController(None, None, None, None).consultarListaFacturas()[1] == [1, '']
+    assert ComprasController(None, None, None).consultarComprasRegistradasController()[1] == [1, '']
+
+
+def test_listados_devuelven_error_de_bd(bd, consultar):
+    consultar("DROP TABLE mercados")
+    consultar("DROP TABLE comercios")
+    consultar("DROP TABLE facturas")
+    consultar("DROP TABLE compras")
+
+    assert ComerciosController(None, None, None).consultarListaComercios() == ([], [0, 'No se pudo consultar los comercios: no such table: comercios'])
+    assert FacturaController(None, None, None, None).consultarListaFacturas() == ([], [0, 'No se pudo obtener información de las facturas: no such table: facturas'])
+    assert ComprasController(None, None, None).consultarComprasRegistradasController() == ([], [0, 'Error al consultar compras registradas: no such table: compras'])
 
 
 def test_error_de_bd_se_devuelve_como_mensaje(bd, consultar):

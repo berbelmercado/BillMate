@@ -48,7 +48,7 @@ class ComerciosController:
                               f'No se pudo insertar el comercio: {ex}']
         if estado==0:
             messagebox = [0, 
-                          'No se permiten campos vacíos... ponga bien esa mondá >.<']
+                          'No se admiten campos vacíos']
         
         return messagebox
     
@@ -61,10 +61,11 @@ class ComerciosController:
                                         ,None
                                         ,None)
             listaComercio = listadoComercio.consultarComercios()
+            mensaje = [1,'']
         except sqlite3.Error as ex:
-            print(f'Error al consultar comercios en la base de datos: {ex}')
-        
-        return listaComercio
+            mensaje = [0,f'No se pudo consultar los comercios: {ex}']
+
+        return listaComercio, mensaje
     
     def consultarComerciosController(self):
 
@@ -104,6 +105,6 @@ class ComerciosController:
                               f'No se pudo actualizar el comercio: {ex}']
         if estado==0:
             messagebox = [0, 
-                          'No se permiten campos vacíos... ponga bien esa mondá >.<']
+                          'No se admiten campos vacíos']
         
         return messagebox

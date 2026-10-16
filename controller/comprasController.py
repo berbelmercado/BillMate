@@ -61,11 +61,11 @@ class ComprasController():
                                             ,None)
             #Ejecutamos la consulta select y guardamos los registros en una lista
             listadoComprasRegistradas = objComprasRegistradas.buscarComprasRegistradas()
-
+            mensaje = [1,'']
         except sqlite3.Error as ex:
-            print(f'Error al consultar compras registradas: {ex}')
+            mensaje = [0,f'Error al consultar compras registradas: {ex}']
 
-        return listadoComprasRegistradas
+        return listadoComprasRegistradas, mensaje
     
     def consultarCompra(self):
         listadoCompra = []#Inicializamos variable 

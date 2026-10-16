@@ -245,7 +245,9 @@ class ConsultarCompras(CTkToplevel):
        objConsultaComprasRegistradas = ComprasController (None
                                                ,None
                                                ,None)
-       listadoComprasRegistradas=objConsultaComprasRegistradas.consultarComprasRegistradasController()
+       listadoComprasRegistradas, mensaje = objConsultaComprasRegistradas.consultarComprasRegistradasController()
+       if mensaje[0]==0:
+            msx.mensajeError(mensaje[1])
 
        #creación frame para treeview
        self.fmTreviewConsultarCompras= CTkFrame(self.frmGlobal

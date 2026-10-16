@@ -83,7 +83,9 @@ class ConsultarFacturas(CTkToplevel):
                                                ,None
                                                ,None)
           #recuperamos datos
-          listadoFacturas = objConsultaFacturas.consultarListaFacturas()
+          listadoFacturas, mensaje = objConsultaFacturas.consultarListaFacturas()
+          if mensaje[0]==0:
+               msbx.mensajeError(mensaje[1])
 
           return listadoFacturas
 

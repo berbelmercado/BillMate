@@ -70,10 +70,11 @@ class FacturaController:
                                      ,None
                                      ,None)
             listadoFacturas = listaFacturas.consultarListaFacturas()
+            mensaje = [1,'']
         except sqlite3.Error as ex:
-            print(f'No se pudo obtener información de las facturas: {ex}')
+            mensaje = [0,f'No se pudo obtener información de las facturas: {ex}']
 
-        return listadoFacturas
+        return listadoFacturas, mensaje
     
     def consultarFacturasController(self):
 

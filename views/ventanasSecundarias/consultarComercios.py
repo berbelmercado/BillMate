@@ -261,7 +261,9 @@ class ConsultarComercios(CTkToplevel):
        consultaComercios = ComerciosController(None
                                                ,None
                                                ,None)
-       listadoComercios=consultaComercios.consultarListaComercios()
+       listadoComercios, mensaje = consultaComercios.consultarListaComercios()
+       if mensaje[0]==0:
+            msx.mensajeError(mensaje[1])
 
        #creación frame para treeview
        self.fmTreviewConsultarComercios= CTkFrame(self
