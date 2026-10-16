@@ -1,6 +1,6 @@
 # BillMate: estado y próximos pasos
 
-Última actualización: 2026-10-16 (versión 1.9, etiqueta `v1.9`).
+Última actualización: 2026-10-16 (versión 2.0, etiqueta `v2.0`).
 
 ## Hecho en la versión 1.8
 
@@ -28,11 +28,9 @@
 | Controladores como funciones con parámetros (productos, comercios, facturas, compras, mercados), con varias correcciones de paso | `3205323`, `82dac4c`, `2daa39b`, `c45e451`, `8157db8` |
 | Versión 1.9 en el instalador (probado sobre una base de la 1.8) | `37352d8` |
 
-Opcional: crear un Release en GitHub desde la etiqueta `v1.9` y adjuntar `BillMate_windowns_setup.exe`.
-
 ---
 
-## Hecho después de la 1.9 (para la próxima versión)
+## Hecho en la versión 2.0
 
 ### Rediseño de la pantalla de compra
 
@@ -79,7 +77,14 @@ Decisiones tomadas:
 - Las pantallas se abren dentro de la ventana principal, no en ventanas aparte.
 - Registrar y consultar cada dato se hace en la misma página.
 
-Pendiente: el instalador todavía es la 1.9. Para llevar estos cambios a la app instalada hay que generar uno nuevo; por la magnitud del cambio se propone la versión 2.0.
+### Logo y versión 2.0
+
+| Cambio | Commit |
+|---|---|
+| Logo nuevo y nítido (bolsa de compras con "B"), generado por `config_setup/generar_logo.py` | `4b5109d` |
+| Versión 2.0 en el instalador (probado con una base nueva, con una de la 1.9 y con una de la 1.8) | `0f9d32c` |
+
+Opcional: crear un Release en GitHub desde la etiqueta `v2.0` y adjuntar `BillMate_windowns_setup.exe`.
 
 ---
 
