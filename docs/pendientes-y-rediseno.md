@@ -19,6 +19,7 @@
 | Mejora | Commit |
 |---|---|
 | Mensaje de campos vacíos en comercios corregido; los listados de comercios, facturas y compras muestran los errores de la base de datos | `4afadc3` |
+| Ventanas con `transient()` en lugar de `-topmost` (ya no quedan encima de otros programas); los mensajes salen sobre la ventana activa sin crear un `Tk()` nuevo | `c812960` |
 
 Pendiente de la 1.8: generar el instalador (auto-py-to-exe con `config_setup/auto-py-to-exe.json` y luego Inno Setup con `config_setup/config_setup.iss`). Opcional: crear un Release en GitHub desde la etiqueta `v1.8` y adjuntar `BillMate_windowns_setup.exe`.
 
@@ -108,7 +109,8 @@ Son unos 5 clics y una ventana extra por producto. Si el producto no existe, hay
 | Productos duplicados | Hay 5 nombres repetidos en `productos`, por ejemplo "Crema Dental" y "Salsa De Tomate". Se podría unificar con una migración y agregar `UNIQUE`. |
 | Fechas en dos formatos | `facturas.fechaFactura` usa `2024/09/07` y `compras.fechaCreacion` usa `2024-09-08`. Conviene unificar a `AAAA-MM-DD` con una migración. |
 | Base de datos en el historial de GitHub | Se dejó de versionar, pero los commits de 2024 aún tienen `database/BillMate.db`. Si contiene datos que no deben ser públicos, hay que reescribir el historial. |
-| Ventanas siempre encima | Todas las ventanas usan `-topmost` y quedan encima de otros programas. `mensajesEmergentes.py` crea un `Tk()` nuevo por mensaje. Lo correcto es `transient()` + `grab_set()`. |
+| Bloqueo de la ventana principal | En "Agregar Mercados", tras cargar una factura o un comercio se llama a `self.grab_set()`, y la ventana principal queda bloqueada hasta cerrarla. "Registrar Factura" hace lo mismo tras un error al guardar. |
+| Título faltante | La ventana "Registrar Compras" no tiene título y aparece como "CTkToplevel". |
 | Controladores con estado | Reciben todos los campos en el constructor y se instancian con muchos `None`. Se podrían simplificar a funciones con parámetros. |
 | Nombre de variable | La columna ya es `compras.descripcion`, pero en Python sigue `describcionCompra`. |
 | Git en esta carpeta | La carpeta pertenece a otro usuario de Windows. Para usar git desde la terminal o VS Code: `git config --global --add safe.directory D:/BillMate`. |
