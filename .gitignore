@@ -4,4 +4,5 @@ envBillMate/
 output/
 database/
 __pycache__/
+.pytest_cache/
 *.pyc

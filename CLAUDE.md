@@ -19,9 +19,13 @@ pip install -r librerias
 
 # Run the app
 python main.py
+
+# Tests (dev dependency: pip install -r requirements-dev.txt)
+python -m pytest                                    # all tests
+python -m pytest tests/test_controladores.py -k apostrofes   # one test
 ```
 
-There is no test suite, linter, or formatter configured.
+Tests call controllers/models directly (no GUI). The `bd` fixture in `tests/conftest.py` chdirs into `tmp_path` and builds the schema, so `ruta_base_datos()` resolves to a throwaway `./database/BillMate.db` and the real DB is never touched; `empaquetado` simulates a PyInstaller build (`sys.frozen`, `sys._MEIPASS`, `APPDATA`). No linter or formatter is configured.
 
 ### Packaging
 
