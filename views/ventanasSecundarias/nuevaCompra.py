@@ -494,20 +494,56 @@ class NuevaCompra(CTkToplevel):
         marco.grid(row=3, column=0, sticky='ew', padx=conNC["padX"], pady=conNC["padY"])
         marco.grid_columnconfigure(0, weight=1)
 
-        self.lbCuadre = CTkLabel(marco, text='', font=self.fuente(), text_color=conColor["ColorLetras"], anchor='w')
+        textos = CTkFrame(marco, fg_color=conColor["fg_color"])
+        textos.grid(row=0, column=0, sticky='w')
+        self.lbCuadre = CTkLabel(textos, text='', font=self.fuente(), text_color=conColor["ColorLetras"], anchor='w')
         self.lbCuadre.grid(row=0, column=0, sticky='w', padx=conNC["padX"])
+        self.lbDiferencia = CTkLabel(textos, text='', font=self.fuente(), anchor='w')
+        self.lbDiferencia.grid(row=0, column=1, sticky='w')
 
         self.grid_(self.boton(marco, 'Cerrar', self.destroy, conNC["btnPieWidth"], self.imagenCancelar), 0, 1)
         self.grid_(self.boton(marco, 'Cargar compra', self.cargarCompra, conNC["btnPieWidth"], self.imagenCargar), 0, 2)
 
     def actualizarPie(self):
+        #Ítems y suma de toda la compra en curso; cuadre solo con los ítems de la factura del encabezado
         suma = sum(fila[4] for fila in self.listaItems)
-        self.lbCuadre.configure(text=f'Ítems: {len(self.listaItems)}     Suma: {formatearMoneda(suma)}')
+        texto = f'Ítems: {len(self.listaItems)}     Suma: {formatearMoneda(suma)}'
+        diferencia = None
+
+        facturaId = self.campoFactura.valorId if hasattr(self, 'campoFactura') else None
+        if facturaId in self.facturas:
+            numero, totalFactura, fecha = self.facturas[facturaId]
+            filas, mensaje = mercadoTempController.cuadreFacturas()
+            sumaFactura = next((fila[2] for fila in filas if fila[0] == facturaId), 0)
+            diferencia = round(totalFactura - sumaFactura, 2)
+            texto += f'     Factura {numero}: {formatearMoneda(totalFactura)}     Diferencia:'
+
+        self.lbCuadre.configure(text=texto)
+        if diferencia is None:
+            self.lbDiferencia.configure(text='')
+        else:
+            self.lbDiferencia.configure(text=formatearMoneda(diferencia)
+                                        ,text_color=conNC["colorCuadreBien"] if diferencia == 0 else conNC["colorCuadreMal"])
+
+    def facturasSinCuadrar(self):
+        #Texto con las facturas de la compra en curso cuya suma de ítems no coincide con su total
+        filas, mensaje = mercadoTempController.cuadreFacturas()
+        if mensaje[0] == 0:
+            mss.mensajeError(mensaje[1])
+            return None
+        return [f'Factura {numero}: ítems {formatearMoneda(suma)}, total {formatearMoneda(total)}, diferencia {formatearMoneda(diferencia)}'
+                for facturaId, numero, suma, total, diferencia in filas if diferencia != 0]
 
     def cargarCompra(self):
-        #Pasa los ítems de la compra en curso a mercados
+        #Pasa los ítems de la compra en curso a mercados; si alguna factura no cuadra, primero pregunta
         if not self.listaItems:
             mss.mensajeError('No hay ítems para cargar')
+            return
+        sinCuadrar = self.facturasSinCuadrar()
+        if sinCuadrar is None:
+            return
+        if sinCuadrar and not mss.preguntar('Estas facturas no cuadran:\n\n' + '\n'.join(sinCuadrar)
+                                            + '\n\n¿Cargar la compra de todas formas?'):
             return
         mensaje = mercadoTempController.cargarCompra()
         if mensaje[0] == 0:

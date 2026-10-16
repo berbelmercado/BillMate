@@ -55,7 +55,7 @@ Colors, fonts, and widget sizes/positions are not hard-coded in widgets; they co
 
 ### Purchase workflow (mercadosTemp → mercados)
 
-Line items being entered in `agregarMercados.py` are first written to the staging table `mercadosTemp` (add/edit/delete freely). "Cargar compra" (`mercadoTempController.cargarCompra` → `cargarCompraModel`) copies all rows into `mercados`, deletes the staging rows, and resets the `mercadosTemp` autoincrement sequence. A `mercados` row links `compras` (a purchase batch), `facturas`, `productos`, and `comercios`.
+The "Agregar Mercados" menu button opens `views/ventanasSecundarias/nuevaCompra.py` (`NuevaCompra`). Its header (compra, factura, comercio) and product field use `campoAutocompletar.CampoAutocompletar`, which can also create missing records ("+ Crear", using the id returned by the `insertar*` functions). Line items are first written to the staging table `mercadosTemp` (add/edit/delete freely); each row keeps its own compra/factura/comercio. The footer compares the items of the header's factura with its total (`mercadoTempController.cuadreFacturas`). "Cargar compra" (button or Ctrl+Enter) asks for confirmation if any factura doesn't match, then `mercadoTempController.cargarCompra` → `cargarCompraModel` copies all rows into `mercados`, deletes the staging rows, and resets the `mercadosTemp` autoincrement sequence. A `mercados` row links `compras` (a purchase batch), `facturas`, `productos`, and `comercios`.
 
 ### Resource paths
 
