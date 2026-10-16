@@ -6,3 +6,4 @@ database/
 __pycache__/
 .pytest_cache/
 *.pyc
+BillMate_windowns_setup.exe
