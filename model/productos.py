@@ -12,9 +12,9 @@ class Productos:
     def insertarProductos(self):
             #Insertamos nuevo poducto
             conexion=con()
-            sql = f"""INSERT INTO productos VALUES ({'NULL'},'{self.nombreProducto}')
+            sql = """INSERT INTO productos VALUES (NULL, ?)
                 """
-            conexion.cursor.execute(sql)
+            conexion.cursor.execute(sql, (self.nombreProducto,))
             conexion.desconectar()
             estatus=0
 
@@ -40,9 +40,9 @@ class Productos:
 
          producto =[]
         #Sentencia sql
-         sql = f""" SELECT * FROM productos WHERE nombreProducto LIKE'%{self.nombreProducto}%'
+         sql = """ SELECT * FROM productos WHERE nombreProducto LIKE ?
                  """
-         conexion.cursor.execute(sql)#Ejecutamos consulta
+         conexion.cursor.execute(sql, (f'%{self.nombreProducto}%',))#Ejecutamos consulta
          producto = conexion.cursor.fetchall()#Listamos información
          conexion.desconectar()#Cerramos conexión
 
@@ -52,11 +52,11 @@ class Productos:
          #actualizamos un producto
          conexion = con()
          
-         sql =  f""" UPDATE productos 
-                  SET nombreProducto = '{self.nombreProducto}'
-                  WHERE productoId ={self.productoId}
+         sql =  """ UPDATE productos
+                  SET nombreProducto = ?
+                  WHERE productoId = ?
                 """
-         conexion.cursor.execute(sql)
+         conexion.cursor.execute(sql, (self.nombreProducto, self.productoId))
          conexion.desconectar()
          
         

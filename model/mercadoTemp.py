@@ -24,18 +24,16 @@ class MercadoTemp ():
 
         conexion = conn()#Abrimos conexion
 
-        sql = f"""  INSERT INTO mercadosTemp  VALUES({'NULL'}
-                                                     ,'{self.compraIdTemp}'
-                                                     ,'{self.facturaIdTemp}'
-                                                     ,'{self.productoIdTemp}'
-                                                     ,'{self.comercioIdTemp}'
-                                                     ,'{self.cantidadTemp}'
-                                                     ,'{self.precioUnidadTemp}'
-                                                     ,'{self.precioTotalTemp}'
-                                                     )
+        sql = """  INSERT INTO mercadosTemp  VALUES(NULL, ?, ?, ?, ?, ?, ?, ?)
                """
-        
-        conexion.cursor.execute(sql)#Ejecutamos consulta
+
+        conexion.cursor.execute(sql, (self.compraIdTemp
+                                      ,self.facturaIdTemp
+                                      ,self.productoIdTemp
+                                      ,self.comercioIdTemp
+                                      ,self.cantidadTemp
+                                      ,self.precioUnidadTemp
+                                      ,self.precioTotalTemp))#Ejecutamos consulta
 
         conexion.desconectar()#Cerramos conexión
     
@@ -77,17 +75,24 @@ class MercadoTemp ():
     def actualizarProductoTemporal(self):
         conexion= conn()
 
-        sql = f""" UPDATE mercadosTemp
-                   SET compraIdTemp = {self.compraIdTemp}
-                       ,facturaIdTemp =  {self.facturaIdTemp}
-                       ,productoIdTemp =  {self.productoIdTemp}
-                       ,comercioIdTemp =  {self.comercioIdTemp}
-                       ,cantidadTemp =  '{self.cantidadTemp}'
-                       ,precioUnidadTemp =  '{self.precioUnidadTemp}'
-                       ,precioTotalTemp =  '{self.precioTotalTemp}'
-                    WHERE mercadoIdTemp = {self.mercadoIdTemp}
+        sql = """ UPDATE mercadosTemp
+                   SET compraIdTemp = ?
+                       ,facturaIdTemp = ?
+                       ,productoIdTemp = ?
+                       ,comercioIdTemp = ?
+                       ,cantidadTemp = ?
+                       ,precioUnidadTemp = ?
+                       ,precioTotalTemp = ?
+                    WHERE mercadoIdTemp = ?
                """
-        conexion.cursor.execute(sql)
+        conexion.cursor.execute(sql, (self.compraIdTemp
+                                      ,self.facturaIdTemp
+                                      ,self.productoIdTemp
+                                      ,self.comercioIdTemp
+                                      ,self.cantidadTemp
+                                      ,self.precioUnidadTemp
+                                      ,self.precioTotalTemp
+                                      ,self.mercadoIdTemp))
 
         conexion.desconectar()
 
@@ -95,10 +100,10 @@ class MercadoTemp ():
         
         conexion = conn()
 
-        sql = f""" DELETE FROM mercadosTemp WHERE mercadoIdTemp = {self.mercadoIdTemp}
-               """     
-        
-        conexion.cursor.execute(sql)
+        sql = """ DELETE FROM mercadosTemp WHERE mercadoIdTemp = ?
+               """
+
+        conexion.cursor.execute(sql, (self.mercadoIdTemp,))
 
         conexion.desconectar()
 
@@ -114,9 +119,9 @@ class MercadoTemp ():
 		                  ,productoIdTemp
 		                  ,comercioIdTemp
                    FROM mercadosTemp 
-                   WHERE mercadoIdTemp ={self.mercadoIdTemp}
+                   WHERE mercadoIdTemp = ?
                """
-        conexion.cursor.execute(sql) #Ejecutamos consulta SQL
+        conexion.cursor.execute(sql, (self.mercadoIdTemp,)) #Ejecutamos consulta SQL
         
         listaLlaves = conexion.cursor.fetchall()
 

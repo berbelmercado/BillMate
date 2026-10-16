@@ -19,13 +19,11 @@ class Facturas:
             #se conecta a la base de datos
             conexion=con()
              #Se crea sentencia sql
-            sql = f"""INSERT INTO facturas VALUES ({'NULL'}
-                                                    ,'{self.numeroFactura}'
-                                                    ,'{self.valorTotalFactura}'
-                                                    ,'{self.fechaFactura}'
-                                                    )
+            sql = """INSERT INTO facturas VALUES (NULL, ?, ?, ?)
                 """
-            conexion.cursor.execute(sql) #Se ejecuta la consulta
+            conexion.cursor.execute(sql, (self.numeroFactura
+                                          ,self.valorTotalFactura
+                                          ,self.fechaFactura)) #Se ejecuta la consulta
             conexion.desconectar()  #Se cierra la conexión
 
     def consultarListaFacturas(self):
@@ -49,9 +47,9 @@ class Facturas:
 
          listaConsultaFacturas = []
 
-         sql = f""" SELECT * FROM facturas WHERE numeroFactura LIKE'%{self.numeroFactura}%' """
+         sql = """ SELECT * FROM facturas WHERE numeroFactura LIKE ? """
 
-         conexion.cursor.execute(sql)
+         conexion.cursor.execute(sql, (f'%{self.numeroFactura}%',))
 
          listaConsultaFacturas = conexion.cursor.fetchall()
 
@@ -63,14 +61,17 @@ class Facturas:
          
          conexion = con()#Conectamos con la base de datos
 
-         sql = f""" UPDATE facturas
-                    SET numeroFactura = '{self.numeroFactura}'
-                        ,valorTotalFactura = '{self.valorTotalFactura}'
-                        ,fechaFactura = '{self.fechaFactura}'
-                    WHERE facturaId = {self.facturaId}
+         sql = """ UPDATE facturas
+                    SET numeroFactura = ?
+                        ,valorTotalFactura = ?
+                        ,fechaFactura = ?
+                    WHERE facturaId = ?
                 """
 
-         conexion.cursor.execute(sql)
+         conexion.cursor.execute(sql, (self.numeroFactura
+                                       ,self.valorTotalFactura
+                                       ,self.fechaFactura
+                                       ,self.facturaId))
 
          conexion.desconectar()
 

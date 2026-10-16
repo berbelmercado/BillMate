@@ -44,6 +44,7 @@ class Mercados():
         
         conexion = conn()
 
+        #El nombre de la columna sale de la lista fija sqlOpciones; el texto buscado va como parámetro
         sql = f""" SELECT  mercados.mercadoId
                             ,productos.nombreProducto
                             ,mercados.cantidad
@@ -53,19 +54,19 @@ class Mercados():
                             ,facturas.fechaFactura
                             ,comercios.nombreComercio
                             ,compras.describcion
-                    FROM mercados 
+                    FROM mercados
                             INNER JOIN productos
                                 ON mercados.productoId = productos.productoId
-                            INNER JOIN facturas 
+                            INNER JOIN facturas
                                 ON mercados.facturaId = facturas.facturaId
                             INNER JOIN comercios
                                 ON mercados.comercioId = comercios.comercioId
                             INNER JOIN compras
                                 ON mercados.compraId = compras.idCompra
-                    WHERE {self.sqlOpciones[self.opcion]} like '%{self.sqlCampo[self.opcion]}%'
-                    ORDER BY mercados.mercadoId DESC 
+                    WHERE {self.sqlOpciones[self.opcion]} like ?
+                    ORDER BY mercados.mercadoId DESC
                """
-        conexion.cursor.execute(sql)
+        conexion.cursor.execute(sql, (f'%{self.sqlCampo[self.opcion]}%',))
         listaMercado =  conexion.cursor.fetchall()
         conexion.desconectar()
 
@@ -75,18 +76,25 @@ class Mercados():
 
         conexion = conn() #Abrimos conexión
         #Consulta SQL
-        sql = f""" UPDATE  mercados 
-                   SET compraId = {self.compraId}
-                       ,facturaId = {self.facturaId}
-                       ,productoId = {self.productoId}
-                       ,comercioId = {self.comercioId}
-                       ,cantidad = {self.cantidad}
-                       ,precioUnidad = {self.precioUnidad}
-                       ,precioTotal = {self.precioTotal}
-                   WHERE mercadoId = {self.mercadoId}
+        sql = """ UPDATE  mercados
+                   SET compraId = ?
+                       ,facturaId = ?
+                       ,productoId = ?
+                       ,comercioId = ?
+                       ,cantidad = ?
+                       ,precioUnidad = ?
+                       ,precioTotal = ?
+                   WHERE mercadoId = ?
                """
-    
-        conexion.cursor.execute(sql)
+
+        conexion.cursor.execute(sql, (self.compraId
+                                      ,self.facturaId
+                                      ,self.productoId
+                                      ,self.comercioId
+                                      ,self.cantidad
+                                      ,self.precioUnidad
+                                      ,self.precioTotal
+                                      ,self.mercadoId))
         conexion.desconectar()
 
     def consultarKeysMercadosModel(self):
@@ -96,14 +104,14 @@ class Mercados():
 
         conexion= conn() #Abrimos conexión
 
-        sql = f""" SELECT  compraId
+        sql = """ SELECT  compraId
 		                  ,facturaId
-		                  ,productoId	                  
+		                  ,productoId
                           ,comercioId
                    FROM mercados
-                   WHERE mercadoId = {self.mercadoId}
+                   WHERE mercadoId = ?
                """
-        conexion.cursor.execute(sql) #Ejecutamos consulta SQL
+        conexion.cursor.execute(sql, (self.mercadoId,)) #Ejecutamos consulta SQL
         
         listaLlaves = conexion.cursor.fetchall()
 
@@ -115,10 +123,10 @@ class Mercados():
 
         conexion = conn()
 
-        sql = f""" DELETE FROM mercados 
-                   WHERE mercadoId = {self.mercadoId}
+        sql = """ DELETE FROM mercados
+                   WHERE mercadoId = ?
                """
-        conexion.cursor.execute(sql)
+        conexion.cursor.execute(sql, (self.mercadoId,))
         conexion.desconectar()
     
     def consultarUltimoMercado(self):

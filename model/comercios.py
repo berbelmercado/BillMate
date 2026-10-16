@@ -15,12 +15,9 @@ class Comercios:
         conexion = conn()  # Conexión a la base de datos
 
         # Sentencia SQL
-        sql = f""" INSERT INTO comercios VALUES ({'NULL'}
-                                                ,'{self.nombreComercio}'
-                                                ,'{self.direccionComercio}'
-                                                )
+        sql = """ INSERT INTO comercios VALUES (NULL, ?, ?)
               """
-        conexion.cursor.execute(sql)  # Se ejecuta la consulta
+        conexion.cursor.execute(sql, (self.nombreComercio, self.direccionComercio))  # Se ejecuta la consulta
 
         conexion.desconectar()  # Cerramos conexión
 
@@ -44,9 +41,9 @@ class Comercios:
 
         listaComercios = []
 
-        sql = f""" SELECT * FROM comercios WHERE nombreComercio LIKE'%{self.nombreComercio}%' """
+        sql = """ SELECT * FROM comercios WHERE nombreComercio LIKE ? """
 
-        conexion.cursor.execute(sql)  # Ejecutamos consulta SQL
+        conexion.cursor.execute(sql, (f'%{self.nombreComercio}%',))  # Ejecutamos consulta SQL
         listaComercios = conexion.cursor.fetchall()  # Recuperamos los datos
         conexion.desconectar()
 
@@ -56,10 +53,10 @@ class Comercios:
         # Método para modificar comercios
         conexion = conn()
 
-        sql = f"""  UPDATE comercios
-                    SET nombreComercio = '{self.nombreComercio}'
-                       ,direccionComercio = '{self.direccionComercio}'
-                    WHERE  comercioId = {self.comercioId}
+        sql = """  UPDATE comercios
+                    SET nombreComercio = ?
+                       ,direccionComercio = ?
+                    WHERE  comercioId = ?
                 """
-        conexion.cursor.execute(sql)
+        conexion.cursor.execute(sql, (self.nombreComercio, self.direccionComercio, self.comercioId))
         conexion.desconectar()

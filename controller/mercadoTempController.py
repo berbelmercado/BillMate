@@ -1,6 +1,7 @@
 import sqlite3
 from model.mercadoTemp import MercadoTemp
 from model.mercadoTemp import cargarCompraModel
+from controller.validaciones import esNumero
 
 class MercadoTempController():
 
@@ -191,11 +192,3 @@ def fnCargarCompraController():
         mensaje = [0,f'No fue posible cargar la compra Error: {ex}']
 
     return mensaje
-
-def esNumero(texto):
-    #Devuelve True si el texto se puede convertir a número (vacío, espacios o letras no)
-    try:
-        float(texto)
-        return True
-    except (TypeError, ValueError):
-        return False

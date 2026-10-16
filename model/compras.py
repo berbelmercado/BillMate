@@ -13,12 +13,9 @@ class Compras:
         conexion = conn()
 
         # sentencia SQL
-        sql = f""" INSERT INTO compras VALUES ({'NULL'}
-                                                ,'{self.describcionCompra}'
-                                                ,'{self.fechaCreacionCompra}'
-                                                )
+        sql = """ INSERT INTO compras VALUES (NULL, ?, ?)
              """
-        conexion.cursor.execute(sql)  # Ejecutamos la sentencia
+        conexion.cursor.execute(sql, (self.describcionCompra, self.fechaCreacionCompra))  # Ejecutamos la sentencia
 
         conexion.desconectar()  # Cerramos conexion
 
@@ -47,10 +44,10 @@ class Compras:
         conexion = conn()  # Abrimos la conexión a la bd
 
         # Consulta SQL
-        sql = f""" SELECT * FROM compras WHERE describcion LIKE '%{self.describcionCompra}%'
+        sql = """ SELECT * FROM compras WHERE describcion LIKE ?
               """
 
-        conexion.cursor.execute(sql)
+        conexion.cursor.execute(sql, (f'%{self.describcionCompra}%',))
         listadoCompras = conexion.cursor.fetchall()
 
         conexion.desconectar()
@@ -62,10 +59,10 @@ class Compras:
 
         conexion = conn()  # Abrimos conexión
 
-        sql = f""" UPDATE compras 
-                   SET describcion = '{self.describcionCompra}'
-                   WHERE idCompra = {self.idCompra}                
+        sql = """ UPDATE compras
+                   SET describcion = ?
+                   WHERE idCompra = ?
                    """
-        conexion.cursor.execute(sql)  # Ejecutamos consulta sql
+        conexion.cursor.execute(sql, (self.describcionCompra, self.idCompra))  # Ejecutamos consulta sql
 
         conexion.desconectar()  # Cerramos conexión

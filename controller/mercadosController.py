@@ -1,5 +1,6 @@
 import sqlite3
 from model.mercados import Mercados
+from controller.validaciones import esNumero
 
 class MercadosController():
     def __init__(self
@@ -61,6 +62,15 @@ class MercadosController():
     def actualizarProductosController(self):
 
         mensaje = []
+
+        #Validamos los precios antes de actualizar
+        if not esNumero(self.precioUnidad):
+            return [0, 'El campo "Precio unidad" no es válido']
+        if not esNumero(self.precioTotal):
+            return [0, 'El campo "Precio Total" no es válido']
+
+        self.precioUnidad = float(self.precioUnidad)
+        self.precioTotal = float(self.precioTotal)
 
         try:
             #Objeto
