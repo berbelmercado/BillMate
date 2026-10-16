@@ -25,6 +25,7 @@
 | Fechas de factura en `AAAA-MM-DD` como las de compras (migración 2 y calendarios) | `f156889` |
 | Una escritura fallida ya no deja la base bloqueada ("database is locked") | `3faa6d1` |
 | Productos duplicados unidos (migración 3) y nombre de producto único | `c06dd36` |
+| Controladores como funciones con parámetros (productos, comercios, facturas, compras, mercados), con varias correcciones de paso | `3205323`, `82dac4c`, `2daa39b`, `c45e451`, `8157db8` |
 
 Pendiente de la 1.8: generar el instalador (auto-py-to-exe con `config_setup/auto-py-to-exe.json` y luego Inno Setup con `config_setup/config_setup.iss`). Opcional: crear un Release en GitHub desde la etiqueta `v1.8` y adjuntar `BillMate_windowns_setup.exe`.
 
@@ -112,5 +113,4 @@ Son unos 5 clics y una ventana extra por producto. Si el producto no existe, hay
 | Tema | Detalle |
 |---|---|
 | Base de datos en el historial de GitHub | Se dejó de versionar, pero los commits de 2024 aún tienen `database/BillMate.db`. Si contiene datos que no deben ser públicos, hay que reescribir el historial. |
-| Controladores con estado | Reciben todos los campos en el constructor y se instancian con muchos `None`. Se podrían simplificar a funciones con parámetros. |
 | Git en esta carpeta | La carpeta pertenece a otro usuario de Windows. Para usar git desde la terminal o VS Code: `git config --global --add safe.directory D:/BillMate`. |
