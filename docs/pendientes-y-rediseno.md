@@ -1,6 +1,6 @@
 # BillMate: estado y próximos pasos
 
-Última actualización: 2026-10-16 (versión 1.8, etiqueta `v1.8`).
+Última actualización: 2026-10-16 (versión 1.9, etiqueta `v1.9`).
 
 ## Hecho en la versión 1.8
 
@@ -14,7 +14,7 @@
 | Precios con formato colombiano (`12.500` = 12500) | `fa30395` |
 | Versión 1.8 en el instalador | `dfb8125` |
 
-## Hecho después de la 1.8
+## Hecho en la versión 1.9
 
 | Mejora | Commit |
 |---|---|
@@ -26,8 +26,9 @@
 | Una escritura fallida ya no deja la base bloqueada ("database is locked") | `3faa6d1` |
 | Productos duplicados unidos (migración 3) y nombre de producto único | `c06dd36` |
 | Controladores como funciones con parámetros (productos, comercios, facturas, compras, mercados), con varias correcciones de paso | `3205323`, `82dac4c`, `2daa39b`, `c45e451`, `8157db8` |
+| Versión 1.9 en el instalador (probado sobre una base de la 1.8) | `37352d8` |
 
-Pendiente de la 1.8: generar el instalador (auto-py-to-exe con `config_setup/auto-py-to-exe.json` y luego Inno Setup con `config_setup/config_setup.iss`). Opcional: crear un Release en GitHub desde la etiqueta `v1.8` y adjuntar `BillMate_windowns_setup.exe`.
+Opcional: crear un Release en GitHub desde la etiqueta `v1.9` y adjuntar `BillMate_windowns_setup.exe`.
 
 ---
 
