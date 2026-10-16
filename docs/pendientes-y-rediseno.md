@@ -22,6 +22,7 @@
 | Ventanas con `transient()` en lugar de `-topmost` (ya no quedan encima de otros programas); los mensajes salen sobre la ventana activa sin crear un `Tk()` nuevo | `c812960` |
 | La ventana principal ya no queda bloqueada tras cargar factura o comercio en "Agregar Mercados" ni tras un error en "Registrar Factura"; "Registrar Compras" tiene título | `322d189` |
 | Errata `describcion` corregida a `descripcion` en el código y en los textos de pantalla | `d8fd28f` |
+| Fechas de factura en `AAAA-MM-DD` como las de compras (migración 2 y calendarios) | `f156889` |
 
 Pendiente de la 1.8: generar el instalador (auto-py-to-exe con `config_setup/auto-py-to-exe.json` y luego Inno Setup con `config_setup/config_setup.iss`). Opcional: crear un Release en GitHub desde la etiqueta `v1.8` y adjuntar `BillMate_windowns_setup.exe`.
 
@@ -109,7 +110,6 @@ Son unos 5 clics y una ventana extra por producto. Si el producto no existe, hay
 | Tema | Detalle |
 |---|---|
 | Productos duplicados | Hay 5 nombres repetidos en `productos`, por ejemplo "Crema Dental" y "Salsa De Tomate". Se podría unificar con una migración y agregar `UNIQUE`. |
-| Fechas en dos formatos | `facturas.fechaFactura` usa `2024/09/07` y `compras.fechaCreacion` usa `2024-09-08`. Conviene unificar a `AAAA-MM-DD` con una migración. |
 | Base de datos en el historial de GitHub | Se dejó de versionar, pero los commits de 2024 aún tienen `database/BillMate.db`. Si contiene datos que no deben ser públicos, hay que reescribir el historial. |
 | Controladores con estado | Reciben todos los campos en el constructor y se instancian con muchos `None`. Se podrían simplificar a funciones con parámetros. |
 | Git en esta carpeta | La carpeta pertenece a otro usuario de Windows. Para usar git desde la terminal o VS Code: `git config --global --add safe.directory D:/BillMate`. |
