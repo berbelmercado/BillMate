@@ -1,5 +1,5 @@
 """Pruebas de controladores y modelos contra una base SQLite temporal."""
-from controller.productosController import ProductosController
+from controller import productosController
 from controller.comerciosController import ComerciosController
 from controller.facturasController import FacturaController
 from controller.comprasController import ComprasController
@@ -11,8 +11,8 @@ OPCION_PRODUCTO, OPCION_FACTURA, OPCION_COMPRA = 0, 1, 2
 
 def registrar_datos_base():
     #Producto, comercio, factura y compra con apóstrofes (id 1 en cada tabla)
-    assert ProductosController(None, "D'onofrio").insertarProducto()[0] == 1
-    assert ProductosController(None, 'Arroz').insertarProducto()[0] == 1
+    assert productosController.insertarProducto("D'onofrio")[0] == 1
+    assert productosController.insertarProducto('Arroz')[0] == 1
     assert ComerciosController(None, "Tienda D'Luis", 'Calle 5 #3-2').insertarComercios()[0] == 1
     assert FacturaController(None, "fe'001", '12500', '2026-10-15').insertarFacturas()[0] == 1
     assert ComprasController(None, "Mercado 'quincena'", '2026-10-15').insertarCompras()[0] == 1
@@ -40,7 +40,7 @@ def cargar_una_compra():
 def test_registro_y_busqueda_con_apostrofes(bd):
     registrar_datos_base()
 
-    assert ProductosController(None, "d'on").consultarProductos() == ([(1, "D'Onofrio")], [1])
+    assert productosController.consultarProductos("d'on") == ([(1, "D'Onofrio")], [1])
     assert ComerciosController(None, "d'l", None).consultarComerciosController()[0] == [(1, "Tienda D'Luis", 'Calle 5 #3-2')]
     assert FacturaController(None, "FE'", None, None).consultarFacturasController()[0] == [(1, "FE'001", 12500.0, '2026-10-15')]
     assert ComprasController(None, "'quin", None).consultarCompra()[0] == [(1, "Mercado 'Quincena'", '2026-10-15')]
@@ -48,13 +48,13 @@ def test_registro_y_busqueda_con_apostrofes(bd):
 
 def test_busqueda_con_comodin_no_rompe(bd):
     registrar_datos_base()
-    assert ProductosController(None, '%').consultarProductos()[1] == [1]
+    assert productosController.consultarProductos('%')[1] == [1]
 
 
 def test_modificar_registros(bd, consultar):
     registrar_datos_base()
 
-    assert ProductosController(1, "pan d'bono").editarProductos()[0] == 1
+    assert productosController.editarProducto(1, "pan d'bono")[0] == 1
     assert ComerciosController(1, 'Otro', 'Calle 1').modificarComerciosController()[0] == 1
     assert FacturaController(1, 'fe002', '9900', '2026-10-16').modificarFacturas()[0] == 1
     assert ComprasController(1, 'mercado mes', None).modificarCompra()[0] == 1
@@ -146,7 +146,7 @@ def test_precios_con_separador_de_miles_se_guardan_bien(bd, consultar):
 # --- Errores de base de datos llegan como mensaje ---
 
 def test_campos_vacios(bd):
-    assert ProductosController(None, '   ').insertarProducto() == [0, 'No se admiten campos vacíos']
+    assert productosController.insertarProducto('   ') == [0, 'No se admiten campos vacíos']
     assert ComprasController(None, '', None).insertarCompras()[0] == 0
     assert FacturaController(None, 'A1', '12abc', '2026-10-15').insertarFacturas()[0] == 2
     assert ComerciosController(None, ' ', 'Calle 1').insertarComercios() == [0, 'No se admiten campos vacíos']
@@ -156,9 +156,9 @@ def test_campos_vacios(bd):
 def test_productos_repetidos_no_se_admiten(bd, consultar):
     registrar_datos_base()
 
-    assert ProductosController(None, '  arroz ').insertarProducto() == [0, 'Ya existe un producto llamado "Arroz"']
-    assert ProductosController(2, "d'onofrio").editarProductos() == [0, 'Ya existe un producto llamado "D\'Onofrio"']
-    assert ProductosController(2, 'arroz').editarProductos()[0] == 1
+    assert productosController.insertarProducto('  arroz ') == [0, 'Ya existe un producto llamado "Arroz"']
+    assert productosController.editarProducto(2, "d'onofrio") == [0, 'Ya existe un producto llamado "D\'Onofrio"']
+    assert productosController.editarProducto(2, 'arroz')[0] == 1
     assert consultar("SELECT COUNT(*) FROM productos") == [(2,)]
 
 
@@ -185,5 +185,5 @@ def test_error_de_bd_se_devuelve_como_mensaje(bd, consultar):
     consultar("DROP TABLE productos")
     consultar("DROP TABLE mercados")
 
-    assert ProductosController(None, 'Arroz').insertarProducto() == [0, 'No se insertó el producto: no such table: productos']
+    assert productosController.insertarProducto('Arroz') == [0, 'No se insertó el producto: no such table: productos']
     assert mercados(1).eliminarProductosController() == [0, 'No es posible eliminar el producto: no such table: mercados']

@@ -6,7 +6,7 @@ from views.ventanasSecundarias.configuracionVentanasSecundarias import dicConfig
 from views.configuracionesGenerales import dicConfiguracionGeneralColores as conColores
 from views.configuracionesGenerales import dicConfiguracionGeneralFuentes as conFuentes
 from views.configuracionesGenerales import dicConfig as conMaus
-from controller.productosController import ProductosController
+from controller import productosController
 from views.messagebox import mensajesEmergentes as msbx
 from views.vwImgConfig import  leerImagen
 
@@ -38,8 +38,7 @@ class ConsultarProductos(CTkToplevel):
     def fnModificarProducto(self):
         #Funcionalidad para modificación de producto
         #declaramos objeto
-        objProducto = ProductosController(self.productoId,self.etNombreProducto.get())
-        mensaje = objProducto.editarProductos()
+        mensaje = productosController.editarProducto(self.productoId,self.etNombreProducto.get())
 
         if mensaje[0]==1:
             self.etNombreProducto.delete(0,'end')
@@ -65,11 +64,7 @@ class ConsultarProductos(CTkToplevel):
 
     def consultarProductos(self):
         #consulta Lista de productos existentes en la bd y los envía a la función twConsultarProducto
-        listadoProductos = []
-       #Declaramos objeto
-        consultaProductos = ProductosController(None
-                                               ,None)
-        listadoProductos,mensaje= consultaProductos.consultarListaProducto()#llamamos función desde el controlador
+        listadoProductos,mensaje= productosController.consultarListaProductos()#llamamos función desde el controlador
 
         if mensaje[0]==0:
             msbx.mensajeError(mensaje[1])
@@ -79,11 +74,7 @@ class ConsultarProductos(CTkToplevel):
 
     def fnBuscarProducto(self):
          #Funcionalidad botón buscar
-         productos = ProductosController(None
-                                         ,self.etIngresarNombreProducto.get()) #Creamos el objeto
-
-
-         listaProducto,mensaje = productos.consultarProductos() #llamamos al método consultar producto
+         listaProducto,mensaje = productosController.consultarProductos(self.etIngresarNombreProducto.get()) #llamamos al método consultar producto
 
          if mensaje[0]==1:
             #Borramos la información insertada en la tabla

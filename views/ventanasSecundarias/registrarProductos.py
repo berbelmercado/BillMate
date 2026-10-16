@@ -5,7 +5,7 @@ from views.configuracionesGenerales import dicConfiguracionGeneralColores as con
 from views.configuracionesGenerales import dicConfiguracionGeneralFuentes as conFuente
 from views.configuracionesGenerales import dicConfig as conMaus
 from views.vwImgConfig import leerImagen
-from controller.productosController import ProductosController
+from controller import productosController
 from views.messagebox import mensajesEmergentes as msbx
 
 
@@ -33,10 +33,7 @@ class RegistrarProductos(CTkToplevel):
         self.destroy()
 
     def btnGuardar(self):
-        productos = ProductosController(None
-                              ,self.etIngresarNombreProducto.get()
-                              )
-        mensaje=productos.insertarProducto()
+        mensaje=productosController.insertarProducto(self.etIngresarNombreProducto.get())
         if mensaje[0]==1:
             msbx.mensajeInformativo(mensaje[1])
         if mensaje[0]==0:
