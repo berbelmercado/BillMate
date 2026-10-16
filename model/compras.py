@@ -16,8 +16,10 @@ class Compras:
         sql = """ INSERT INTO compras VALUES (NULL, ?, ?)
              """
         conexion.cursor.execute(sql, (self.descripcionCompra, self.fechaCreacionCompra))  # Ejecutamos la sentencia
+        idCompra = conexion.cursor.lastrowid  # id de la compra creada
 
         conexion.desconectar()  # Cerramos conexion
+        return idCompra
 
     def buscarComprasRegistradas(self):
         # Función para buscar todas las compras registradas

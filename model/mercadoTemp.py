@@ -129,6 +129,26 @@ class MercadoTemp ():
 
         return listaLlaves
 
+def cuadreFacturasModel():
+    #Por cada factura con ítems en la compra en curso: id, número, suma de los ítems y total de la factura
+    conexion = conn()
+
+    sql = """ SELECT facturas.facturaId
+                     ,facturas.numeroFactura
+                     ,SUM(mercadosTemp.precioTotalTemp)
+                     ,facturas.valorTotalFactura
+              FROM mercadosTemp
+                     INNER JOIN facturas
+                         ON mercadosTemp.facturaIdTemp = facturas.facturaId
+              GROUP BY facturas.facturaId
+              ORDER BY MIN(mercadosTemp.mercadoIdTemp)
+          """
+    conexion.cursor.execute(sql)
+    filas = conexion.cursor.fetchall()
+    conexion.desconectar()
+
+    return filas
+
 def cargarCompraModel():
     #Carga a la tabla mercados los productos de la tabla mercados temporal
     conexion =conn()

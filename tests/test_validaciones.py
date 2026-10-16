@@ -1,6 +1,6 @@
 import pytest
 
-from controller.validaciones import esNumero, convertirNumero, formatearNumero
+from controller.validaciones import esNumero, convertirNumero, formatearNumero, formatearMoneda, cantidadNumerica
 from controller import facturasController
 from controller import mercadoTempController
 
@@ -33,6 +33,32 @@ def test_es_numero_rechaza_lo_demas(texto):
 def test_formatear_numero_se_vuelve_a_leer_igual(valor, texto):
     assert formatearNumero(valor) == texto
     assert convertirNumero(texto) == round(valor, 2)
+
+
+@pytest.mark.parametrize('valor, texto', [
+    (12500, '$ 12.500'),
+    (12500.5, '$ 12.500,50'),
+    (1250000.0, '$ 1.250.000'),
+    (0, '$ 0'),
+    (999.999, '$ 1.000'),
+    (-3400, '-$ 3.400'),
+])
+def test_formatear_moneda(valor, texto):
+    assert formatearMoneda(valor) == texto
+
+
+@pytest.mark.parametrize('texto, esperado', [
+    ('2', 2),
+    ('0.8k', 0.8),
+    ('1.558k', 1.558),       #en cantidades el punto es decimal, no separador de miles
+    ('1,5 kg', 1.5),
+    (' 3 und', 3),
+    ('media', None),
+    ('', None),
+    (None, None),
+])
+def test_cantidad_numerica(texto, esperado):
+    assert cantidadNumerica(texto) == esperado
 
 
 @pytest.mark.parametrize('numero, valor, fecha, esperado', [

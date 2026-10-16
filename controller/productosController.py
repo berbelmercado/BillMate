@@ -14,8 +14,8 @@ def insertarProducto(nombreProducto):
         return [0,'No se admiten campos vacíos']
 
     try:
-        Productos(None, nombreProducto).insertarProductos()
-        return [1,'Se insertó el producto correctamente']
+        productoId = Productos(None, nombreProducto).insertarProductos()
+        return [1,'Se insertó el producto correctamente', productoId]
     except sqlite3.IntegrityError:
         return [0, f'Ya existe un producto llamado "{nombreProducto}"']
     except sqlite3.Error as ex:

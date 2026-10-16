@@ -18,8 +18,10 @@ class Comercios:
         sql = """ INSERT INTO comercios VALUES (NULL, ?, ?)
               """
         conexion.cursor.execute(sql, (self.nombreComercio, self.direccionComercio))  # Se ejecuta la consulta
+        comercioId = conexion.cursor.lastrowid  # id del comercio creado
 
         conexion.desconectar()  # Cerramos conexión
+        return comercioId
 
     def consultarComercios(self):
         # Se consultan todos los comercios registrados

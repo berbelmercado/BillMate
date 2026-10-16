@@ -16,8 +16,8 @@ def insertarCompra(descripcionCompra, fechaCreacionCompra):
         return [0, EN_BLANCO]
 
     try:
-        Compras(None, descripcionCompra, fechaCreacionCompra).insertarCompras()
-        return [1,'Se insertó correctamente la compra']
+        idCompra = Compras(None, descripcionCompra, fechaCreacionCompra).insertarCompras()
+        return [1,'Se insertó correctamente la compra', idCompra]
     except sqlite3.Error as ex:
         return [0,f'Error al insertar la compra: {ex}']
 

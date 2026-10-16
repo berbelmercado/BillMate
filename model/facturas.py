@@ -24,7 +24,9 @@ class Facturas:
             conexion.cursor.execute(sql, (self.numeroFactura
                                           ,self.valorTotalFactura
                                           ,self.fechaFactura)) #Se ejecuta la consulta
+            facturaId = conexion.cursor.lastrowid #id de la factura creada
             conexion.desconectar()  #Se cierra la conexión
+            return facturaId
 
     def consultarListaFacturas(self):
         #Creamos conexión

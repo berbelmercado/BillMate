@@ -171,6 +171,29 @@ def test_productos_repetidos_no_se_admiten(bd, consultar):
     assert consultar("SELECT COUNT(*) FROM productos") == [(2,)]
 
 
+def test_insertar_devuelve_el_id_creado(bd):
+    assert productosController.insertarProducto('Arroz') == [1, 'Se insertó el producto correctamente', 1]
+    assert productosController.insertarProducto('Leche')[2] == 2
+    assert comerciosController.insertarComercio('Exito', 'Calle 1')[2] == 1
+    assert facturasController.insertarFactura('fe1', '100', '2026-10-16')[2] == 1
+    assert comprasController.insertarCompra('Quincena', '2026-10-16')[2] == 1
+
+
+def test_cuadre_por_factura(bd):
+    registrar_datos_base()  #factura 1 por 12.500
+    assert facturasController.insertarFactura('fe2', '5.000', '2026-10-16')[0] == 1
+    assert agregar_temp()[0] == 1  #7.000
+    assert agregar_temp(productoId=2, cantidad='1', precioUnidad='1200', precioTotal='1200')[0] == 1
+    assert mercadoTempController.insertarMercadoTemp(1, 2, 1, 1, '1', '5000', '5000')[0] == 1
+
+    assert mercadoTempController.cuadreFacturas() == ([(1, "FE'001", 8200.0, 12500.0, 4300.0)
+                                                       ,(2, 'FE2', 5000.0, 5000.0, 0.0)], [1, ''])
+
+
+def test_cuadre_sin_items(bd):
+    assert mercadoTempController.cuadreFacturas() == ([], [1, ''])
+
+
 def test_listados_completos(bd):
     registrar_datos_base()
 

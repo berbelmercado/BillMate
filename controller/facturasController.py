@@ -24,11 +24,11 @@ def insertarFactura(numeroFactura, valorTotalFactura, fechaFactura):
         return list(NO_NUMERICO)
 
     try:
-        Facturas(None
-                 ,numeroFactura.strip().upper()
-                 ,convertirNumero(valorTotalFactura)
-                 ,fechaFactura).insertarFacturas()
-        return [1,'Factura ingresada correctamente']
+        facturaId = Facturas(None
+                             ,numeroFactura.strip().upper()
+                             ,convertirNumero(valorTotalFactura)
+                             ,fechaFactura).insertarFacturas()
+        return [1,'Factura ingresada correctamente', facturaId]
     except sqlite3.Error as ex:
         return [0,f'Error al insertar factura: {ex}']
 

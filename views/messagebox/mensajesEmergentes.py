@@ -15,17 +15,21 @@ def ventanaActiva():
 def mostrarMensaje(funcion, titulo, mensaje):
     padre = ventanaActiva()
     if padre is not None:
-        funcion(title=titulo, message=mensaje, parent=padre)
-        return
+        return funcion(title=titulo, message=mensaje, parent=padre)
     # Sin ventana principal (error al arrancar): raíz temporal oculta
     root = Tk()
     root.withdraw()
     root.attributes("-topmost", True)
-    funcion(title=titulo, message=mensaje, parent=root)
+    respuesta = funcion(title=titulo, message=mensaje, parent=root)
     root.destroy()
+    return respuesta
 
 def mensajeInformativo(mensaje):
     mostrarMensaje(messagebox.showinfo, 'Información', mensaje)
 
 def mensajeError(mensaje):
     mostrarMensaje(messagebox.showerror, 'Error', mensaje)
+
+def preguntar(mensaje):
+    # Pregunta Sí/No; devuelve True si el usuario responde Sí
+    return bool(mostrarMensaje(messagebox.askyesno, 'Confirmar', mensaje))

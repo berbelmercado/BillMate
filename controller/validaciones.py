@@ -35,6 +35,33 @@ def formatearNumero(valor):
     return f'{valor:.2f}'.replace('.', ',')
 
 
+def formatearMoneda(valor):
+    #Valor para mostrar en pantalla: 12500 -> '$ 12.500', 12500.5 -> '$ 12.500,50', -3400 -> '-$ 3.400'
+    signo = '-' if valor < 0 else ''
+    texto = f'{abs(valor):,.2f}'.replace(',', ' ').replace('.', ',').replace(' ', '.')
+    if texto.endswith(',00'):
+        texto = texto[:-3]
+    return f'{signo}$ {texto}'
+
+
+#Número al inicio de la cantidad: '2', '0.8k', '1,5 kg'. Aquí el punto es decimal (1.558k = 1,558 kg)
+_CANTIDAD = re.compile(r'\s*(\d+(?:[.,]\d+)?)')
+
+
+def cantidadNumerica(texto):
+    """Número con el que empieza la cantidad, para calcular el total; None si no empieza con un número.
+
+    '2' -> 2, '0.8k' -> 0.8, '1.558k' -> 1.558, '1,5 kg' -> 1.5, 'media' -> None.
+    No usa convertirNumero porque en las cantidades el punto es decimal, no separador de miles.
+    """
+    if not isinstance(texto, str):
+        return None
+    coincidencia = _CANTIDAD.match(texto)
+    if coincidencia is None:
+        return None
+    return float(coincidencia.group(1).replace(',', '.'))
+
+
 def esNumero(texto):
     #Devuelve True si el texto es un precio válido (vacío, espacios o letras no)
     return convertirNumero(texto) is not None

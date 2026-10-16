@@ -1,6 +1,6 @@
 import sqlite3
 from model.mercadoTemp import MercadoTemp
-from model.mercadoTemp import cargarCompraModel
+from model.mercadoTemp import cargarCompraModel, cuadreFacturasModel
 from controller.validaciones import esNumero, convertirNumero
 
 MENSAJES_VALIDACION = {0: 'No se permiten campos vacíos'
@@ -72,6 +72,20 @@ def eliminarMercadoTemp(mercadoIdTemp):
         return [1]
     except sqlite3.Error as ex:
         return [0,f'No se pudo eliminar el producto error: {ex}']
+
+
+def cuadreFacturas():
+    """Compara, por factura, la suma de los ítems de la compra en curso con el total de la factura.
+
+    Devuelve (filas, mensaje); cada fila es (facturaId, numeroFactura, sumaItems, totalFactura, diferencia),
+    con diferencia = totalFactura - sumaItems (positiva si faltan ítems por registrar).
+    """
+    try:
+        filas = [(facturaId, numero, suma, total, round(total - suma, 2))
+                 for facturaId, numero, suma, total in cuadreFacturasModel()]
+        return filas, [1,'']
+    except sqlite3.Error as ex:
+        return [], [0,f'No se pudo calcular el cuadre de las facturas: {ex}']
 
 
 def cargarCompra():

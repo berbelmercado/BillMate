@@ -15,8 +15,9 @@ class Productos:
             sql = """INSERT INTO productos VALUES (NULL, ?)
                 """
             conexion.cursor.execute(sql, (self.nombreProducto,))
+            productoId = conexion.cursor.lastrowid #id del producto creado
             conexion.desconectar()
-            estatus=0
+            return productoId
 
 
     def consultarListaProductos(self):

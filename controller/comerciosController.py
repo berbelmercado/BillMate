@@ -15,8 +15,8 @@ def insertarComercio(nombreComercio, direccionComercio):
         return [0, 'No se admiten campos vacíos']
 
     try:
-        Comercios(None, nombreComercio, direccionComercio).insertarComercios()
-        return [1, 'Se insertó correctamente el comercio']
+        comercioId = Comercios(None, nombreComercio, direccionComercio).insertarComercios()
+        return [1, 'Se insertó correctamente el comercio', comercioId]
     except sqlite3.Error as ex:
         return [0, f'No se pudo insertar el comercio: {ex}']
 
