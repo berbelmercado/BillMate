@@ -4,26 +4,26 @@ from model.compras import Compras
 class ComprasController():
     def __init__(self,
                  idCompra
-                 ,describcionCompra
+                 ,descripcionCompra
                  ,fechaCreacionCompra):
         
         self.idCompra = idCompra
-        self.describcionCompra = describcionCompra
+        self.descripcionCompra = descripcionCompra
         self.fechaCreacionCompra = fechaCreacionCompra
         
 
     def formatoDatos(self):
-        #Formateamos la describción
-        self.describcionCompra=self.describcionCompra.strip().title()
+        #Formateamos la descripción
+        self.descripcionCompra=self.descripcionCompra.strip().title()
 
     def validarDatosCompras(self):
-        #Validamos la describción
+        #Validamos la descripción
 
         self.formatoDatos() #Formateamos datos
         
         control =None  #Inicializamos variable de control
 
-        if self.describcionCompra =='' or self.describcionCompra.isspace()==True : 
+        if self.descripcionCompra =='' or self.descripcionCompra.isspace()==True : 
             control=0
         else:
             control=1
@@ -40,14 +40,14 @@ class ComprasController():
         if estado==1:
             try:
                 objInsertarCompras= Compras(None
-                                            ,self.describcionCompra
+                                            ,self.descripcionCompra
                                             ,self.fechaCreacionCompra)
                 objInsertarCompras.insertarCompras()
                 mensaje=[1,'Se insertó correctamente la compra']
             except sqlite3.Error as ex:
                 mensaje=[0,f'Error al insertar la compra: {ex}']
         if estado==0:
-            mensaje=[0,'No se permite enviar la describción en blanco']
+            mensaje=[0,'No se permite enviar la descripción en blanco']
         
         return mensaje
     
@@ -74,7 +74,7 @@ class ComprasController():
         try:
             #Instanciamos la clase Compras
             objConsultarCompra = Compras(None
-                                         ,self.describcionCompra
+                                         ,self.descripcionCompra
                                          ,None)
             
             listadoCompra = objConsultarCompra.consultarCompras() #Ejecutamos la consultas 
@@ -93,7 +93,7 @@ class ComprasController():
         try:
             #Instanciamos la clase
             objModificarCompra = Compras(self.idCompra
-                                         ,self.describcionCompra
+                                         ,self.descripcionCompra
                                          ,None)
             objModificarCompra.modificarCompras()
 

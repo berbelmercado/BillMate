@@ -81,7 +81,7 @@ class ConsultarCompras(CTkToplevel):
     def fnModificarCompra(self):
          #Creamos objeto
           objModificarCompra= ComprasController(self.compraId
-                                               ,self.etModificacionesDescribcionCompra.get()
+                                               ,self.etModificacionesDescripcionCompra.get()
                                                ,None
                                                )
           
@@ -92,7 +92,7 @@ class ConsultarCompras(CTkToplevel):
               self.twConsultarCompras()
 
               #limpiamos entry
-              self.etModificacionesDescribcionCompra.delete(0,'end')
+              self.etModificacionesDescripcionCompra.delete(0,'end')
 
               #Imprimimos mensaje en la pantalla
               msx.mensajeInformativo(mensaje[1])
@@ -111,7 +111,7 @@ class ConsultarCompras(CTkToplevel):
                                       ,y=conCom["fmBusquedaComprasY"]
                                       )
         
-        #Label ingresar describción compra
+        #Label ingresar descripción compra
         self.lbBuscarCompras = CTkLabel(self.fmBusquedaCompras
                                                 ,text='Ingrese Nombre Comercio'
                                                 ,fg_color=conColores["bgLabels"]
@@ -127,7 +127,7 @@ class ConsultarCompras(CTkToplevel):
                                            ,pady=conCom["padY"]
                                            )
         
-        #Entry ingresar describción compra
+        #Entry ingresar descripción compra
         self.etBuscarCompras = CTkEntry(self.fmBusquedaCompras
                                                  ,fg_color=conColores["bgEntrys"]
                                                  #,font=(conFuentes["Fuente"],conFuentes["tamano"])
@@ -189,32 +189,32 @@ class ConsultarCompras(CTkToplevel):
             self.fmFrameModificacionCompras.place(x=conCom["fmFrameModificacionComprasX"]
                                                    ,y=conCom["fmFrameModificacionComprasY"])
             
-            #Label describción compra
-            self.lbModificacionesDescribcionCompras= CTkLabel(self.fmFrameModificacionCompras
+            #Label descripción compra
+            self.lbModificacionesDescripcionCompras= CTkLabel(self.fmFrameModificacionCompras
                                             ,text='Nombre Comercio'
                                             ,fg_color=conColores["bgLabels"]
                                             ,font=(conFuentes["Fuente"],conFuentes["tamano"])
                                             ,text_color=conColores["colorLetrasLabel"]
                                             ,corner_radius=8
-                                            ,width=conCom["lbModificacionesDescribcionComprasWidth"]
-                                            ,height=conCom["lbModificacionesDescribcionComprasHigth"]
+                                            ,width=conCom["lbModificacionesDescripcionComprasWidth"]
+                                            ,height=conCom["lbModificacionesDescripcionComprasHigth"]
                                             )
-            self.lbModificacionesDescribcionCompras.grid(column=0
+            self.lbModificacionesDescripcionCompras.grid(column=0
                                         ,row=0
                                         ,padx=conCom["padX"]
                                         ,pady=conCom["padX"]
                                         )
-            #Entry describción compra
-            self.etModificacionesDescribcionCompra=CTkEntry(self.fmFrameModificacionCompras
+            #Entry descripción compra
+            self.etModificacionesDescripcionCompra=CTkEntry(self.fmFrameModificacionCompras
                                             ,fg_color=conColores["bgEntrys"]
                                             #,font=(conFuentes["Fuente"],conFuentes["tamano"])
                                             ,text_color=conColores["colorLetrasEntry"]
                                             ,justify='center'
                                             ,corner_radius=8
-                                            ,width=conCom["etModificacionesDescribcionCompraWidth"]
-                                            ,height=conCom["etModificacionesDescribcionCompraHigth"]
+                                            ,width=conCom["etModificacionesDescripcionCompraWidth"]
+                                            ,height=conCom["etModificacionesDescripcionCompraHigth"]
                                             )
-            self.etModificacionesDescribcionCompra.grid(column=0 
+            self.etModificacionesDescripcionCompra.grid(column=0 
                                        ,row=1
                                        ,padx=conCom["padX"]
                                        ,pady=conCom["padX"])
@@ -268,7 +268,7 @@ class ConsultarCompras(CTkToplevel):
        #creación de treview para resultados facturas
        self.twConsultarComprasRegistradas = ttk.Treeview(self.fmTreviewConsultarCompras
                                                 ,style='Treeview'
-                                                ,columns=('describcionCompra'
+                                                ,columns=('descripcionCompra'
                                                           ,'fechaRegistro'
                                                         )
                                                 ,height=conCom['twConsultarComprasRegistradasHeight']
@@ -281,7 +281,7 @@ class ConsultarCompras(CTkToplevel):
        
        # #Indicamos el titulo de las columnas
        self.twConsultarComprasRegistradas.heading("#0", text='Comercio Id',)
-       self.twConsultarComprasRegistradas.heading("#1", text='Describcion Compra',)
+       self.twConsultarComprasRegistradas.heading("#1", text='Descripcion Compra',)
        self.twConsultarComprasRegistradas.heading("#2", text='Fecha De Registro',)
         
        # #configuramos las columnas
@@ -313,19 +313,19 @@ class ConsultarCompras(CTkToplevel):
        
     def seleccionarCompras(self,event):
         #Limpiamos el entry
-        self.etModificacionesDescribcionCompra.delete(0,'end')
+        self.etModificacionesDescripcionCompra.delete(0,'end')
        
         self.compraId=None
-        self.describcionCompra = None
+        self.descripcionCompra = None
         self.fechaRegistroCompra = None
         try:
         
           #Inicializamos las variables
           self.compraId = self.twConsultarComprasRegistradas.item(self.twConsultarComprasRegistradas.selection())['text']
-          self.describcionCompra = self.twConsultarComprasRegistradas.item(self.twConsultarComprasRegistradas.selection())['values'][0]
+          self.descripcionCompra = self.twConsultarComprasRegistradas.item(self.twConsultarComprasRegistradas.selection())['values'][0]
           self.fechaRegistroCompra = self.twConsultarComprasRegistradas.item(self.twConsultarComprasRegistradas.selection())['values'][1]
 
           #Insertamos nuevo valor
-          self.etModificacionesDescribcionCompra.insert(0,self.describcionCompra)
+          self.etModificacionesDescripcionCompra.insert(0,self.descripcionCompra)
         except:
           pass

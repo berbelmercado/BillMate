@@ -69,7 +69,7 @@ class ConsultarMercados(CTkToplevel):
         elif seleleccion == 'Número de Factura':
             self.opcion = 1
             
-        elif seleleccion == 'Describción Mercado':
+        elif seleleccion == 'Descripción Mercado':
             self.opcion = 2
         else:
             self.opcion = 10
@@ -289,12 +289,12 @@ class ConsultarMercados(CTkToplevel):
             #Importamos los datos desde la vista consultar compras
 
             self.compraId = int(self.objConsutarCompras.compraId)
-            self.describcionCompra = self.objConsutarCompras.describcionCompra
+            self.descripcionCompra = self.objConsutarCompras.descripcionCompra
             
             #seteamos el número de factura en el entry para mostrarlo
             self.etDescMercado.configure(state='normal')
             self.etDescMercado.delete(0, 'end')
-            self.etDescMercado.insert(0, self.describcionCompra)
+            self.etDescMercado.insert(0, self.descripcionCompra)
             self.etDescMercado.configure(state='disabled')
             self.objConsutarCompras.destroy()#se destruye la ventana
 
@@ -482,7 +482,7 @@ class ConsultarMercados(CTkToplevel):
                                                     ,height=conSec.dicConfigConsultarMercado["cboxIngresarDatoBusquedaHeight"]
                                                     ,values=["Nombre del Producto"
                                                            ,"Número de Factura"
-                                                           ,"Describción Mercado"]
+                                                           ,"Descripción Mercado"]
                                                     ,state='readonly'
                                                     ,command= self.fnOpcionesBusqueda
                                                     )   
@@ -648,7 +648,7 @@ class ConsultarMercados(CTkToplevel):
                                    ,pady=conSec.dicConfigConsultarMercado["padyFmModificaciones"]
                                    )
 
-        #label Describcion Mercado
+        #label Descripcion Mercado
         self.lbDescMercado=CTkLabel(self.fmModificaciones
                                        ,text='Desc. Mercado'
                                        ,fg_color=conColores["bgLabels"]
@@ -761,7 +761,7 @@ class ConsultarMercados(CTkToplevel):
                                    ,padx=conSec.dicConfigConsultarMercado["padXFmModificaciones"]
                                    ,pady=conSec.dicConfigConsultarMercado["padyFmModificaciones"]
                                    )
-        #Entry describcion mercado
+        #Entry descripcion mercado
         self.etDescMercado= CTkEntry(self.fmModificaciones
                                         ,fg_color=conColores["bgEntrys"]
                                         ,font=(conFuentes["Fuente"],conFuentes["tamano"])
@@ -958,7 +958,7 @@ class ConsultarMercados(CTkToplevel):
             self.etNombreComercio.insert(0,self.vrNombreComercioSelect)
             self.etNombreComercio.configure(state='disabled')
 
-            #Insertamos describción compra en entry
+            #Insertamos descripción compra en entry
             self.etDescMercado.configure(state = 'normal')
             self.etDescMercado.insert(0,self.vrDescMercadoSelect)
             self.etDescMercado.configure(state = 'disabled')

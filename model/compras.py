@@ -2,10 +2,10 @@ from model.conexionDb import ConexionDb as conn
 
 
 class Compras:
-    def __init__(self, idCompra, describcionCompra, fechaCreacionCompra):
+    def __init__(self, idCompra, descripcionCompra, fechaCreacionCompra):
 
         self.idCompra = idCompra
-        self.describcionCompra = describcionCompra
+        self.descripcionCompra = descripcionCompra
         self.fechaCreacionCompra = fechaCreacionCompra
 
     def insertarCompras(self):
@@ -15,7 +15,7 @@ class Compras:
         # sentencia SQL
         sql = """ INSERT INTO compras VALUES (NULL, ?, ?)
              """
-        conexion.cursor.execute(sql, (self.describcionCompra, self.fechaCreacionCompra))  # Ejecutamos la sentencia
+        conexion.cursor.execute(sql, (self.descripcionCompra, self.fechaCreacionCompra))  # Ejecutamos la sentencia
 
         conexion.desconectar()  # Cerramos conexion
 
@@ -47,7 +47,7 @@ class Compras:
         sql = """ SELECT * FROM compras WHERE descripcion LIKE ?
               """
 
-        conexion.cursor.execute(sql, (f'%{self.describcionCompra}%',))
+        conexion.cursor.execute(sql, (f'%{self.descripcionCompra}%',))
         listadoCompras = conexion.cursor.fetchall()
 
         conexion.desconectar()
@@ -63,6 +63,6 @@ class Compras:
                    SET descripcion = ?
                    WHERE idCompra = ?
                    """
-        conexion.cursor.execute(sql, (self.describcionCompra, self.idCompra))  # Ejecutamos consulta sql
+        conexion.cursor.execute(sql, (self.descripcionCompra, self.idCompra))  # Ejecutamos consulta sql
 
         conexion.desconectar()  # Cerramos conexión

@@ -333,17 +333,17 @@ dicConfigAgregarMercado={
     ,"cbNFijarComercioWidht":140
     ,"cbNFijarComercioHeight":30
    
-    #label describcion mercado
-    ,"lbDescribcionMercadoX":835
-    ,"lbDescribcionMercadoY":5
-    ,"lbDescribcionMercadoWidht":170
-    ,"lbDescribcionMercadoHeight":30
+    #label descripcion mercado
+    ,"lbDescripcionMercadoX":835
+    ,"lbDescripcionMercadoY":5
+    ,"lbDescripcionMercadoWidht":170
+    ,"lbDescripcionMercadoHeight":30
 
-    #Entry describción mercado
-    ,"etDescribcionMercadoX":835
-    ,"etDescribcionMercadoY":45
-    ,"etDescribcionMercadoWidht":170
-    ,"etDescribcionMercadoHeight":30
+    #Entry descripción mercado
+    ,"etDescripcionMercadoX":835
+    ,"etDescripcionMercadoY":45
+    ,"etDescripcionMercadoWidht":170
+    ,"etDescripcionMercadoHeight":30
     
     #Boton  agregar
     ,"btAgregarItemX":5
@@ -559,11 +559,11 @@ dicConfigConsultarMercado={
     ,"lbNombreComercioWidth":190
     ,"lbNombreComercioHeight":30
 
-    #Label describcion mercado
+    #Label descripcion mercado
     ,"lbDescMercadoWidth":95
     ,"lbDescMercadoHeight":30
 
-    #Entry describcion mercado
+    #Entry descripcion mercado
     ,"etDescMercadoWidth":110
     ,"etDescMercadoHeight":30
 
@@ -750,13 +750,13 @@ dicConfigRegistrarCompra = {
     ,"fmRegistroCompraPadX":5
     ,"fmRegistroCompraPadY":5
 
-    #label describción compra
-    ,"lbDescribcionCompraWidth":190
-    ,"lbDescribcionCompraHeight":30
+    #label descripción compra
+    ,"lbDescripcionCompraWidth":190
+    ,"lbDescripcionCompraHeight":30
     
     #Entry descibcion compra
-    ,"etDescribcionCompraWidth":190
-    ,"etDescribcionCompraHeight":30
+    ,"etDescripcionCompraWidth":190
+    ,"etDescripcionCompraHeight":30
 
     ,"padxCompras":5
     ,"padyCompras":5
@@ -774,11 +774,11 @@ dicConfigConsultarCompra = {
     ,"fmBusquedaComprasX":5
     ,"fmBusquedaComprasY":5
 
-    #Label ingresar describcion compra
+    #Label ingresar descripcion compra
     ,"lbBuscarComprasWidth":180
     ,"lbBuscarComprassHeight":30
 
-    #Entry ingresar describcion compra
+    #Entry ingresar descripcion compra
     ,"etBuscarComprasWidth":180
     ,"etBuscarComprasHeight":30
 
@@ -796,13 +796,13 @@ dicConfigConsultarCompra = {
     ,"fmFrameModificacionComprasX":5
     ,"fmFrameModificacionComprasY":188
 
-    #Label modificaciones describción compra
-    ,"lbModificacionesDescribcionComprasWidth":180
-    ,"lbModificacionesDescribcionComprasHigth":30
+    #Label modificaciones descripción compra
+    ,"lbModificacionesDescripcionComprasWidth":180
+    ,"lbModificacionesDescripcionComprasHigth":30
 
-    #Entry modificaciones describción compra
-    ,"etModificacionesDescribcionCompraWidth":180
-    ,"etModificacionesDescribcionCompraHigth":30
+    #Entry modificaciones descripción compra
+    ,"etModificacionesDescripcionCompraWidth":180
+    ,"etModificacionesDescripcionCompraHigth":30
 
     #pads widgets
     ,"padX":5

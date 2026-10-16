@@ -38,7 +38,7 @@ class RegistrarCompras(CTkToplevel):
 
         #Se crea objeto para inserción de información
         objGuardarCompra= ComprasController(None
-                                            ,self.etDescribcionCompra.get()
+                                            ,self.etDescripcionCompra.get()
                                             ,fecha)
         #Se optiene el status de inserción
         control = objGuardarCompra.insertarCompras()
@@ -47,7 +47,7 @@ class RegistrarCompras(CTkToplevel):
             #Se muestra mensaje de inserción
 
             mss.mensajeInformativo(control[1])
-            self.etDescribcionCompra.delete(0,'end')
+            self.etDescripcionCompra.delete(0,'end')
         if control[0]==0:
             #Se muestra mensaje de error
 
@@ -67,34 +67,34 @@ class RegistrarCompras(CTkToplevel):
         self.fmRegistroCompra.pack(padx=reCom['fmRegistroCompraPadX']
                                    ,pady=reCom['fmRegistroCompraPadY']
                                    )
-        #Label describcion compra
-        self.lbDescribcionCompra = CTkLabel(self.fmRegistroCompra
-                                            ,text= 'Describción Compra'
+        #Label descripcion compra
+        self.lbDescripcionCompra = CTkLabel(self.fmRegistroCompra
+                                            ,text= 'Descripción Compra'
                                             ,fg_color=color['bgLabels']
                                             ,font=(fuente['Fuente'],fuente['tamano'])
                                             ,text_color=color["colorLetrasLabel"]
-                                            ,width=reCom['lbDescribcionCompraWidth']
-                                            ,height=reCom['lbDescribcionCompraHeight']
+                                            ,width=reCom['lbDescripcionCompraWidth']
+                                            ,height=reCom['lbDescripcionCompraHeight']
                                             ,corner_radius=8
                                             )
-        self.lbDescribcionCompra.grid(row=0
+        self.lbDescripcionCompra.grid(row=0
                                       ,column=0
                                       ,padx=reCom['padxCompras']
                                       ,pady=reCom['padyCompras']
                                       )
         
-        #Label entry describcion compra
+        #Label entry descripcion compra
 
-        self.etDescribcionCompra = CTkEntry(self.fmRegistroCompra
+        self.etDescripcionCompra = CTkEntry(self.fmRegistroCompra
                                             ,fg_color=color["bgEntrys"]
                                             ,font=(fuente["Fuente"],fuente["tamano"])
                                             ,text_color=color["colorLetrasEntry"]
                                             ,justify='center'                             
-                                            ,width=reCom['etDescribcionCompraWidth']
-                                            ,height=reCom['etDescribcionCompraHeight']
+                                            ,width=reCom['etDescripcionCompraWidth']
+                                            ,height=reCom['etDescripcionCompraHeight']
                                             ,corner_radius=8
                                             )
-        self.etDescribcionCompra.grid(row=0
+        self.etDescripcionCompra.grid(row=0
                                       ,column=1
                                       ,padx=reCom['padxCompras']
                                       ,pady=reCom['padyCompras']

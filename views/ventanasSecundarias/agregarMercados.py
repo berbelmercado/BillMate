@@ -62,7 +62,7 @@ class AgregarMercados(CTkToplevel):
             self.etNombreProducto
             ,self.etNumeroFactura
             ,self.etNombreComercio
-            ,self.etDescribcionMercado
+            ,self.etDescripcionMercado
         ]
 
         for i in entrys:
@@ -85,7 +85,7 @@ class AgregarMercados(CTkToplevel):
                     y.configure(state='disabled')
 
             if self.varFijarFactura.get()==0 and self.varFijarCompra.get()==1 and self.varFijarComercio.get()==0:
-                if y==self.etDescribcionMercado:
+                if y==self.etDescripcionMercado:
                     pass
                 else:
                     y.configure(state='normal')
@@ -274,13 +274,13 @@ class AgregarMercados(CTkToplevel):
             #Importamos los datos desde la vista consultar compras
 
             self.compraId = int(self.objConsutarCompras.compraId)
-            self.describcionCompra = self.objConsutarCompras.describcionCompra
+            self.descripcionCompra = self.objConsutarCompras.descripcionCompra
             
             #seteamos el número de factura en el entry para mostrarlo
-            self.etDescribcionMercado.configure(state='normal')
-            self.etDescribcionMercado.delete(0, 'end')
-            self.etDescribcionMercado.insert(0, self.describcionCompra)
-            self.etDescribcionMercado.configure(state='disabled')
+            self.etDescripcionMercado.configure(state='normal')
+            self.etDescripcionMercado.delete(0, 'end')
+            self.etDescripcionMercado.insert(0, self.descripcionCompra)
+            self.etDescripcionMercado.configure(state='disabled')
             # self.grab_set()
             # self.focus()
             self.objConsutarCompras.destroy()#se destruye la ventana
@@ -667,30 +667,30 @@ class AgregarMercados(CTkToplevel):
                                     ,y=conSec.dicConfigAgregarMercado["etComercioY"]
                                     )
         #label descibcion mercado
-        self.lbDescribcionMercado=CTkLabel(self.fmFormulario
+        self.lbDescripcionMercado=CTkLabel(self.fmFormulario
                                            ,text='Desc. Mercado'
                                            ,fg_color=conColor["bgLabels"]
                                            ,font=(conFuente["Fuente"],conFuente["tamano"])
                                            ,text_color=conColor["colorLetrasLabel"]
                                            ,corner_radius=8
                                            ,justify="center"
-                                           ,width=conSec.dicConfigAgregarMercado["lbDescribcionMercadoWidht"]
-                                           ,height=conSec.dicConfigAgregarMercado["lbDescribcionMercadoHeight"]
+                                           ,width=conSec.dicConfigAgregarMercado["lbDescripcionMercadoWidht"]
+                                           ,height=conSec.dicConfigAgregarMercado["lbDescripcionMercadoHeight"]
                                            )
-        self.lbDescribcionMercado.place(x=conSec.dicConfigAgregarMercado["lbDescribcionMercadoX"]
-                                        ,y=conSec.dicConfigAgregarMercado["lbDescribcionMercadoY"])
-        #Entry describcion mercado
-        self.etDescribcionMercado=CTkEntry(self.fmFormulario
+        self.lbDescripcionMercado.place(x=conSec.dicConfigAgregarMercado["lbDescripcionMercadoX"]
+                                        ,y=conSec.dicConfigAgregarMercado["lbDescripcionMercadoY"])
+        #Entry descripcion mercado
+        self.etDescripcionMercado=CTkEntry(self.fmFormulario
                                            ,fg_color=conColor["bgEntrys"]
                                            ,font=(conFuente["Fuente"],conFuente["tamano"])
                                            ,text_color=conColor["colorLetrasEntry"]
                                            ,justify="center"
                                            ,corner_radius=8
-                                           ,width=conSec.dicConfigAgregarMercado["etDescribcionMercadoWidht"]
-                                           ,height=conSec.dicConfigAgregarMercado["etDescribcionMercadoHeight"]
+                                           ,width=conSec.dicConfigAgregarMercado["etDescripcionMercadoWidht"]
+                                           ,height=conSec.dicConfigAgregarMercado["etDescripcionMercadoHeight"]
                                            )
-        self.etDescribcionMercado.place(x=conSec.dicConfigAgregarMercado["etDescribcionMercadoX"]
-                                        ,y=conSec.dicConfigAgregarMercado["etDescribcionMercadoY"])
+        self.etDescripcionMercado.place(x=conSec.dicConfigAgregarMercado["etDescripcionMercadoX"]
+                                        ,y=conSec.dicConfigAgregarMercado["etDescripcionMercadoY"])
         
         #Checbutton Fijar Comercio
         self.varFijarComercio = IntVar()
@@ -838,7 +838,7 @@ class AgregarMercados(CTkToplevel):
                                                 ,'PrecioTotal'
                                                 ,'NumeroDeFactura'
                                                 ,'Comercio'
-                                                ,'describcionCompra'
+                                                ,'descripcionCompra'
                                         ))
         #Cambia el estilo para las columnas insertadas
         self.tvListaItem.tag_configure('evenrow',background=conColor["bgGeneral"],foreground=conColor["ColorLetras"])
@@ -851,7 +851,7 @@ class AgregarMercados(CTkToplevel):
         self.tvListaItem.heading("#4", text='Precio Total',)
         self.tvListaItem.heading("#5", text='Numero de Factura',)
         self.tvListaItem.heading("#6", text='Comercio',)
-        self.tvListaItem.heading("#7", text='Describcion Compra',)
+        self.tvListaItem.heading("#7", text='Descripcion Compra',)
         
         # #configuramos las columnas
         self.tvListaItem.column("#0",width=80, anchor='center',)
@@ -909,7 +909,7 @@ class AgregarMercados(CTkToplevel):
         self.vrValorTotalFactura = None
         self.vrFechaFactura = None
         self.vrNombreComercio = None
-        self.vrDescribcionCompra = None
+        self.vrDescripcionCompra = None
 
         try: 
               self.vrIdeMercadoTemp = self.tvListaItem.item(self.tvListaItem.selection())['text']
@@ -919,7 +919,7 @@ class AgregarMercados(CTkToplevel):
               self.vrPrecioTotal =self.tvListaItem.item(self.tvListaItem.selection())['values'][3]
               self.vrNumeroFactura =self.tvListaItem.item(self.tvListaItem.selection())['values'][4]
               self.vrNombreComercio =self.tvListaItem.item(self.tvListaItem.selection())['values'][5]
-              self.vrDescribcionCompra = self.tvListaItem.item(self.tvListaItem.selection())['values'][6]
+              self.vrDescripcionCompra = self.tvListaItem.item(self.tvListaItem.selection())['values'][6]
 
               self.etNombreProducto.configure(state='normal')
               self.etNombreProducto.insert(0,self.vrNombreProducto)
@@ -939,9 +939,9 @@ class AgregarMercados(CTkToplevel):
               self.etNombreComercio.insert(0,self.vrNombreComercio)
               self.etNombreComercio.configure(state='disabled')
 
-              self.etDescribcionMercado.configure(state='normal')
-              self.etDescribcionMercado.insert(0, self.vrDescribcionCompra)
-              self.etDescribcionMercado.configure(state='disabled')
+              self.etDescripcionMercado.configure(state='normal')
+              self.etDescripcionMercado.insert(0, self.vrDescripcionCompra)
+              self.etDescripcionMercado.configure(state='disabled')
               
               self.consultarLlaves(self.vrIdeMercadoTemp)
 
