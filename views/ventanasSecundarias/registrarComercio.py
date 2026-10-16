@@ -4,7 +4,7 @@ from views.ventanasSecundarias import configuracionVentanasSecundarias as conSec
 from views.configuracionesGenerales import dicConfiguracionGeneralColores as conColor
 from views.configuracionesGenerales import dicConfiguracionGeneralFuentes as conFuente
 from views.configuracionesGenerales import dicConfig as conMaus
-from controller.comerciosController import ComerciosController
+from controller import comerciosController
 from views.messagebox import mensajesEmergentes as msbx
 from  views.vwImgConfig import leerImagen
 
@@ -30,10 +30,8 @@ class RegistrarComercio(CTkToplevel):
    
    def btnGuardarComercios(self):
        #Funcionalidad para el botón guardar
-       guardarComercios = ComerciosController(None
-                                              ,self.etNombreComercio.get()
-                                              ,self.etDireccionComercio.get())
-       validaIsercion = guardarComercios.insertarComercios()
+       validaIsercion = comerciosController.insertarComercio(self.etNombreComercio.get()
+                                                            ,self.etDireccionComercio.get())
 
        #Retorna la validación de los campos
        if validaIsercion[0]==1:

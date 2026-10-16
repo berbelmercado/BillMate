@@ -6,7 +6,7 @@ from views.configuracionesGenerales import dicConfig as conMaus
 from views.ventanasSecundarias.configuracionVentanasSecundarias  import dicConfigPosicion as conPos
 from views.configuracionesGenerales import dicConfiguracionGeneralColores as conColores
 from views.configuracionesGenerales import dicConfiguracionGeneralFuentes as conFuentes
-from controller.comerciosController import ComerciosController
+from controller import comerciosController
 from views.messagebox import mensajesEmergentes as msx
 
 from views.vwImgConfig import  leerImagen
@@ -42,13 +42,7 @@ class ConsultarComercios(CTkToplevel):
     
     def btnConsultarComercio(self):
          
-         listadoComercio = []
-         #creamos objeto
-         objConsultaComercio = ComerciosController(None
-                                                   ,self.etBuscarComercios.get()
-                                                   ,None)
-         
-         listadoComercio,mensaje = objConsultaComercio.consultarComerciosController()
+         listadoComercio,mensaje = comerciosController.consultarComercios(self.etBuscarComercios.get())
         
          if mensaje[0]==1:
               #limpiamos la tabla
@@ -64,16 +58,12 @@ class ConsultarComercios(CTkToplevel):
                                                                         ,i[2])
                                                                ,tags='evenrow')
          else:
-              msx.mensajeError(mensaje)
-                                
+              msx.mensajeError(mensaje[1])
+
     def fnModificarComercios(self):
-         #Creamos objeto
-          objModificarComercios= ComerciosController(self.comercioId
-                                                    ,self.etModificacionesNombreComercio.get()
-                                                    ,self.etModificacionesDireccionComercio.get()
-                                                    )
-          
-          mensaje=objModificarComercios.modificarComerciosController()
+          mensaje=comerciosController.modificarComercio(self.comercioId
+                                                        ,self.etModificacionesNombreComercio.get()
+                                                        ,self.etModificacionesDireccionComercio.get())
 
           if mensaje[0]==1:
               self.twConsultarComercios()
@@ -256,11 +246,7 @@ class ConsultarComercios(CTkToplevel):
 
     def twConsultarComercios(self):
        
-       listadoComercios = []
-       consultaComercios = ComerciosController(None
-                                               ,None
-                                               ,None)
-       listadoComercios, mensaje = consultaComercios.consultarListaComercios()
+       listadoComercios, mensaje = comerciosController.consultarListaComercios()
        if mensaje[0]==0:
             msx.mensajeError(mensaje[1])
 

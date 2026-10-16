@@ -1,110 +1,51 @@
 import sqlite3
 from model.comercios import Comercios
 
-class ComerciosController:
-    #constructor
-    def __init__(self
-                 ,comercioId
-                 ,nombreComercio
-                 ,direccionComercio):
-        
-        self.comercioId = comercioId
-        self.nombreComercio = nombreComercio
-        self.direccionComercio = direccionComercio
 
-    def titleDatos(self,):
-        #Trasforma el texto poniendo la primera letra de cada palabra en mayusculas y elimina los espacios a los lados del texto
-        self.nombreComercio = self.nombreComercio.strip().title()
-        self.direccionComercio = self.direccionComercio.strip().title()
+def formatearTexto(texto):
+    #Primera letra de cada palabra en mayúscula y sin espacios a los lados
+    return texto.strip().title()
 
-    def validarCamposComercio(self
-                              ,nombreComercio
-                              ,direccionComercio):
-        
-        #validamos los campos para no aceptar campos en blanco o sólo espacios
-        if nombreComercio.isspace()==True or nombreComercio=='' or direccionComercio.isspace()==True or direccionComercio=='' :
-            estado=0
-        else:
-            estado=1
-        
-        return estado
 
-    def insertarComercios(self):
-        #Método para insertar los comercios a la BD
-        self.titleDatos()
-        estado=self.validarCamposComercio(self.nombreComercio
-                                         ,self.direccionComercio)
+def insertarComercio(nombreComercio, direccionComercio):
+    #Inserta un comercio nuevo en la BD
+    nombreComercio = formatearTexto(nombreComercio)
+    direccionComercio = formatearTexto(direccionComercio)
+    if nombreComercio == '' or direccionComercio == '':
+        return [0, 'No se admiten campos vacíos']
 
-        if estado==1:
-            try:
-                comercio = Comercios(None
-                                     ,self.nombreComercio
-                                     ,self.direccionComercio)
-                comercio.insertarComercios()
-                messagebox = [1,
-                              'Se insertó correctamente el comercio']
-            except sqlite3.Error as ex:
-                messagebox = [0,
-                              f'No se pudo insertar el comercio: {ex}']
-        if estado==0:
-            messagebox = [0, 
-                          'No se admiten campos vacíos']
-        
-        return messagebox
-    
-    def consultarListaComercios(self):
-        #Se consultan todos los comercios registrados
-        listaComercio =[]
+    try:
+        Comercios(None, nombreComercio, direccionComercio).insertarComercios()
+        return [1, 'Se insertó correctamente el comercio']
+    except sqlite3.Error as ex:
+        return [0, f'No se pudo insertar el comercio: {ex}']
 
-        try:
-            listadoComercio = Comercios(None
-                                        ,None
-                                        ,None)
-            listaComercio = listadoComercio.consultarComercios()
-            mensaje = [1,'']
-        except sqlite3.Error as ex:
-            mensaje = [0,f'No se pudo consultar los comercios: {ex}']
 
-        return listaComercio, mensaje
-    
-    def consultarComerciosController(self):
+def consultarListaComercios():
+    #Todos los comercios, para llenar la tabla al abrir la vista
+    try:
+        return Comercios(None, None, None).consultarComercios(), [1, '']
+    except sqlite3.Error as ex:
+        return [], [0, f'No se pudo consultar los comercios: {ex}']
 
-        listaComrercio = []
 
-        try:
-            #Declaramos un objeto
-            objComercios = Comercios(None
-                                     ,self.nombreComercio
-                                     ,None
-                                     )
-            #instanciamos la clase
-            listaComrercio = objComercios.consultarComercioModel()
-            messagebox = [1,'']
-        except sqlite3.Error as ex:
-            messagebox =[0,f"No se pudo consultar los comercios: {ex}"]
-        return listaComrercio, messagebox
-    
-    def modificarComerciosController(self):
-        
-        self.titleDatos()
+def consultarComercios(nombreComercio):
+    #Comercios cuyo nombre contiene el texto buscado
+    try:
+        return Comercios(None, nombreComercio, None).consultarComercioModel(), [1, '']
+    except sqlite3.Error as ex:
+        return [], [0, f'No se pudo consultar los comercios: {ex}']
 
-        estado=self.validarCamposComercio(self.nombreComercio
-                                         ,self.direccionComercio)
 
-        if estado==1:
-            try:
-                #declaramos el objeto
-                comercio = Comercios(self.comercioId
-                                    ,self.nombreComercio
-                                    ,self.direccionComercio)
-                comercio.modificarComerciosModel()
-                messagebox = [1,
-                              'Se actualizó el comercio']
-            except sqlite3.Error as ex:
-                messagebox = [0,
-                              f'No se pudo actualizar el comercio: {ex}']
-        if estado==0:
-            messagebox = [0, 
-                          'No se admiten campos vacíos']
-        
-        return messagebox
+def modificarComercio(comercioId, nombreComercio, direccionComercio):
+    #Cambia el nombre y la dirección de un comercio existente
+    nombreComercio = formatearTexto(nombreComercio)
+    direccionComercio = formatearTexto(direccionComercio)
+    if nombreComercio == '' or direccionComercio == '':
+        return [0, 'No se admiten campos vacíos']
+
+    try:
+        Comercios(comercioId, nombreComercio, direccionComercio).modificarComerciosModel()
+        return [1, 'Se actualizó el comercio']
+    except sqlite3.Error as ex:
+        return [0, f'No se pudo actualizar el comercio: {ex}']
