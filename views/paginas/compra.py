@@ -1,142 +1,105 @@
-"""Pantalla para registrar los ítems de una compra en una sola ventana (reemplaza a Agregar Mercados).
+"""Página Agregar Mercados: registrar los ítems de una compra.
 
 Encabezado (compra, factura, comercio) que se llena una vez, línea de ingreso que se maneja con Enter
-y tabla de los ítems de la compra en curso (tabla mercadosTemp).
+y tabla de los ítems de la compra en curso (tabla mercadosTemp), con el cuadre contra la factura.
 """
 from datetime import date
-from tkinter import ttk
-from PIL import Image
-from customtkinter import CTkToplevel, CTkFrame, CTkLabel, CTkEntry, CTkButton, CTkImage, CTkInputDialog, CTkScrollbar
-from tkcalendar import Calendar
-from views.ventanasSecundarias.campoAutocompletar import CampoAutocompletar
-from views.ventanasSecundarias.configuracionVentanasSecundarias import dicConfigNuevaCompra as conNC
-from views.configuracionesGenerales import dicConfiguracionGeneralColores as conColor
-from views.configuracionesGenerales import dicConfig as conMaus
+from customtkinter import CTkFrame, CTkLabel, CTkInputDialog
+from views.configuracionesGenerales import dicTema as tema
+from views.configuracionesGenerales import dicConfigPaginas as conPag
+from views import componentes as comp
+from views.campoAutocompletar import CampoAutocompletar
+from views.paginas.inicio import avisarDatosCambiados
+from views.messagebox import mensajesEmergentes as mss
 from controller import productosController, comerciosController, facturasController, comprasController, mercadoTempController
 from controller.validaciones import convertirNumero, formatearNumero, formatearMoneda, cantidadNumerica
-from views.messagebox import mensajesEmergentes as mss
-from views.vwImgConfig import leerImagen
-from views.frameListasTreview import avisarDatosCambiados
+
+TECLAS_SIN_TEXTO = ('Return', 'KP_Enter', 'Tab', 'ISO_Left_Tab', 'Escape', 'Shift_L', 'Shift_R')
 
 
-class NuevaCompra(CTkToplevel):
+class PaginaCompra(CTkFrame):
 
     def __init__(self, master):
-        super().__init__(master, fg_color=conColor["fg_color"])
-        self.master = master
-        self.title("Agregar Mercados")
-        self.geometry(f'{conNC["vnWidth"]}x{conNC["vnHeight"]}+{conNC["vnX"]}+{conNC["vnY"]}')
-        self.minsize(conNC["vnMinWidth"], conNC["vnMinHeight"])
-        self.transient(master)
-        self.lift()
-
-        self.imagenGuardar = CTkImage(dark_image=Image.open(leerImagen("Guardar")), size=(24, 24))
-        self.imagenCancelar = CTkImage(dark_image=Image.open(leerImagen("Cancelar")), size=(24, 24))
-        self.imagenAgregar = CTkImage(dark_image=Image.open(leerImagen("Agregar")), size=(24, 24))
-        self.imagenCargar = CTkImage(dark_image=Image.open(leerImagen("cargar")), size=(24, 24))
-
+        super().__init__(master, fg_color=tema["fondo"], corner_radius=0)
         self.facturas = {}          #facturaId -> (numero, total, fecha), para llenar Total y Fecha
         self.itemEditando = None    #mercadoIdTemp del ítem que se está editando, None si se agrega uno nuevo
         self.totalManual = False    #True si el usuario escribió el total del ítem a mano
         self.listaItems = []
 
-        #La tabla (fila 2) es la que crece al agrandar la ventana
+        #La tabla (fila 3) es la que crece con la ventana
         self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(2, weight=1)
+        self.grid_rowconfigure(3, weight=1)
 
+        subtitulo = comp.encabezadoPagina(self, 'Agregar Mercados')
+        subtitulo.configure(text='Enter: siguiente campo  ·  Doble clic: editar ítem  ·  Supr: borrar  ·  Ctrl+Enter: cargar')
         self.crearEncabezado()
         self.crearLineaIngreso()
         self.crearTabla()
         self.crearPie()
 
-        self.bind('<Control-Return>', lambda evento: self.cargarCompra())
-        self.bind('<Control-KP_Enter>', lambda evento: self.cargarCompra())
+        #Ctrl+Enter carga la compra desde cualquier campo o desde la tabla de esta página
+        for widget in (self.campoCompra.entry, self.campoFactura.entry, self.etTotalFactura, self.selectorFecha.entry
+                       ,self.campoComercio.entry, self.campoProducto.entry, self.etCantidad, self.etPrecio, self.etTotalItem
+                       ,self.tabla):
+            widget.bind('<Control-Return>', lambda evento: self.cargarCompra())
+            widget.bind('<Control-KP_Enter>', lambda evento: self.cargarCompra())
 
+    def refrescar(self):
+        #Al mostrar la página: opciones al día (pudieron cambiar en otras páginas), ítems y encabezado
+        for campo in (self.campoCompra, self.campoFactura, self.campoComercio, self.campoProducto):
+            campo.recargar()
+            if campo.valorId is not None and campo.textoDe(campo.valorId) is None:
+                campo.limpiar()     #el registro elegido ya no existe
         self.refrescarTabla()
-        self.encabezadoDesdeItems()
+        if self.campoCompra.valorId is None and self.campoFactura.valorId is None and self.campoComercio.valorId is None:
+            self.encabezadoDesdeItems()
         self.after(150, self.enfocarInicio)
 
-    # --- Estilo común ---
+    def marco(self, fila, **opciones):
+        #Tarjeta de una sección de la página
+        tarjeta = comp.tarjeta(self)
+        tarjeta.grid(row=fila, column=0, sticky='nsew', padx=conPag["padX"] * 2, **opciones)
+        return tarjeta
 
-    def fuente(self):
-        return (conNC["fuente"], conNC["tamanoFuente"])
-
-    def estiloEntry(self):
-        return dict(height=conNC["altoCampo"]
-                    ,font=self.fuente()
-                    ,fg_color=conColor["bgEntrys"]
-                    ,text_color=conColor["colorLetrasEntry"]
-                    ,corner_radius=8)
-
-    def etiqueta(self, master, texto):
-        return CTkLabel(master
-                        ,text=texto
-                        ,font=self.fuente()
-                        ,fg_color=conColor["bgLabels"]
-                        ,text_color=conColor["colorLetrasLabel"]
-                        ,corner_radius=8
-                        ,height=conNC["altoCampo"])
-
-    def boton(self, master, texto, comando, ancho, imagen=None):
-        return CTkButton(master
-                         ,text=texto
-                         ,command=comando
-                         ,fg_color=conColor["bgBotones"]
-                         ,font=self.fuente()
-                         ,image=imagen
-                         ,compound=conMaus["compound"]
-                         ,cursor=conMaus["cursor"]
-                         ,width=ancho
-                         ,height=conNC["altoCampo"])
-
-    def grid_(self, widget, fila, columna, **opciones):
-        widget.grid(row=fila, column=columna, padx=conNC["padX"], pady=conNC["padY"], **opciones)
+    def ubicar(self, master, etiqueta, widget, columna, filaEtiqueta, columnas=1):
+        #Etiqueta encima del campo, dentro de una tarjeta
+        relleno = conPag["padTarjeta"]
+        izquierda = relleno if columna == 0 else conPag["padY"] // 2
+        comp.etiqueta(master, etiqueta).grid(row=filaEtiqueta, column=columna, columnspan=columnas, sticky='ew'
+                                              ,padx=(izquierda, 0), pady=(conPag["padY"] // 2, 2))
+        widget.grid(row=filaEtiqueta + 1, column=columna, columnspan=columnas, sticky='ew', padx=(izquierda, 0))
 
     # --- Encabezado: compra, factura y comercio ---
 
     def crearEncabezado(self):
-        marco = CTkFrame(self, fg_color=conColor["fg_color"])
-        marco.grid(row=0, column=0, sticky='ew', padx=conNC["padX"], pady=conNC["padY"])
+        #Una sola fila, en el orden en que se llena: compra, factura, total, fecha y comercio
+        tarjeta = self.marco(1, pady=(0, conPag["padY"]))
+        relleno = conPag["padTarjeta"]
+        for columna, peso in ((0, 2), (1, 1), (2, 1), (3, 0), (4, 2)):
+            tarjeta.grid_columnconfigure(columna, weight=peso)
+        estilo = comp.estiloCampo()
 
-        self.grid_(self.etiqueta(marco, ' Compra '), 0, 0, sticky='w')
-        self.campoCompra = CampoAutocompletar(marco
-                                              ,opciones=self.opcionesCompras
-                                              ,crear=self.crearCompra
+        self.campoCompra = CampoAutocompletar(tarjeta, opciones=self.opcionesCompras, crear=self.crearCompra
                                               ,alElegir=lambda i, t: self.campoFactura.entry.focus()
-                                              ,width=conNC["campoCompraWidth"]
-                                              ,**self.estiloEntry())
-        self.grid_(self.campoCompra, 0, 1, columnspan=3, sticky='w')
-
-        self.grid_(self.etiqueta(marco, ' Factura '), 1, 0, sticky='w')
-        self.campoFactura = CampoAutocompletar(marco
-                                               ,opciones=self.opcionesFacturas
-                                               ,crear=self.crearFactura
-                                               ,alElegir=self.facturaElegida
-                                               ,alEscribir=self.facturaSinElegir
-                                               ,width=conNC["campoFacturaWidth"]
-                                               ,**self.estiloEntry())
-        self.grid_(self.campoFactura, 1, 1, sticky='w')
-
-        self.grid_(self.etiqueta(marco, ' Total '), 1, 2, sticky='w')
-        self.etTotalFactura = CTkEntry(marco, width=conNC["etTotalFacturaWidth"], justify='right', **self.estiloEntry())
-        self.grid_(self.etTotalFactura, 1, 3, sticky='w')
+                                              ,width=conPag["merAnchoCampo"], **estilo)
+        self.ubicar(tarjeta, 'Compra', self.campoCompra, 0, 0)
+        self.campoFactura = CampoAutocompletar(tarjeta, opciones=self.opcionesFacturas, crear=self.crearFactura
+                                               ,alElegir=self.facturaElegida, alEscribir=self.facturaSinElegir
+                                               ,width=conPag["merAnchoCampo"], **estilo)
+        self.ubicar(tarjeta, 'Factura', self.campoFactura, 1, 0)
+        self.etTotalFactura = comp.campo(tarjeta, width=conPag["merAnchoCampo"], justify='right')
+        self.ubicar(tarjeta, 'Total factura', self.etTotalFactura, 2, 0)
         self.etTotalFactura.bind('<Return>', self.enterTotalFactura)
-
-        self.grid_(self.etiqueta(marco, ' Fecha '), 1, 4, sticky='w')
-        self.etFechaFactura = CTkEntry(marco, width=conNC["etFechaFacturaWidth"], justify='center', **self.estiloEntry())
-        self.grid_(self.etFechaFactura, 1, 5, sticky='w')
-        self.btnCalendario = self.boton(marco, '...', self.abrirCalendario, conNC["btnCalendarioWidth"])
-        self.grid_(self.btnCalendario, 1, 6, sticky='w')
-        self.facturaSinElegir()
-
-        self.grid_(self.etiqueta(marco, ' Comercio '), 2, 0, sticky='w')
-        self.campoComercio = CampoAutocompletar(marco
-                                                ,opciones=self.opcionesComercios
-                                                ,crear=self.crearComercio
+        self.selectorFecha = comp.SelectorFecha(tarjeta)
+        self.ubicar(tarjeta, 'Fecha factura', self.selectorFecha, 3, 0)
+        self.campoComercio = CampoAutocompletar(tarjeta, opciones=self.opcionesComercios, crear=self.crearComercio
                                                 ,alElegir=lambda i, t: self.campoProducto.entry.focus()
-                                                ,width=conNC["campoComercioWidth"]
-                                                ,**self.estiloEntry())
-        self.grid_(self.campoComercio, 2, 1, columnspan=3, sticky='w')
+                                                ,width=conPag["merAnchoCampo"], **estilo)
+        self.ubicar(tarjeta, 'Comercio', self.campoComercio, 4, 0)
+        self.campoComercio.grid_configure(padx=(conPag["padY"] // 2, relleno))
+        for widget in tarjeta.grid_slaves(row=1):
+            widget.grid_configure(pady=(0, relleno))
+        self.facturaSinElegir()
 
     def opcionesCompras(self):
         lista, mensaje = comprasController.consultarListaCompras()
@@ -165,21 +128,21 @@ class NuevaCompra(CTkToplevel):
             mss.mensajeError('Escriba el total de la factura y presione Enter para crearla')
             self.etTotalFactura.focus()
             return None
-        mensaje = facturasController.insertarFactura(numero, self.etTotalFactura.get(), self.etFechaFactura.get())
+        mensaje = facturasController.insertarFactura(numero, self.etTotalFactura.get(), self.selectorFecha.get())
         if mensaje[0] != 1:
             mss.mensajeError(mensaje[1])
             return None
         return mensaje[2]
 
     def facturaElegida(self, facturaId, numero):
-        #Factura existente: Total y Fecha se muestran y no se editan aquí
+        #Factura existente: Total y Fecha se muestran y no se editan aquí (se cambian en la página Facturas)
         numero, total, fecha = self.facturas[facturaId]
-        for entry, valor in ((self.etTotalFactura, formatearNumero(total)), (self.etFechaFactura, fecha)):
-            entry.configure(state='normal')
-            entry.delete(0, 'end')
-            entry.insert(0, valor)
-            entry.configure(state='disabled')
-        self.btnCalendario.configure(state='disabled')
+        self.etTotalFactura.configure(state='normal')
+        self.etTotalFactura.delete(0, 'end')
+        self.etTotalFactura.insert(0, formatearNumero(total))
+        self.etTotalFactura.configure(state='disabled', fg_color=tema["campoDeshabilitado"])
+        self.selectorFecha.poner(fecha)
+        self.selectorFecha.habilitar(False)
         self.actualizarPie()
         self.campoComercio.entry.focus()
 
@@ -188,13 +151,12 @@ class NuevaCompra(CTkToplevel):
         if self.etTotalFactura.cget('state') == 'disabled':
             self.etTotalFactura.configure(state='normal')
             self.etTotalFactura.delete(0, 'end')
-            self.etFechaFactura.configure(state='normal')
-            self.etFechaFactura.delete(0, 'end')
-        self.etTotalFactura.configure(state='normal')
-        self.etFechaFactura.configure(state='normal')
-        if self.etFechaFactura.get().strip() == '':
-            self.etFechaFactura.insert(0, date.today().isoformat())
-        self.btnCalendario.configure(state='normal')
+            self.selectorFecha.habilitar(True)
+            self.selectorFecha.poner('')
+        self.etTotalFactura.configure(state='normal', fg_color=tema["campo"])
+        self.selectorFecha.habilitar(True)
+        if self.selectorFecha.get() == '':
+            self.selectorFecha.hoy()
         if hasattr(self, 'lbCuadre'):
             self.actualizarPie()
 
@@ -208,21 +170,6 @@ class NuevaCompra(CTkToplevel):
             self.campoComercio.entry.focus()
         return 'break'
 
-    def abrirCalendario(self):
-        self.venCalendario = CTkToplevel(self)
-        self.venCalendario.title("Fecha de la factura")
-        self.venCalendario.transient(self)
-        self.venCalendario.grab_set()
-        calendario = Calendar(self.venCalendario, selectmode='day', locale='es_ES', date_pattern="yyyy-MM-dd")
-        calendario.pack()
-
-        def seleccionar():
-            self.etFechaFactura.delete(0, 'end')
-            self.etFechaFactura.insert(0, calendario.get_date())
-            self.venCalendario.destroy()
-
-        self.boton(self.venCalendario, 'Seleccionar', seleccionar, 150, self.imagenGuardar).pack(pady=conNC["vcPady"])
-
     def opcionesComercios(self):
         lista, mensaje = comerciosController.consultarListaComercios()
         if mensaje[0] == 0:
@@ -231,7 +178,10 @@ class NuevaCompra(CTkToplevel):
         return [(comercioId, f'{nombre} - {direccion}') for comercioId, nombre, direccion in lista]
 
     def crearComercio(self, nombre):
-        dialogo = CTkInputDialog(title='Nuevo comercio', text=f'Dirección de "{nombre}":')
+        dialogo = CTkInputDialog(title='Nuevo comercio', text=f'Dirección de "{nombre}":'
+                                 ,fg_color=tema["tarjeta"], button_fg_color=tema["acento"], button_hover_color=tema["acentoHover"]
+                                 ,entry_fg_color=tema["campo"], entry_border_color=tema["borde"], entry_text_color=tema["texto"]
+                                 ,text_color=tema["texto"])
         direccion = dialogo.get_input()
         if direccion is None:
             return None
@@ -256,6 +206,8 @@ class NuevaCompra(CTkToplevel):
 
     def enfocarInicio(self):
         #Empieza en el primer dato que falte
+        if not self.winfo_ismapped():
+            return
         for campo in (self.campoCompra, self.campoFactura, self.campoComercio):
             if campo.valorId is None:
                 campo.entry.focus()
@@ -265,41 +217,29 @@ class NuevaCompra(CTkToplevel):
     # --- Línea de ingreso: producto, cantidad, precio y total ---
 
     def crearLineaIngreso(self):
-        #Dos filas para que todo quepa en el ancho mínimo de la ventana: el producto ocupa la primera
-        #y crece con la ventana; cantidad, precio, total y botones van en la segunda
-        marco = CTkFrame(self, fg_color=conColor["fg_color"])
-        marco.grid(row=1, column=0, sticky='ew', padx=conNC["padX"], pady=conNC["padY"])
-        marco.grid_columnconfigure(0, weight=1)
+        tarjeta = self.marco(2, pady=(0, conPag["padY"]))
+        relleno = conPag["padTarjeta"]
+        #Producto ocupa el doble que cada número; los botones no crecen
+        for columna, peso in ((0, 3), (1, 1), (2, 1), (3, 1)):
+            tarjeta.grid_columnconfigure(columna, weight=peso)
+        estilo = comp.estiloCampo()
 
-        filaProducto = CTkFrame(marco, fg_color=conColor["fg_color"])
-        filaProducto.grid(row=0, column=0, sticky='ew')
-        filaProducto.grid_columnconfigure(1, weight=1)
-        self.grid_(self.etiqueta(filaProducto, ' Producto '), 0, 0)
-        self.campoProducto = CampoAutocompletar(filaProducto
-                                                ,opciones=self.opcionesProductos
-                                                ,crear=self.crearProducto
+        self.campoProducto = CampoAutocompletar(tarjeta, opciones=self.opcionesProductos, crear=self.crearProducto
                                                 ,alElegir=lambda i, t: self.enfocar(self.etCantidad)
-                                                ,width=conNC["campoProductoWidth"]
-                                                ,**self.estiloEntry())
-        self.grid_(self.campoProducto, 0, 1, sticky='ew')
+                                                ,width=conPag["merAnchoCampo"], **estilo)
+        self.ubicar(tarjeta, 'Producto', self.campoProducto, 0, 0)
+        self.etCantidad = comp.campo(tarjeta, width=conPag["merAnchoCampo"], justify='center')
+        self.ubicar(tarjeta, 'Cant', self.etCantidad, 1, 0)
+        self.etPrecio = comp.campo(tarjeta, width=conPag["merAnchoCampo"], justify='right')
+        self.ubicar(tarjeta, 'Precio unidad', self.etPrecio, 2, 0)
+        self.etTotalItem = comp.campo(tarjeta, width=conPag["merAnchoCampo"], justify='right')
+        self.ubicar(tarjeta, 'Total', self.etTotalItem, 3, 0)
 
-        filaNumeros = CTkFrame(marco, fg_color=conColor["fg_color"])
-        filaNumeros.grid(row=1, column=0, sticky='w')
-        self.grid_(self.etiqueta(filaNumeros, ' Cant '), 0, 0)
-        self.etCantidad = CTkEntry(filaNumeros, width=conNC["etCantidadWidth"], justify='center', **self.estiloEntry())
-        self.grid_(self.etCantidad, 0, 1)
-
-        self.grid_(self.etiqueta(filaNumeros, ' Precio '), 0, 2)
-        self.etPrecio = CTkEntry(filaNumeros, width=conNC["etPrecioWidth"], justify='right', **self.estiloEntry())
-        self.grid_(self.etPrecio, 0, 3)
-
-        self.grid_(self.etiqueta(filaNumeros, ' Total '), 0, 4)
-        self.etTotalItem = CTkEntry(filaNumeros, width=conNC["etTotalItemWidth"], justify='right', **self.estiloEntry())
-        self.grid_(self.etTotalItem, 0, 5)
-
-        self.btnAgregar = self.boton(filaNumeros, 'Agregar', self.guardarItem, conNC["btnAgregarWidth"], self.imagenAgregar)
-        self.grid_(self.btnAgregar, 0, 6)
-        self.btnCancelarEdicion = self.boton(filaNumeros, 'Cancelar', self.limpiarLinea, conNC["btnCancelarEdicionWidth"], self.imagenCancelar)
+        self.btnAgregar = comp.boton(tarjeta, 'Agregar', self.guardarItem, ancho=conPag["comAnchoBoton"])
+        self.btnAgregar.grid(row=1, column=4, padx=(conPag["padY"], relleno))
+        self.btnCancelarEdicion = comp.boton(tarjeta, 'Cancelar', self.limpiarLinea, 'secundario', conPag["comAnchoBoton"])
+        for widget in tarjeta.grid_slaves(row=1):
+            widget.grid_configure(pady=(0, relleno))
 
         #Enter pasa al siguiente campo; en Total agrega el ítem
         self.etCantidad.bind('<Return>', lambda evento: self.enterEn(evento, self.etPrecio))
@@ -341,7 +281,7 @@ class NuevaCompra(CTkToplevel):
 
     def recalcularTotal(self, evento=None):
         #Total sugerido = número con que empieza la cantidad x precio, salvo que el total se haya escrito a mano
-        if evento is not None and evento.keysym in ('Return', 'KP_Enter', 'Tab', 'ISO_Left_Tab', 'Escape'):
+        if evento is not None and evento.keysym in TECLAS_SIN_TEXTO:
             return
         if self.totalManual:
             return
@@ -353,7 +293,7 @@ class NuevaCompra(CTkToplevel):
         self.etTotalItem.insert(0, formatearNumero(round(cantidad * precio, 2)))
 
     def totalEscrito(self, evento):
-        if evento.keysym not in ('Return', 'KP_Enter', 'Tab', 'ISO_Left_Tab', 'Escape', 'Shift_L', 'Shift_R'):
+        if evento.keysym not in TECLAS_SIN_TEXTO:
             self.totalManual = True
 
     def guardarItem(self):
@@ -399,54 +339,30 @@ class NuevaCompra(CTkToplevel):
         for entry in (self.etCantidad, self.etPrecio, self.etTotalItem):
             entry.delete(0, 'end')
         self.etCantidad.insert(0, '1')
-        self.btnAgregar.configure(text='Agregar', image=self.imagenAgregar)
+        self.btnAgregar.configure(text='Agregar')
         self.btnCancelarEdicion.grid_forget()
         self.campoProducto.entry.focus()
 
     # --- Tabla de ítems ---
 
     def crearTabla(self):
-        marco = CTkFrame(self, fg_color=conColor["fg_color"])
-        marco.grid(row=2, column=0, sticky='nsew', padx=conNC["padX"], pady=conNC["padY"])
-        marco.grid_columnconfigure(0, weight=1)
-        marco.grid_rowconfigure(0, weight=1)
-
-        estilo = ttk.Style()
-        estilo.configure('Compra.Treeview', font=(conNC["fuente"], conNC["tablaTamanoFuente"]), rowheight=conNC["tablaAltoFila"])
-        estilo.configure('Compra.Treeview.Heading', font=(conNC["fuente"], conNC["tablaTamanoFuente"], 'bold'))
-
-        columnas = ('producto', 'cantidad', 'precio', 'total')
-        self.tabla = ttk.Treeview(marco, columns=columnas, show='headings', style='Compra.Treeview', selectmode='browse')
-        for columna, titulo, ancho, alineacion in (('producto', 'Producto', conNC["colProductoWidth"], 'w')
-                                                   ,('cantidad', 'Cant', conNC["colCantidadWidth"], 'center')
-                                                   ,('precio', 'Precio unidad', conNC["colPrecioWidth"], 'e')
-                                                   ,('total', 'Total', conNC["colTotalWidth"], 'e')):
-            self.tabla.heading(columna, text=titulo)
-            self.tabla.column(columna, width=ancho, anchor=alineacion, stretch=(columna == 'producto'))
-        self.tabla.grid(row=0, column=0, sticky='nsew')
-
-        barra = CTkScrollbar(marco, command=self.tabla.yview)
-        barra.grid(row=0, column=1, sticky='ns')
-        self.tabla.configure(yscrollcommand=barra.set)
-
+        tarjeta = self.marco(3, pady=(0, conPag["padY"]))
+        columnas = (('producto', 'Producto', conPag["comColProducto"], 'w', True)
+                    ,('cantidad', 'Cant', conPag["comColCantidad"], 'center', False)
+                    ,('precio', 'Precio unidad', conPag["comColPrecio"], 'e', False)
+                    ,('total', 'Total', conPag["comColTotal"], 'e', False))
+        self.tabla = comp.crearTabla(tarjeta, columnas)
         self.tabla.bind('<Double-1>', lambda evento: self.editarItem())
         self.tabla.bind('<Return>', lambda evento: self.editarItem())
         self.tabla.bind('<Delete>', lambda evento: self.borrarItem())
-
-        CTkLabel(marco
-                 ,text='Doble clic o Enter: editar ítem    Supr: borrar ítem    Ctrl+Enter: cargar compra'
-                 ,text_color=conColor["ColorLetras"]
-                 ,font=(conNC["fuente"], conNC["tablaTamanoFuente"])).grid(row=1, column=0, sticky='w')
 
     def refrescarTabla(self):
         self.listaItems, mensaje = mercadoTempController.consultarMercadoTemp()
         if mensaje[0] == 0:
             mss.mensajeError(mensaje[1])
-        self.tabla.delete(*self.tabla.get_children())
         #consultarMercadoTemp devuelve el más reciente primero; en la tabla van en el orden en que se agregaron
-        for mercadoIdTemp, producto, cantidad, precioUnidad, precioTotal, *resto in reversed(self.listaItems):
-            self.tabla.insert('', 'end', iid=str(mercadoIdTemp)
-                              ,values=(producto, cantidad, formatearMoneda(precioUnidad), formatearMoneda(precioTotal)))
+        comp.llenarTabla(self.tabla, [(mercadoIdTemp, (producto, cantidad, formatearMoneda(precioUnidad), formatearMoneda(precioTotal)))
+                                      for mercadoIdTemp, producto, cantidad, precioUnidad, precioTotal, *resto in reversed(self.listaItems)])
         hijos = self.tabla.get_children()
         if hijos:
             self.tabla.see(hijos[-1])
@@ -478,8 +394,8 @@ class NuevaCompra(CTkToplevel):
         self.etCantidad.insert(0, fila[2])
         self.etPrecio.insert(0, formatearNumero(fila[3]))
         self.etTotalItem.insert(0, formatearNumero(fila[4]))
-        self.btnAgregar.configure(text='Guardar cambio', image=self.imagenGuardar)
-        self.grid_(self.btnCancelarEdicion, 0, 7)
+        self.btnAgregar.configure(text='Guardar cambio')
+        self.btnCancelarEdicion.grid(row=1, column=5, padx=(0, conPag["padTarjeta"]), pady=(0, conPag["padTarjeta"]))
         self.enfocar(self.etCantidad)
 
     def borrarItem(self):
@@ -495,27 +411,22 @@ class NuevaCompra(CTkToplevel):
             self.limpiarLinea()
         self.refrescarTabla()
 
-    # --- Pie: totales y botones ---
+    # --- Pie: totales, cuadre y carga ---
 
     def crearPie(self):
-        marco = CTkFrame(self, fg_color=conColor["fg_color"])
-        marco.grid(row=3, column=0, sticky='ew', padx=conNC["padX"], pady=conNC["padY"])
-        marco.grid_columnconfigure(0, weight=1)
-
-        textos = CTkFrame(marco, fg_color=conColor["fg_color"])
-        textos.grid(row=0, column=0, sticky='w')
-        self.lbCuadre = CTkLabel(textos, text='', font=self.fuente(), text_color=conColor["ColorLetras"], anchor='w')
-        self.lbCuadre.grid(row=0, column=0, sticky='w', padx=conNC["padX"])
-        self.lbDiferencia = CTkLabel(textos, text='', font=self.fuente(), anchor='w')
-        self.lbDiferencia.grid(row=0, column=1, sticky='w')
-
-        self.grid_(self.boton(marco, 'Cerrar', self.destroy, conNC["btnPieWidth"], self.imagenCancelar), 0, 1)
-        self.grid_(self.boton(marco, 'Cargar compra', self.cargarCompra, conNC["btnPieWidth"], self.imagenCargar), 0, 2)
+        marco = CTkFrame(self, fg_color='transparent')
+        marco.grid(row=4, column=0, sticky='ew', padx=conPag["padX"] * 2, pady=(0, conPag["padX"]))
+        marco.grid_columnconfigure(2, weight=1)
+        self.lbCuadre = CTkLabel(marco, text='', font=comp.fuente(conPag["tamanoCampo"]), text_color=tema["textoSuave"], anchor='w')
+        self.lbCuadre.grid(row=0, column=0, sticky='w')
+        self.lbDiferencia = CTkLabel(marco, text='', font=comp.fuente(conPag["tamanoCampo"], 'bold'), anchor='w')
+        self.lbDiferencia.grid(row=0, column=1, sticky='w', padx=(conPag["padY"] // 2, 0))
+        comp.boton(marco, 'Cargar compra', self.cargarCompra, ancho=conPag["comAnchoBotonCargar"]).grid(row=0, column=3, sticky='e')
 
     def actualizarPie(self):
         #Ítems y suma de toda la compra en curso; cuadre solo con los ítems de la factura del encabezado
         suma = sum(fila[4] for fila in self.listaItems)
-        texto = f'Ítems: {len(self.listaItems)}     Suma: {formatearMoneda(suma)}'
+        texto = f'Ítems: {len(self.listaItems)}    Suma: {formatearMoneda(suma)}'
         diferencia = None
 
         facturaId = self.campoFactura.valorId if hasattr(self, 'campoFactura') else None
@@ -524,14 +435,14 @@ class NuevaCompra(CTkToplevel):
             filas, mensaje = mercadoTempController.cuadreFacturas()
             sumaFactura = next((fila[2] for fila in filas if fila[0] == facturaId), 0)
             diferencia = round(totalFactura - sumaFactura, 2)
-            texto += f'     Factura {numero}: {formatearMoneda(totalFactura)}     Diferencia:'
+            texto += f'    Factura {numero}: {formatearMoneda(totalFactura)}    Diferencia:'
 
         self.lbCuadre.configure(text=texto)
         if diferencia is None:
             self.lbDiferencia.configure(text='')
         else:
             self.lbDiferencia.configure(text=formatearMoneda(diferencia)
-                                        ,text_color=conNC["colorCuadreBien"] if diferencia == 0 else conNC["colorCuadreMal"])
+                                        ,text_color=tema["exito"] if diferencia == 0 else tema["peligro"])
 
     def facturasSinCuadrar(self):
         #Texto con las facturas de la compra en curso cuya suma de ítems no coincide con su total

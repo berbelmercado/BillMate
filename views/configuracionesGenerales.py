@@ -1,20 +1,4 @@
-#Este diccionario guarda los colores que usa el sistema
-dicConfiguracionGeneralColores={"bgGeneral":'#202020'   #'#75B3FA'#''#75DCFA #202020,#35155D
-                         ,"fg_color":"#17153B"#"#0B2447"
-                         ,"bgBotones":'#576CBC'#"#DEFA7F"
-                         ,"bgEntrys":"#3A3A3A"
-                         ,"bgLabels":"#C8ACD6" #576CBC,#607CEB
-                         ,"ColorLetras":"#A9A9A9"
-                         ,"colorLetrasLabel":'black'
-                         ,"colorLetrasEntry":'black'
-}
-
-#En este diccionario se guardan los tipos de fuentes que se usa en todo el sistema
-dicConfiguracionGeneralFuentes={"Fuente":'Helvetica'
-                                ,"tamano":14
-                                }
-
-#Configuración común de los botones de todas las ventanas
+#Configuración común de los botones
 dicConfig={
            #Cursor en botones
             "cursor":"hand2"#plus
@@ -25,20 +9,81 @@ dicConfig={
             ,"corner_radius":8
         }
 
-#Colores de la pantalla de inicio (barra lateral, tarjetas y tabla de la última compra)
-dicTemaInicio={
+#Colores de la aplicación (barra lateral, páginas, tarjetas, campos y tablas)
+dicTema={
             "fondo":'#141322'            #área de contenido
             ,"lateral":'#1B1A2E'         #barra lateral
             ,"tarjeta":'#232238'
             ,"borde":'#2F2D4A'
             ,"acento":'#576CBC'          #botón principal y fila seleccionada
             ,"acentoHover":'#6B80D4'
-            ,"botonHover":'#2A2944'      #botones de la barra lateral al pasar el mouse
+            ,"botonHover":'#2A2944'      #botones planos al pasar el mouse y botón activo de la barra lateral
             ,"texto":'#ECECF4'
             ,"textoSuave":'#9A98B5'
             ,"filaPar":'#1C1B30'
             ,"filaImpar":'#232238'
             ,"encabezadoTabla":'#2A2944'
+            ,"campo":'#1C1B30'           #fondo de los campos de texto
+            ,"campoDeshabilitado":'#191828'
+            ,"exito":'#7FD18B'
+            ,"peligro":'#E05A5A'
+            ,"peligroHover":'#F07070'
+}
+
+#Tamaños y fuentes comunes de las páginas (views/componentes.py y views/paginas/)
+dicConfigPaginas={
+            "fuente":'Helvetica'
+            ,"tamanoTitulo":24
+            ,"tamanoSubtitulo":13
+            ,"tamanoEtiqueta":12
+            ,"tamanoCampo":14
+            ,"tamanoBoton":14
+            ,"tamanoTabla":12
+            ,"tamanoTituloPanel":16
+
+            ,"altoCampo":34
+            ,"altoBoton":36
+            ,"radio":8
+            ,"radioTarjeta":12
+            ,"altoFilaTabla":30
+
+            ,"padX":16
+            ,"padY":10
+            ,"padTarjeta":14
+
+            #Panel de formulario de las pantallas de datos
+            ,"anchoPanel":300
+            ,"anchoBuscador":420
+
+            #Lista desplegable del autocompletado (views/campoAutocompletar.py)
+            ,"listaMaxOpciones":50
+            ,"listaMaxVisibles":8
+            ,"listaTamanoFuente":12
+
+            #Selector de fecha
+            ,"anchoFecha":130
+            ,"anchoBotonFecha":40
+            ,"padCalendario":10
+
+            #Página Mercados: columnas de la tabla y ancho mínimo de los campos del panel de edición
+            ,"merColProducto":200
+            ,"merColCantidad":70
+            ,"merColPrecio":100
+            ,"merColTotal":100
+            ,"merColFactura":100
+            ,"merColFecha":95
+            ,"merColComercio":140
+            ,"merColCompra":150
+            ,"merAnchoCampo":60
+            ,"merAnchoSegmentos":300
+
+            #Página Agregar Mercados: columnas de la tabla de ítems y botones
+            ,"comColProducto":320
+            ,"comColCantidad":90
+            ,"comColPrecio":140
+            ,"comColTotal":140
+            ,"comAnchoBoton":140
+            ,"comAnchoBotonCargar":180
 }
 
 #Tamaños y fuentes de la pantalla de inicio

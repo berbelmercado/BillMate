@@ -1,7 +1,10 @@
 # Importaciones
 from views import ventanaPrincipal as vp
 from views import frameMenu as fm
-from views import frameListasTreview as trv
+from views.paginas.inicio import PanelInicio
+from views.paginas.datos import PaginaProductos, PaginaFacturas, PaginaComercios, PaginaCompras
+from views.paginas.mercados import PaginaMercados
+from views.paginas.compra import PaginaCompra
 from views.messagebox import mensajesEmergentes
 from controller import crearBdController
 
@@ -19,9 +22,16 @@ def main():
         # Inicializa la ventana principal
         raiz = vp.VentanaPrincipal()
 
-        # Añade la barra lateral y la pantalla de inicio a la ventana principal
-        fm.FrameMenu(master=raiz.frameGlogal)
-        trv.PanelInicio(master=raiz.frameGlogal)
+        # Páginas que se muestran a la derecha de la barra lateral, y la barra lateral que navega entre ellas
+        raiz.registrarPaginas({'inicio': PanelInicio
+                               ,'compra': PaginaCompra
+                               ,'mercados': PaginaMercados
+                               ,'productos': PaginaProductos
+                               ,'facturas': PaginaFacturas
+                               ,'comercios': PaginaComercios
+                               ,'compras': PaginaCompras})
+        fm.FrameMenu(master=raiz.frameGlogal, ventana=raiz)
+        raiz.mostrar('inicio')
 
         # Inicia el bucle principal de la interfaz gráfica
         raiz.mainloop()

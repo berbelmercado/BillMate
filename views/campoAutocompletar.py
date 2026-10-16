@@ -2,7 +2,8 @@
 import sys
 import tkinter as tk
 from customtkinter import CTkFrame, CTkEntry
-from views.ventanasSecundarias.configuracionVentanasSecundarias import dicConfigNuevaCompra as conNC
+from views.configuracionesGenerales import dicTema as tema
+from views.configuracionesGenerales import dicConfigPaginas as conPag
 
 #Teclas que no cambian el texto: no deben volver a filtrar la lista
 TECLAS_SIN_TEXTO = {'Up', 'Down', 'Return', 'KP_Enter', 'Escape', 'Tab', 'ISO_Left_Tab', 'Shift_L', 'Shift_R'
@@ -110,7 +111,7 @@ class CampoAutocompletar(CTkFrame):
         coincidencias = [opcion for opcion in self.datos if escrito in opcion[1].lower()]
         #Primero las que empiezan con lo escrito
         coincidencias.sort(key=lambda opcion: not opcion[1].lower().startswith(escrito))
-        self.visibles = coincidencias[:conNC['listaMaxOpciones']]
+        self.visibles = coincidencias[:conPag['listaMaxOpciones']]
         existeExacto = any(opcion[1].lower() == escrito for opcion in self.datos)
         if self.crear is not None and escrito and not existeExacto:
             self.visibles.append(('crear', self.texto()))
@@ -128,21 +129,24 @@ class CampoAutocompletar(CTkFrame):
             self.ventanaLista.transient(self.winfo_toplevel())
             ventanaSinActivar(self.ventanaLista)
             self.lista = tk.Listbox(self.ventanaLista
-                                    ,font=(conNC['fuente'], conNC['listaTamanoFuente'])
-                                    ,bg=conNC['listaFondo']
-                                    ,fg=conNC['listaLetra']
-                                    ,selectbackground=conNC['listaSeleccion']
+                                    ,font=(conPag['fuente'], conPag['listaTamanoFuente'])
+                                    ,bg=tema['tarjeta']
+                                    ,fg=tema['texto']
+                                    ,selectbackground=tema['acento']
+                                    ,selectforeground='white'
                                     ,activestyle='none'
                                     ,exportselection=False
-                                    ,borderwidth=1
-                                    ,highlightthickness=0)
+                                    ,borderwidth=0
+                                    ,highlightthickness=1
+                                    ,highlightbackground=tema['borde']
+                                    ,highlightcolor=tema['borde'])
             self.lista.pack(fill='both', expand=True)
             self.lista.bind('<ButtonRelease-1>', self._clicLista)
 
         self.lista.delete(0, 'end')
         for idOpcion, textoOpcion in self.visibles:
             self.lista.insert('end', f'+ Crear "{textoOpcion}"' if idOpcion == 'crear' else textoOpcion)
-        self.lista.configure(height=min(len(self.visibles), conNC['listaMaxVisibles']))
+        self.lista.configure(height=min(len(self.visibles), conPag['listaMaxVisibles']))
         self.lista.selection_clear(0, 'end')
         self.lista.selection_set(0)
         self.lista.see(0)

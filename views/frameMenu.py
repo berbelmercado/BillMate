@@ -1,81 +1,40 @@
-"""Barra lateral de la ventana principal: logo, acción principal y accesos a registros y consultas"""
+"""Barra lateral de la ventana principal: logo, acción principal y navegación entre páginas"""
 from customtkinter import CTkFrame,CTkButton,CTkImage,CTkLabel
 from PIL import Image
 from views import configuracionesGenerales as conGen
-from views.configuracionesGenerales import dicTemaInicio as tema
+from views.configuracionesGenerales import dicTema as tema
 from views.configuracionesGenerales import dicConfigInicio as conIni
 from views.vwImgConfig import leerImagen
-from views.ventanasSecundarias import registrarFactura as rf
-from views.ventanasSecundarias import registrarComercio as rc
-from views.ventanasSecundarias import registrarProductos as rp
-from views.ventanasSecundarias import nuevaCompra as nc
-from views.ventanasSecundarias import consultarProductos as cp
-from views.ventanasSecundarias import consultarMercados as cm
-from views.ventanasSecundarias import consultarFacturas as cf
-from views.ventanasSecundarias import consultarComercios as cc
-from views.ventanasSecundarias import registrarCompras as rcp
-from views.ventanasSecundarias import consultarCompras as conCom
 from views.messagebox import mensajesEmergentes as mss
 from controller.crearBdController import abrirCarpetaDatosController
 
 class FrameMenu(CTkFrame):
 
     #Barra lateral; se ubica en la columna 0 del contenedor de la ventana principal
-    def __init__(self,master):
+    def __init__(self,master,ventana):
         super().__init__(master
                          ,fg_color=tema["lateral"]
                          ,corner_radius=0
                          ,width=conIni["anchoLateral"])
         self.master=master
+        self.ventana=ventana            #VentanaPrincipal, que muestra las páginas
+        self.ventana.menu=self
+        self.botonesPagina={}           #nombre de página -> botón, para resaltar la visible
         self.grid(row=0, column=0, sticky='ns')
         self.grid_propagate(False)
         self.grid_columnconfigure(0, weight=1)
         self.crearWidgets()
-
-    def mostrarVentanaRegistrarFactura(self):
-        #muestra la ventana secundaria para registrar factura
-        ventanaRegistrarFactura=rf.RegistrarFactura(self.master)
-
-    def mostrarVentanaRegistrarComercio(self):
-        #muestra la ventana secundaria para registrar comercio
-        ventanaRegistrarComercio=rc.RegistrarComercio(self.master)
-
-    def mostrarVentanaRegistrarProducto(self):
-        #ventana secundaria registrar producto
-        ventanaRegistrarProducto=rp.RegistrarProductos(self.master)
-
-    def mostrarVentanaAgregarMercado(self):
-        #ventana secundaria registrar mercado
-        ventanaAgregarMercado=nc.NuevaCompra(self.master)
-
-    def mostrarVentanaconsultarProductos(self):
-        #ventana secundaria consultar productos
-        ventanaConsultarProducto=cp.ConsultarProductos(self.master)
-
-    def mostrarVentanaConsultarFacturas(self):
-        ventanaConsultarFacturas= cf.ConsultarFacturas(self.master)
-
-    def mostrarVentanaConsultarMercados(self):
-        #ventana secundaria consultar mercados
-        ventanaConsultarMercados=cm.ConsultarMercados(self.master)
-
-    def mostrarVentanaConsultarComercios(self):
-        #ventana secundaria consultar comercios
-        ventanaConsultarComercios=cc.ConsultarComercios(self.master)
-
-    def mostrarVentanaRegistrarCompras(self):
-        #Ventana secundaria registrar compra
-        ventanaRegistrarCompras = rcp.RegistrarCompras(self.master)
-
-    def mostrarVentanaConsultarCompras(self):
-        #Ventana secundaria registrar compra
-        ventanaConsultarCompras = conCom.ConsultarCompras(self.master)
 
     def abrirCarpetaDatos(self):
         #Abre la carpeta donde está guardada la base de datos
         mensaje = abrirCarpetaDatosController()
         if mensaje[0] == 0:
             mss.mensajeError(mensaje[1])
+
+    def marcarActivo(self, nombre):
+        #Resalta el botón de la página visible
+        for nombrePagina, boton in self.botonesPagina.items():
+            boton.configure(fg_color=tema["botonHover"] if nombrePagina == nombre else 'transparent')
 
     def icono(self, nombre, tamano):
         imagen = Image.open(leerImagen(nombre))
@@ -111,8 +70,9 @@ class FrameMenu(CTkFrame):
                  ,anchor='w').grid(row=fila, column=0, sticky='ew', padx=conIni["padX"] + 4, pady=(conIni["padY"], 2))
 
     def crearWidgets(self):
-        iconoRegistrar = self.icono("Registrar", conIni["iconoTamano"])
+        iconoInicio = self.icono("imgLogo", conIni["iconoTamano"])
         iconoConsultar = self.icono("Consultar", conIni["iconoTamano"])
+        iconoDatos = self.icono("Registrar", conIni["iconoTamano"])
 
         #Logo y nombre
         CTkLabel(self
@@ -126,7 +86,7 @@ class FrameMenu(CTkFrame):
         #Acción principal
         CTkButton(self
                   ,text='Agregar Mercados'
-                  ,command=self.mostrarVentanaAgregarMercado
+                  ,command=lambda: self.ventana.mostrar('compra')
                   ,image=self.icono("Agregar", conIni["iconoTamano"])
                   ,compound='left'
                   ,fg_color=tema["acento"]
@@ -137,20 +97,22 @@ class FrameMenu(CTkFrame):
                   ,corner_radius=conIni["radioBoton"]
                   ,cursor=conGen.dicConfig["cursor"]).grid(row=1, column=0, sticky='ew', padx=conIni["padX"], pady=conIni["padY"] // 2)
 
+        #Cada botón muestra una página (nombre registrado en VentanaPrincipal) o ejecuta un comando
         fila = 2
-        for titulo, icono, botones in (('REGISTRAR', iconoRegistrar, (('Facturas', self.mostrarVentanaRegistrarFactura)
-                                                                      ,('Comercios', self.mostrarVentanaRegistrarComercio)
-                                                                      ,('Productos', self.mostrarVentanaRegistrarProducto)
-                                                                      ,('Compras', self.mostrarVentanaRegistrarCompras)))
-                                       ,('CONSULTAR', iconoConsultar, (('Mercados', self.mostrarVentanaConsultarMercados)
-                                                                       ,('Productos', self.mostrarVentanaconsultarProductos)
-                                                                       ,('Facturas', self.mostrarVentanaConsultarFacturas)
-                                                                       ,('Comercios', self.mostrarVentanaConsultarComercios)
-                                                                       ,('Compras', self.mostrarVentanaConsultarCompras)))):
+        for titulo, botones in (('GENERAL', (('Inicio', iconoInicio, 'inicio', None)
+                                             ,('Mercados', iconoConsultar, 'mercados', None)))
+                                ,('DATOS', (('Productos', iconoDatos, 'productos', None)
+                                            ,('Facturas', iconoDatos, 'facturas', None)
+                                            ,('Comercios', iconoDatos, 'comercios', None)
+                                            ,('Compras', iconoDatos, 'compras', None)))):
             self.seccion(fila, titulo)
             fila += 1
-            for texto, comando in botones:
-                self.botonLateral(fila, f'  {texto}', comando, icono)
+            for texto, icono, pagina, comando in botones:
+                if pagina is not None:
+                    comando = lambda nombre=pagina: self.ventana.mostrar(nombre)
+                boton = self.botonLateral(fila, f'  {texto}', comando, icono)
+                if pagina is not None:
+                    self.botonesPagina[pagina] = boton
                 fila += 1
 
         #La fila vacía empuja "Carpeta de datos" al pie de la barra

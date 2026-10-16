@@ -42,26 +42,35 @@ Both configs contain absolute `D:/BillMate/...` paths.
 
 MVC layout with three packages; the flow is always **view → controller → model → SQLite**.
 
-- `main.py` — calls `crearBdController.existeBase()` (creates the DB if missing and applies pending schema migrations), then builds `VentanaPrincipal` with `FrameMenu` (left sidebar) and `PanelInicio` (home screen: summary cards and the latest purchase). Startup errors are also shown in a message box, since the packaged exe has no console.
+- `main.py` — calls `crearBdController.existeBase()` (creates the DB if missing and applies pending schema migrations), then builds `VentanaPrincipal`, registers the pages (`registrarPaginas`), adds `FrameMenu` (left sidebar) and shows `'inicio'`. Startup errors are also shown in a message box, since the packaged exe has no console.
 - `model/` — one class per table, plus `conexionDb.ConexionDb`. Every model method opens a fresh `ConexionDb()` (which enables `PRAGMA foreign_keys`), runs parameterized SQL (`?`), and calls `desconectar()` (which commits and closes). If a statement fails, the cursor (`CursorSeguro`) rolls back and closes the connection before re-raising, so a failed write never leaves the DB locked. `UML/Modelo relacional.png` shows the relational model.
 - **Schema and migrations** — `model/crearTablasBd.CreacionBbBillMate` creates the original schema (version 0) and must not be edited. `model/migraciones.MIGRACIONES` holds one function per version; `aplicarMigraciones()` tracks the version in `PRAGMA user_version`, backs up an existing DB to `BillMate.db.respaldo-v<N>` first, and runs each migration in a transaction that is rolled back on failure. To change the schema, append a new function to `MIGRACIONES` (never edit a released one) and add a test in `tests/test_migraciones.py`. The original schema and migration 1 still say `describcion` (the old column name); everywhere else it is `descripcion`.
 - `controller/` — one module of plain functions per entity (no classes), imported as a module: `from controller import productosController` → `productosController.insertarProducto(nombre)`. Each function takes only the values it needs, validates input, instantiates the model, and returns a result list `mensaje = [status, text]` where `1` = success and `0` = error (query functions return `(rows, mensaje)`; the `insertar*` functions return `[1, text, newId]` on success, using `cursor.lastrowid` from the model). Views check `mensaje[0]` and show `mensajesEmergentes.mensajeInformativo` / `mensajeError`.
 - Price input is parsed by `controller/validaciones.convertirNumero` (Colombian format: `.` thousands separator, `,` decimal; `1.500` → 1500, `12.5` → 12.5) and written back with `formatearNumero`. Use these instead of `float()` on user input.
-- `views/` — the main window uses `grid`:
-  - `ventanaPrincipal`: the window, plus `estiloTablas()`, the global `ttk.Treeview` style that the secondary screens inherit;
-  - `frameMenu`: the sidebar;
-  - `frameListasTreview.PanelInicio`: the home screen; it has its own `Inicio.Treeview` style;
-  - `frameTotal`: the running total widget used by `consultarMercados`.
+- `views/` — a single main window, laid out with `grid`; screens are **pages** shown inside it:
+  - `ventanaPrincipal.VentanaPrincipal`: the window. `mostrar(nombre)` creates the page the first time, shows it in column 1, hides the previous one and calls its `refrescar()`.
+  - `frameMenu`: the sidebar. Page buttons call `ventana.mostrar(...)`, and the visible page's button is highlighted via `marcarActivo`.
+  - `componentes`: shared widgets in the app style:
+    - `encabezadoPagina`, `campo`, `boton` (`principal` / `secundario` / `peligro`), `tarjeta`;
+    - `crearTabla` / `llenarTabla` with the `App.Treeview` style;
+    - `SelectorFecha` (the calendar opens from its button or by clicking the field).
+  - `paginas/inicio.PanelInicio`: summary cards and the latest purchase.
+  - `paginas/datos.py`: `PaginaDatos` is the base for Productos, Facturas, Comercios and Compras (search box, table, and a side panel that creates a new record or edits the selected one). A subclass only declares `columnas`, `campos` and the controller calls (`listar`, `buscar`, `filaTabla`, `datosFila`, `crear`, `editar`).
+  - `paginas/mercados.PaginaMercados`: loaded items. You can search by Producto, Factura or Compra (segmented selector). The bottom panel edits the selected item: producto, factura, comercio and compra use `CampoAutocompletar`, and the total is suggested from cantidad × precio. The same panel deletes an item, asking for confirmation first.
+  - `paginas/compra.PaginaCompra`: "Agregar Mercados" (see below).
+  - `campoAutocompletar.CampoAutocompletar`: an entry with a dropdown of matches that can also create missing records ("+ Crear"). The dropdown is a separate window; on Windows it gets `WS_EX_NOACTIVATE` and closes only when focus really leaves the field, otherwise Windows' spurious FocusOut closed it or stole activation.
 
-  Each register/query screen is a `CTkToplevel` in `views/ventanasSecundarias/`. The older ones use absolute `place()` coordinates; `nuevaCompra` uses `grid`. Screens that change purchases call `frameListasTreview.avisarDatosCambiados(self)`, which emits `<<DatosCambiados>>`; `PanelInicio` listens on the `all` tag (via `tkinter.Misc.bind_all`, since CustomTkinter blocks `bind_all`) and refreshes.
+  Only small popups remain as separate windows: the calendar, the new-comercio address dialog, the autocomplete dropdown and the message boxes. Ctrl+Enter in `PaginaCompra` is bound on its own entries, not on the window, so it doesn't fire on other pages.
+
+  Code that changes data calls `paginas/inicio.avisarDatosCambiados(self)`, which emits `<<DatosCambiados>>`. `PanelInicio` listens on the `all` tag (via `tkinter.Misc.bind_all`, since CustomTkinter blocks `bind_all`) and refreshes.
 
 ### Styling and layout config
 
-Colors, fonts, and widget sizes/positions are not hard-coded in widgets; they come from dictionaries in `views/configuracionesGenerales.py` (main window: `dicTemaInicio` colors and `dicConfigInicio` sizes; `dicConfig` keeps `cursor`/`compound`/`corner_radius` shared by every screen) and `views/ventanasSecundarias/configuracionVentanasSecundarias.py` (secondary windows). Icon paths are mapped by name in `views/vwImgConfig.py` (`leerImagen("Guardar")`, etc.). Add new values to these dicts rather than inlining them.
+Colors, fonts, and widget sizes/positions are not hard-coded in widgets; they come from dictionaries in `views/configuracionesGenerales.py` (`dicTema` colors for the whole app, `dicConfigPaginas` sizes for pages and components, `dicConfigInicio` for the sidebar and home page; `dicConfig` keeps `cursor`/`compound`/`corner_radius`). Icon paths are mapped by name in `views/vwImgConfig.py` (`leerImagen("Guardar")`, etc.). Add new values to these dicts rather than inlining them.
 
 ### Purchase workflow (mercadosTemp → mercados)
 
-The "Agregar Mercados" menu button opens `views/ventanasSecundarias/nuevaCompra.py` (`NuevaCompra`). Its header (compra, factura, comercio) and product field use `campoAutocompletar.CampoAutocompletar`, which can also create missing records ("+ Crear", using the id returned by the `insertar*` functions). Line items are first written to the staging table `mercadosTemp` (add/edit/delete freely); each row keeps its own compra/factura/comercio. The footer compares the items of the header's factura with its total (`mercadoTempController.cuadreFacturas`). "Cargar compra" (button or Ctrl+Enter) asks for confirmation if any factura doesn't match, then `mercadoTempController.cargarCompra` → `cargarCompraModel` copies all rows into `mercados`, deletes the staging rows, and resets the `mercadosTemp` autoincrement sequence. A `mercados` row links `compras` (a purchase batch), `facturas`, `productos`, and `comercios`.
+The "Agregar Mercados" sidebar button shows `views/paginas/compra.py` (`PaginaCompra`). Its header (compra, factura, comercio) and product field use `CampoAutocompletar`, which can also create missing records ("+ Crear", using the id returned by the `insertar*` functions). Line items are first written to the staging table `mercadosTemp` (add/edit/delete freely); each row keeps its own compra/factura/comercio. The footer compares the items of the header's factura with its total (`mercadoTempController.cuadreFacturas`). "Cargar compra" (button or Ctrl+Enter) asks for confirmation if any factura doesn't match, then `mercadoTempController.cargarCompra` → `cargarCompraModel` copies all rows into `mercados`, deletes the staging rows, and resets the `mercadosTemp` autoincrement sequence. A `mercados` row links `compras` (a purchase batch), `facturas`, `productos`, and `comercios`.
 
 ### Resource paths
 
