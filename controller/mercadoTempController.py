@@ -1,7 +1,7 @@
 import sqlite3
 from model.mercadoTemp import MercadoTemp
 from model.mercadoTemp import cargarCompraModel
-from controller.validaciones import esNumero
+from controller.validaciones import esNumero, convertirNumero
 
 class MercadoTempController():
 
@@ -50,8 +50,8 @@ class MercadoTempController():
         estado = self.validacionCamposMercadosController()
 
         if estado == 1: 
-            self.precioUnidadTemp = float(self.precioUnidadTemp)
-            self.precioTotalTemp = float(self.precioTotalTemp)
+            self.precioUnidadTemp = convertirNumero(self.precioUnidadTemp)
+            self.precioTotalTemp = convertirNumero(self.precioTotalTemp)
 
             mensaje = []
 

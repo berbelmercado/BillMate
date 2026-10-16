@@ -1,5 +1,6 @@
 import sqlite3
 from model.facturas import Facturas
+from controller.validaciones import convertirNumero
 
 class FacturaController:
     #Controlador para facturas
@@ -26,12 +27,12 @@ class FacturaController:
             if numeroFactura.strip()=='' or valorTotalFactura.strip()=='' or fechaFactura.strip()=='':
                 return 0
 
-            #Validamos que "Valor total factura" sea numérico
-            try:
-                self.valorTotalFactura=float(valorTotalFactura)
-            except ValueError:
+            #Validamos que "Valor total factura" sea numérico (acepta 12.500 y 12.500,50)
+            valor = convertirNumero(valorTotalFactura)
+            if valor is None:
                 return 2
 
+            self.valorTotalFactura = valor
             return 1
          
     def insertarFacturas(self):

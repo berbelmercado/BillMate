@@ -130,6 +130,19 @@ def test_actualizar_mercado_rechaza_precios_invalidos(bd, consultar):
     assert consultar("SELECT precioUnidad, precioTotal FROM mercados WHERE mercadoId=1") == [(3500.0, 7000.0)]
 
 
+# --- Precios con formato colombiano (12.500 = doce mil quinientos) ---
+
+def test_precios_con_separador_de_miles_se_guardan_bien(bd, consultar):
+    registrar_datos_base()
+    assert FacturaController(None, 'fe002', '1.250.000', '2026/10/16').insertarFacturas()[0] == 1
+    assert mercado_temp(precioUnidad='12.500', precioTotal='25.000').insertarMercadosTempController()[0] == 1
+    assert fnCargarCompraController()[0] == 1
+    assert mercados(1, '13.500,50', '27.001').actualizarProductosController() == [1, '']
+
+    assert consultar("SELECT valorTotalFactura FROM facturas WHERE numeroFactura='FE002'") == [(1250000.0,)]
+    assert consultar("SELECT precioUnidad, precioTotal FROM mercados WHERE mercadoId=1") == [(13500.5, 27001.0)]
+
+
 # --- Errores de base de datos llegan como mensaje ---
 
 def test_campos_vacios(bd):

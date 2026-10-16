@@ -13,7 +13,8 @@ from views.ventanasSecundarias import consultarComercios as conCom
 from views.ventanasSecundarias import consultarCompras as conComp
 from views.frameTotal import WidgetsDatos
 from controller.mercadoTempController import MercadoTempController
-from controller.mercadoTempController import fnCargarCompraController 
+from controller.mercadoTempController import fnCargarCompraController
+from controller.validaciones import convertirNumero, formatearNumero
 from views.messagebox import mensajesEmergentes as mss
 from views.vwImgConfig import leerImagen
 from views.frameListasTreview import TreviewUltimoMercado
@@ -981,17 +982,14 @@ class AgregarMercados(CTkToplevel):
         
     def cantidad (self,event):
         #Calcula el valor total si la cantidad es mallor a 2 productos
-        try:
-            
-            cantidad = float(self.etCantidadProducto.get())
-            
-            precioUnidad = float(self.etPrecioUnidad.get())
+        #convertirNumero acepta el formato colombiano (12.500 = doce mil quinientos)
+        cantidad = convertirNumero(self.etCantidadProducto.get())
+        precioUnidad = convertirNumero(self.etPrecioUnidad.get())
 
-                     
-        except:
+        if cantidad is None or precioUnidad is None:
             self.etPrecioTotal.delete(0,'end')
             self.etPrecioTotal.insert(0,self.etPrecioUnidad.get())
-        
+
         else:
             if cantidad==1:
 
@@ -1001,8 +999,6 @@ class AgregarMercados(CTkToplevel):
             if cantidad>1:
 
                 self.etPrecioTotal.delete(0,'end')
-                cantidad = float(self.etCantidadProducto.get())
-                precioUnidad = float(self.etPrecioUnidad.get())
                 precioTotal = (precioUnidad * cantidad)
 
-                self.etPrecioTotal.insert(0,precioTotal)
+                self.etPrecioTotal.insert(0,formatearNumero(precioTotal))

@@ -1,18 +1,38 @@
 import pytest
 
-from controller.validaciones import esNumero
+from controller.validaciones import esNumero, convertirNumero, formatearNumero
 from controller.facturasController import FacturaController
 from controller.mercadoTempController import MercadoTempController
 
 
-@pytest.mark.parametrize('texto', ['12500', '12.5', '-3', ' 7 ', '0'])
-def test_es_numero_acepta_numeros(texto):
+@pytest.mark.parametrize('texto, esperado', [
+    ('12500', 12500),
+    ('12.500', 12500),
+    ('1.250.000', 1250000),
+    ('564,6', 564.6),
+    ('12.500,50', 12500.5),
+    ('1.500', 1500),         #punto con grupo de 3 dígitos: miles, no 1.5
+    ('12.5', 12.5),          #punto que no agrupa de a 3: decimal, como antes
+    ('25000.0', 25000),
+    (' 7 ', 7),
+    ('-3', -3),
+    ('0', 0),
+])
+def test_convertir_numero(texto, esperado):
+    assert convertirNumero(texto) == esperado
     assert esNumero(texto)
 
 
-@pytest.mark.parametrize('texto', ['', '   ', 'abc', '12abc', '12,5', None])
+@pytest.mark.parametrize('texto', ['', '   ', 'abc', '12abc', '12,500.00', '1.2.3', '12.50.0', '1,2,3', '.5', None])
 def test_es_numero_rechaza_lo_demas(texto):
+    assert convertirNumero(texto) is None
     assert not esNumero(texto)
+
+
+@pytest.mark.parametrize('valor, texto', [(37500.0, '37500'), (190.125, '190,12'), (1693.8000000000002, '1693,80')])
+def test_formatear_numero_se_vuelve_a_leer_igual(valor, texto):
+    assert formatearNumero(valor) == texto
+    assert convertirNumero(texto) == round(valor, 2)
 
 
 @pytest.mark.parametrize('numero, valor, fecha, esperado', [
