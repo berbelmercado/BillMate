@@ -33,6 +33,8 @@ class ProductosController:
                                            ,self.nombreProducto)
                 nombreProducto.insertarProductos()#llamamos función desde el modelo
                 mensajeInsersion = [1,'Se insertó el producto correctamente']
+            except sqlite3.IntegrityError:
+                mensajeInsersion = [0, f'Ya existe un producto llamado "{self.nombreProducto}"']
             except sqlite3.Error as ex:
                 mensajeInsersion =[0, f'No se insertó el producto: {ex}']
         else:
@@ -94,6 +96,8 @@ class ProductosController:
                                            ,self.nombreProducto)
                 nombreProducto.editarProductos()#llamamos la función editar del modelo
                 mensajeInsersion = [1,'Se modificó el producto correctamente']
+            except sqlite3.IntegrityError:
+                mensajeInsersion = [0, f'Ya existe un producto llamado "{self.nombreProducto}"']
             except sqlite3.Error as ex:
                 mensajeInsersion =[0, f'No se modificó el producto: {ex}']
                 

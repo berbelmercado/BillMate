@@ -153,6 +153,15 @@ def test_campos_vacios(bd):
     assert ComerciosController(1, 'Otro', '').modificarComerciosController() == [0, 'No se admiten campos vacíos']
 
 
+def test_productos_repetidos_no_se_admiten(bd, consultar):
+    registrar_datos_base()
+
+    assert ProductosController(None, '  arroz ').insertarProducto() == [0, 'Ya existe un producto llamado "Arroz"']
+    assert ProductosController(2, "d'onofrio").editarProductos() == [0, 'Ya existe un producto llamado "D\'Onofrio"']
+    assert ProductosController(2, 'arroz').editarProductos()[0] == 1
+    assert consultar("SELECT COUNT(*) FROM productos") == [(2,)]
+
+
 def test_listados_completos(bd):
     registrar_datos_base()
 

@@ -88,6 +88,7 @@ def test_migracion_2_solo_cambia_fechas_con_formato_esperado(tmp_path, monkeypat
     ruta = ruta_base_datos()
     conexion = sqlite3.connect(ruta)
     conexion.executescript("""
+        DROP INDEX productos_nombre_unico;
         PRAGMA user_version = 1;
         INSERT INTO facturas VALUES (NULL, 'A', 1.0, '2026/10/15');
         INSERT INTO facturas VALUES (NULL, 'B', 1.0, '2026-10-16');
@@ -100,8 +101,36 @@ def test_migracion_2_solo_cambia_fechas_con_formato_esperado(tmp_path, monkeypat
 
     assert consultar(ruta, 'SELECT fechaFactura FROM facturas ORDER BY numeroFactura') == [
         ('2026-10-15',), ('2026-10-16',), ('15/10/2026',)]
-    assert consultar(ruta, 'PRAGMA user_version') == [(2,)]
+    assert consultar(ruta, 'PRAGMA user_version') == [(len(migraciones.MIGRACIONES),)]
     assert consultar(f'{ruta}.respaldo-v1', 'SELECT fechaFactura FROM facturas WHERE numeroFactura = \'A\'') == [('2026/10/15',)]
+
+
+def test_migracion_3_une_productos_duplicados(tmp_path, monkeypatch):
+    #Base en la versión 2, sin el índice único, con productos repetidos en uso
+    monkeypatch.chdir(tmp_path)
+    crearBdController.existeBase()
+    ruta = ruta_base_datos()
+    conexion = sqlite3.connect(ruta)
+    conexion.executescript("""
+        DROP INDEX productos_nombre_unico;
+        PRAGMA user_version = 2;
+        INSERT INTO productos VALUES (1, 'Arroz'), (2, 'Leche'), (3, 'Arroz'), (4, 'arroz ');
+        INSERT INTO facturas VALUES (1, 'FE001', 12500.0, '2026-10-15');
+        INSERT INTO comercios VALUES (1, 'Tienda', 'Calle 1');
+        INSERT INTO compras VALUES (1, 'Quincena', '2026-10-15');
+        INSERT INTO mercados VALUES (1, 1, 1, 3, 1, '1', 100.0, 100.0), (2, 1, 1, 2, 1, '1', 200.0, 200.0);
+        INSERT INTO mercadosTemp VALUES (1, 1, 1, 4, 1, '1', 100.0, 100.0);
+    """)
+    conexion.commit()
+    conexion.close()
+
+    crearBdController.existeBase()
+
+    assert consultar(ruta, 'SELECT * FROM productos ORDER BY productoId') == [(1, 'Arroz'), (2, 'Leche')]
+    assert consultar(ruta, 'SELECT mercadoId, productoId FROM mercados ORDER BY mercadoId') == [(1, 1), (2, 2)]
+    assert consultar(ruta, 'SELECT productoIdTemp FROM mercadosTemp') == [(1,)]
+    assert consultar(ruta, 'PRAGMA foreign_key_check') == []
+    assert consultar(f'{ruta}.respaldo-v2', 'SELECT COUNT(*) FROM productos') == [(4,)]
 
 
 def test_migracion_crea_respaldo_con_los_datos_originales(bd_v0):

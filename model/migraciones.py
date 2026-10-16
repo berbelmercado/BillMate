@@ -52,7 +52,25 @@ def migracion2(conexion):
                         WHERE fechaFactura GLOB '[0-9][0-9][0-9][0-9]/[0-9][0-9]/[0-9][0-9]'""")
 
 
-MIGRACIONES = [migracion1, migracion2]
+def migracion3(conexion):
+    #Une los productos con el mismo nombre (sin distinguir mayúsculas ni espacios a los lados)
+    #en el de menor id, y desde ahí el nombre es único
+    duplicados = conexion.execute("""SELECT productoId
+                                            ,(SELECT MIN(p2.productoId) FROM productos p2
+                                              WHERE LOWER(TRIM(p2.nombreProducto)) = LOWER(TRIM(p1.nombreProducto)))
+                                     FROM productos p1""").fetchall()
+    for productoId, conservado in duplicados:
+        if productoId == conservado:
+            continue
+        conexion.execute('UPDATE mercados SET productoId = ? WHERE productoId = ?', (conservado, productoId))
+        conexion.execute('UPDATE mercadosTemp SET productoIdTemp = ? WHERE productoIdTemp = ?', (conservado, productoId))
+        conexion.execute('DELETE FROM productos WHERE productoId = ?', (productoId,))
+
+    conexion.execute('UPDATE productos SET nombreProducto = TRIM(nombreProducto)')
+    conexion.execute('CREATE UNIQUE INDEX productos_nombre_unico ON productos(nombreProducto COLLATE NOCASE)')
+
+
+MIGRACIONES = [migracion1, migracion2, migracion3]
 
 
 def versionEsquema(conexion):
