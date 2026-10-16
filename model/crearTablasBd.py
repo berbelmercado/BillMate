@@ -1,6 +1,6 @@
 from model.conexionDb import ConexionDb as con
+from model.rutas import ruta_base_datos
 import os
-import sys
 
 class CreacionBbBillMate:
         
@@ -120,15 +120,7 @@ class CreacionBbBillMate:
 
 def  existeBd():
         """Asegura que la base de datos exista."""
-        def resource_path(relative_path):
-                try:
-                        base_path = sys._MEIPASS
-                except Exception:
-                        base_path = os.path.abspath(".")
-
-                return os.path.join(base_path, relative_path)
-
-        if not os.path.exists(resource_path('Database\\BillMate.db')):
+        if not os.path.exists(ruta_base_datos()):
                 estado=0
         else:
                 estado=1  

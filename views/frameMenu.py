@@ -13,6 +13,8 @@ from views.ventanasSecundarias import consultarFacturas as cf
 from views.ventanasSecundarias import consultarComercios as cc
 from views.ventanasSecundarias import registrarCompras as rcp
 from views.ventanasSecundarias import consultarCompras as conCom
+from views.messagebox import mensajesEmergentes as mss
+from controller.crearBdController import abrirCarpetaDatosController
 
 class FrameMenu(CTkFrame):
     
@@ -26,6 +28,7 @@ class FrameMenu(CTkFrame):
         #Importación de imagenes
         self.imagenRegistrar=CTkImage(dark_image=Image.open(leerImagen("Registrar")),size=(35,35))
         self.imagenConsultar=CTkImage(dark_image=Image.open(leerImagen("Consultar")),size=(35,35))
+        self.imagenCarpetaDatos=CTkImage(dark_image=Image.open(leerImagen("Guardar")),size=(35,35))
         self.crearWidgets()
 
     def mostrarVentanaRegistrarFactura(self):
@@ -67,7 +70,13 @@ class FrameMenu(CTkFrame):
     def mostrarVentanaConsultarCompras(self):
         #Ventana secundaria registrar compra
         ventanaConsultarCompras = conCom.ConsultarCompras(self.master)
-        
+
+    def abrirCarpetaDatos(self):
+        #Abre la carpeta donde está guardada la base de datos
+        mensaje = abrirCarpetaDatosController()
+        if mensaje[0] == 0:
+            mss.mensajeError(mensaje[1])
+
 
     def crearWidgets(self):
         #Lectura de imagenes
@@ -256,6 +265,31 @@ class FrameMenu(CTkFrame):
         self.btConsultarCompras.place(x=conGen.dicConfig["xbtGeneralConsulta"]
                                        ,y=conGen.dicConfig["ybtConsultarCompras"]
                                        )
+
+#========Creación de frame Carpeta de datos
+        fmDatos=CTkFrame(self.fmVentanaPrincipal
+                         ,fg_color=conGen.dicConfiguracionGeneralColores["fg_color"]
+                         ,width=conGen.dicConfig["anchoFrameDatos"]
+                         ,height=conGen.dicConfig["altoFrameDatos"]
+                        )
+        fmDatos.pack(padx=conGen.dicConfig["fmpadx"]
+                     ,pady=conGen.dicConfig["fmpady"]
+                     ,anchor=conGen.dicConfig["anchorFmDatos"])
+
+        #Boton abrir carpeta de datos
+        self.btCarpetaDatos=CTkButton(fmDatos
+                                      ,fg_color=conGen.dicConfiguracionGeneralColores["bgBotones"]
+                                      ,image=self.imagenCarpetaDatos
+                                      ,cursor=conGen.dicConfig["cursor"]
+                                      ,text=' Carpeta de datos'
+                                      ,compound=conGen.dicConfig["compound"]
+                                      ,font=(conGen.dicConfiguracionGeneralFuentes["Fuente"],14)
+                                      ,width=conGen.dicConfig["btCarpetaDatosWidth"]
+                                      ,command=self.abrirCarpetaDatos
+                                      )
+        self.btCarpetaDatos.place(x=conGen.dicConfig["xbtCarpetaDatos"]
+                                  ,y=conGen.dicConfig["ybtCarpetaDatos"]
+                                  )
         
 
 

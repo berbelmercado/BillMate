@@ -32,7 +32,7 @@ dicConfig={
 
            #configuracion frame de registro
             ,"anchoFrameRegistrar":195
-            ,"altoFrameRegistrar":260
+            ,"altoFrameRegistrar":245
             ,"padyyFmRegistrar":30
             ,"fmpadx":10
             ,"fmpady":5
@@ -49,14 +49,14 @@ dicConfig={
             ,"btRegistrarMercadoWidth":195
             ,"btRegistrarCompraWidth":195
             ,"ybtRegistrarFactura":0
-            ,"ybtRegistrarComercio":55
-            ,"ybtRegistrarProducto":109
-            ,"ybtRegistrarMercado":161
-            ,"ybtRegistrarCompra":215
+            ,"ybtRegistrarComercio":50
+            ,"ybtRegistrarProducto":100
+            ,"ybtRegistrarMercado":150
+            ,"ybtRegistrarCompra":200
 
             #configuración Frame Consultar 
             ,"anchoFrameConsultar":195
-            ,"altoFrameConsultar":260
+            ,"altoFrameConsultar":245
             ,"fmpadx":10
             ,"fmpady":5
             ,"anchorFmConsultar":'nw'
@@ -64,12 +64,20 @@ dicConfig={
              #configuracion Botones Consultas
             ,"xbtGeneralConsulta":0  
             ,"ybtConsultarProducto":0
-            ,"ybtConsultarFactura":55
-            ,"ybtConsultarComercio":109
-            ,"ybtConsultarMercado":161
-            ,"ybtConsultarCompras":215
+            ,"ybtConsultarFactura":50
+            ,"ybtConsultarComercio":100
+            ,"ybtConsultarMercado":150
+            ,"ybtConsultarCompras":200
 
             ,"btConsultarWidthGeneral":195
+
+            #configuración Frame y botón Carpeta de datos
+            ,"anchoFrameDatos":195
+            ,"altoFrameDatos":50
+            ,"anchorFmDatos":'nw'
+            ,"xbtCarpetaDatos":0
+            ,"ybtCarpetaDatos":0
+            ,"btCarpetaDatosWidth":195
 
             ,"corner_radius":8
         }

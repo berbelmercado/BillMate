@@ -8,7 +8,7 @@ BillMate is a Windows desktop app (CustomTkinter + SQLite) for recording grocery
 
 ## Commands
 
-Run everything from the repo root: DB and image paths are resolved relative to the current working directory (see "Resource paths" below).
+Run everything from the repo root: when running from source, DB and image paths are resolved relative to the current working directory (see "Resource paths" below).
 
 ```powershell
 # Activate the bundled virtualenv (Python 3.13)
@@ -25,7 +25,7 @@ There is no test suite, linter, or formatter configured.
 
 ### Packaging
 
-1. PyInstaller via auto-py-to-exe, using `config_setup/auto-py-to-exe.json` (one-folder, windowed, bundles `img/`, `database/`, and the `customtkinter` package as data). Output goes to `output/main/`.
+1. PyInstaller via auto-py-to-exe, using `config_setup/auto-py-to-exe.json` (one-folder, windowed, bundles `img/` and the `customtkinter` package as data; the database is intentionally not bundled). Output goes to `output/main/`.
 2. Inno Setup script `config_setup/config_setup.iss` wraps `output/main/main.exe` + `_internal/` into `BillMate_windowns_setup.exe`. Bump `MyAppVersion` there when releasing.
 
 Both configs contain absolute `D:/BillMate/...` paths.
@@ -49,4 +49,5 @@ Line items being entered in `agregarMercados.py` are first written to the stagin
 
 ### Resource paths
 
-`ConexionDb`, `crearTablasBd.existeBd`, and `vwImgConfig` each define a `resource_path()` that uses `sys._MEIPASS` when running as a PyInstaller bundle, else `os.path.abspath(".")`. The DB path is `Database\BillMate.db` (Windows separator, case-insensitive vs. the `database/` folder). `database/` is gitignored, so a fresh checkout creates an empty DB on first run.
+- **Database:** always obtained from `model/rutas.ruta_base_datos()`. Frozen (PyInstaller): `%APPDATA%\BillMate\BillMate.db`, so it is writable without admin rights and survives reinstall/uninstall; on first run it copies a v1.6 DB from `_MEIPASS\Database` if one exists. From source: `database/BillMate.db` in the repo (gitignored, so a fresh checkout creates an empty DB). The "Carpeta de datos" menu button opens that folder.
+- **Images:** `views/vwImgConfig.resource_path()` uses `sys._MEIPASS` when bundled, else `os.path.abspath(".")`.

@@ -60,10 +60,6 @@
   {
    "optionDest": "datas",
    "value": "D:/BillMate/envBillMate/Lib/site-packages/customtkinter;customtkinter/"
-  },
-  {
-   "optionDest": "datas",
-   "value": "D:/BillMate/database;database/"
   }
  ],
  "nonPyinstallerOptions": {
