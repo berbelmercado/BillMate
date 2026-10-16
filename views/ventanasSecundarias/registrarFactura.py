@@ -23,9 +23,8 @@ class RegistrarFactura(CTkToplevel):
         self.imagenCancelar=CTkImage(dark_image=Image.open(leerImagen("Cancelar")),size=(28,28))
         self.resizable(False,False)
         # Ponerla encima de las demás
-        self.lift()  
-        self.attributes("-topmost", True)
-        #self.after(10, lambda: self.attributes("-topmost", False))
+        self.transient(master)
+        self.lift()
         self.crearWidget()
     
     def capturarFechaFactura(self):
@@ -44,6 +43,8 @@ class RegistrarFactura(CTkToplevel):
         #muestra una nueva mentana con el calendario
         self.venCalendario=CTkToplevel(self)
         self.venCalendario.title("Ingresar Fecha")
+        self.venCalendario.transient(self)
+        self.venCalendario.grab_set()
         width=conSec.dicConfigRegistrarFactura["vcWidth"]
         height=conSec.dicConfigRegistrarFactura["vcHeight"]
         bg=conSec.dicConfigRegistrarFactura["vcBg"]

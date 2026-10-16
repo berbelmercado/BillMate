@@ -27,9 +27,8 @@ class ConsultarFacturas(CTkToplevel):
         self.imagenCalendario=CTkImage(dark_image=Image.open(leerImagen("Calendario")),size=(28,28))
         self.imagenGuardar=CTkImage(dark_image=Image.open(leerImagen("Guardar")),size=(28,28))
         self.resizable(False,False)
-        self.lift()  
-        self.attributes("-topmost", True)
-        #self.after(10, lambda: self.attributes("-topmost", False))
+        self.transient(master)
+        self.lift()
         self.widgetBusquedaFacturas()
         self.frameModificaciones()
         self.twConsultarFacturas()
@@ -103,8 +102,9 @@ class ConsultarFacturas(CTkToplevel):
 
     def insertarFechaEntry(self):
         #muestra una nueva mentana con el calendario
-        self.venCalendario=CTkToplevel()
+        self.venCalendario=CTkToplevel(self)
         self.venCalendario.title("Ingresar Fecha")
+        self.venCalendario.transient(self)
         width=conReFac["vcWidth"]
         height=conReFac["vcHeight"]
         bg=conReFac["vcBg"]

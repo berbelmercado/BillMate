@@ -20,10 +20,8 @@ class RegistrarProductos(CTkToplevel):
         self.imagenGuardar=CTkImage(dark_image=Image.open(leerImagen("Guardar")),size=(28,28))
         self.imagenCancelar=CTkImage(dark_image=Image.open(leerImagen("Cancelar")),size= (28,28))
         self.resizable(False,False)    
-        self.lift()  
-        self.attributes("-topmost", True)
-        #self.after(10, lambda: self.attributes("-topmost", False))
-        self.wm_attributes("-topmost", 1)
+        self.transient(master)
+        self.lift()
         self.crearWidget()
 
     def validaVentana(self):

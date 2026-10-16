@@ -25,9 +25,8 @@ class RegistrarCompras(CTkToplevel):
         self.imgGuardar = CTkImage(dark_image=Image.open(leerImagen('Guardar')),size=(28,28))
         self.imgCancelar = CTkImage(dark_image=Image.open(leerImagen('Cancelar')),size=(28,28))
 
-        self.lift()  
-        self.attributes("-topmost", True)
-        #self.after(10, lambda: self.attributes("-topmost", False))
+        self.transient(master)
+        self.lift()
         self.crearWidgets()
 
 

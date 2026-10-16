@@ -26,9 +26,8 @@ class ConsultarCompras(CTkToplevel):
         self.widgetsBusquedaCompras()
         self.frameModificacionesCompras()
         self.twConsultarCompras()
-        self.lift()  
-        self.attributes("-topmost", True)
-        #self.after(10, lambda: self.attributes("-topmost", False))
+        self.transient(master)
+        self.lift()
     
     def fmGlobal(self):
         self.frmGlobal=CTkFrame(self

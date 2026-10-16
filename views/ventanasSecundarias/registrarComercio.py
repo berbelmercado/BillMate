@@ -20,9 +20,8 @@ class RegistrarComercio(CTkToplevel):
         #self.imagenCancelar=CTkImage(Image.open(imagen.leerImagen("Cancelar")))
         self.resizable(False,False)
         self.master=master
-        self.lift()  
-        self.attributes("-topmost", True)
-        #self.after(10, lambda: self.attributes("-topmost", False))
+        self.transient(master)
+        self.lift()
         self.crearWidget()
 
    def btnCancelar(self):

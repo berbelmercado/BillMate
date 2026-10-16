@@ -38,9 +38,8 @@ class AgregarMercados(CTkToplevel):
         self.imagenCargar = CTkImage(dark_image =Image.open(leerImagen("cargar")),size=(28,28))
         self.title("Agregar Mercados")
         self.resizable(False,False)
-        self.lift()  
-        self.attributes("-topmost", True)
-        #self.after(10, lambda: self.attributes("-topmost", False))
+        self.transient(master)
+        self.lift()
         self.crearWidget()
         self.productosAgregados()
         self.definiciónVariables()
@@ -153,8 +152,6 @@ class AgregarMercados(CTkToplevel):
 
     def execAgregarProductos(self):
         self.objConsultarProductos = conPro.ConsultarProductos(self)
-        self.objConsultarProductos.lift()
-        self.objConsultarProductos.attributes("-topmost", True)
         self.objConsultarProductos.grab_set()  # Da el foco a la ventana
 
         def fnfnImportarDatosProductos():
@@ -193,8 +190,6 @@ class AgregarMercados(CTkToplevel):
         
         #declaramos objeto que muestra la ventana de consultas
         self.objConsultarFacura = conFacturas.ConsultarFacturas(self)
-        self.objConsultarFacura.lift()
-        self.objConsultarFacura.attributes("-topmost", True)
         self.objConsultarFacura.grab_set()
 
         def fnImportarDatosFacturas():
@@ -236,8 +231,6 @@ class AgregarMercados(CTkToplevel):
 
     def execAgregarComercios(self):
         self.objConsutarComercios = conCom.ConsultarComercios(self)
-        self.objConsutarComercios.lift()
-        self.objConsutarComercios.attributes("-topmost", True)
         self.objConsutarComercios.grab_set()
 
         def fnImportarDatosComercios():
@@ -277,8 +270,6 @@ class AgregarMercados(CTkToplevel):
     def execAgregarCompras(self):
        
         self.objConsutarCompras = conComp.ConsultarCompras(self)
-        self.objConsutarCompras.lift()
-        self.objConsutarCompras.attributes("-topmost", True)
         self.objConsutarCompras.grab_set()
 
         def fnImportarDatosComercios():
@@ -336,8 +327,7 @@ class AgregarMercados(CTkToplevel):
             self.fnLimpiar()
             self.productosAgregados()
             self.obj_frame_total = WidgetsDatos(self.FramePrincipal,conSec.dicConfigAgregarMercado["fmDatosX"],conSec.dicConfigAgregarMercado["fmDatosY"],self.listaProductos)#Calcula el total y cantidad de productos agregados
-            self.lift()  
-            self.attributes("-topmost", True)
+            self.lift()
         if mensaje[0]==0:
             mss.mensajeError(mensaje[1])
     
