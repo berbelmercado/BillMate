@@ -8,7 +8,7 @@ from views.configuracionesGenerales import dicConfig as conMaus
 from views.ventanasSecundarias.configuracionVentanasSecundarias  import dicConfigPosicion as conPos
 from views.configuracionesGenerales import dicConfiguracionGeneralColores as conColores
 from views.configuracionesGenerales import dicConfiguracionGeneralFuentes as conFuentes
-from controller.facturasController import FacturaController
+from controller import facturasController
 from views.messagebox import mensajesEmergentes as msbx
 from views.vwImgConfig import  leerImagen
 
@@ -46,14 +46,7 @@ class ConsultarFacturas(CTkToplevel):
 
     def btnBuscarFactura(self):
          #Función para buscar facturas
-        listaFacturas = []
-
-        objConsultaFactura = FacturaController(None
-                                               ,self.etBuscarFacturas.get()
-                                               ,None
-                                               ,None)
-        
-        listaFacturas,mensaje = objConsultaFactura.consultarFacturasController()
+        listaFacturas,mensaje = facturasController.consultarFacturas(self.etBuscarFacturas.get())
 
         if mensaje[0]==1:
              #Borramos información insertada en la tabla 
@@ -74,15 +67,7 @@ class ConsultarFacturas(CTkToplevel):
     def fnConsultaFactura(self):
           #Consulta facturas registradas
 
-          listadoFacturas = []
-
-          #declaramos objeto
-          objConsultaFacturas = FacturaController(None
-                                               ,None
-                                               ,None
-                                               ,None)
-          #recuperamos datos
-          listadoFacturas, mensaje = objConsultaFacturas.consultarListaFacturas()
+          listadoFacturas, mensaje = facturasController.consultarListaFacturas()
           if mensaje[0]==0:
                msbx.mensajeError(mensaje[1])
 
@@ -136,13 +121,10 @@ class ConsultarFacturas(CTkToplevel):
 
     def fnModificarFacturas(self):
          #modifica la factura seleccionada en el treevieww
-         #Declaramos el objeto 
-         
-         objModificarFacturas = FacturaController(self.vrIdFactura
-                                                  ,self.etModificacionesNumeroFactura.get()
-                                                  ,self.etModificacionesTotalFactura.get()
-                                                  ,self.etModificacionesFechaFactura.get())
-         mensaje = objModificarFacturas.modificarFacturas()
+         mensaje = facturasController.modificarFactura(self.vrIdFactura
+                                                       ,self.etModificacionesNumeroFactura.get()
+                                                       ,self.etModificacionesTotalFactura.get()
+                                                       ,self.etModificacionesFechaFactura.get())
          if mensaje[0]==1:
               self.twConsultarFacturas()
               msbx.mensajeInformativo(mensaje[1])

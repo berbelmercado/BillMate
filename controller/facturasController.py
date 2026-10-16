@@ -2,120 +2,66 @@ import sqlite3
 from model.facturas import Facturas
 from controller.validaciones import convertirNumero
 
-class FacturaController:
-    #Controlador para facturas
-    def __init__(self
-                 ,facturaId
-                 ,numeroFactura
-                 ,valorTotalFactura
-                 ,fechaFactura):
-        self.facturaId = facturaId
-        self.numeroFactura = numeroFactura
-        self.valorTotalFactura = valorTotalFactura
-        self.fechaFactura = fechaFactura
-    
-    def titleDatos(self):
-        #Trasforma el texto poniendo la primera letra de cada palabra en mayusculas y elimina los espacios a los lados del texto
-        self.numeroFactura = self.numeroFactura.strip().upper()       
+VACIOS = [0, 'No se admiten campos vacíos. Por favor valide nuevamente']
+NO_NUMERICO = [2, 'Solo se admiten caracteres númericos en el campo "Total Factura"']
 
-    def validarCamposFacturas(self
-                              ,numeroFactura
-                              ,valorTotalFactura
-                              ,fechaFactura
-                              ):
-            #Validamos si se envía datos vacíos
-            if numeroFactura.strip()=='' or valorTotalFactura.strip()=='' or fechaFactura.strip()=='':
-                return 0
 
-            #Validamos que "Valor total factura" sea numérico (acepta 12.500 y 12.500,50)
-            valor = convertirNumero(valorTotalFactura)
-            if valor is None:
-                return 2
+def validarCamposFactura(numeroFactura, valorTotalFactura, fechaFactura):
+    #0 si hay campos vacíos, 2 si el total no es numérico (acepta 12.500 y 12.500,50), 1 si todo está bien
+    if numeroFactura.strip()=='' or valorTotalFactura.strip()=='' or fechaFactura.strip()=='':
+        return 0
+    if convertirNumero(valorTotalFactura) is None:
+        return 2
+    return 1
 
-            self.valorTotalFactura = valor
-            return 1
-         
-    def insertarFacturas(self):
-        #Método para insertar facturas a la BD
-        self.titleDatos()
-        estado=self.validarCamposFacturas(self.numeroFactura
-                                        ,self.valorTotalFactura
-                                        ,self.fechaFactura)
-        
-        if estado==1:
-            try:
-                insertar=Facturas(None
-                                  ,self.numeroFactura
-                                  ,self.valorTotalFactura
-                                  ,self.fechaFactura
-                                  )
-                insertar.insertarFacturas()
-                mensageInserción = [1,'Factura ingresada correctamente']
-            except sqlite3.Error as ex:
-                mensageInserción = [0,f'Error al insertar factura: {ex}']
-        elif estado==0:
-            mensageInserción = [0, 'No se admiten campos vacíos. Por favor valide nuevamente']
-        elif estado==2:
-            mensageInserción = [2,'Solo se admiten caracteres númericos en el campo "Total Factura"']
 
-        return mensageInserción
-    
-    def consultarListaFacturas(self):
-        
-        listadoFacturas = []
-        
-        try:
-            listaFacturas = Facturas(None
-                                     ,None
-                                     ,None
-                                     ,None)
-            listadoFacturas = listaFacturas.consultarListaFacturas()
-            mensaje = [1,'']
-        except sqlite3.Error as ex:
-            mensaje = [0,f'No se pudo obtener información de las facturas: {ex}']
+def insertarFactura(numeroFactura, valorTotalFactura, fechaFactura):
+    #Inserta una factura nueva en la BD
+    estado = validarCamposFactura(numeroFactura, valorTotalFactura, fechaFactura)
+    if estado == 0:
+        return list(VACIOS)
+    if estado == 2:
+        return list(NO_NUMERICO)
 
-        return listadoFacturas, mensaje
-    
-    def consultarFacturasController(self):
+    try:
+        Facturas(None
+                 ,numeroFactura.strip().upper()
+                 ,convertirNumero(valorTotalFactura)
+                 ,fechaFactura).insertarFacturas()
+        return [1,'Factura ingresada correctamente']
+    except sqlite3.Error as ex:
+        return [0,f'Error al insertar factura: {ex}']
 
-        listadoConsutaFactura = []
 
-        try:
-            objFactura = Facturas(None
-                                  ,self.numeroFactura
-                                  ,None
-                                  ,None)
-            listadoConsutaFactura = objFactura.consultarFacturasModel()
-            mensajeConsulta = [1, '']
-        except sqlite3.Error as ex:
-            mensajeConsulta = [0,f'Problemas con la conexión a la base de datos: {ex}']
+def consultarListaFacturas():
+    #Todas las facturas, para llenar la tabla al abrir la vista
+    try:
+        return Facturas(None, None, None, None).consultarListaFacturas(), [1,'']
+    except sqlite3.Error as ex:
+        return [], [0,f'No se pudo obtener información de las facturas: {ex}']
 
-        return listadoConsutaFactura, mensajeConsulta
-    
-    def modificarFacturas(self):
-                #Método para insertar facturas a la BD
-        self.titleDatos()
 
-        estado=self.validarCamposFacturas(self.numeroFactura
-                                        ,self.valorTotalFactura
-                                        ,self.fechaFactura)
-        if estado==1:
-            try:
-                objmodificarFactura=Facturas(self.facturaId
-                                          ,self.numeroFactura
-                                          ,self.valorTotalFactura
-                                          ,self.fechaFactura
-                                          )
-                objmodificarFactura.modificarFacturas()
-                mensageInserción = [1,'Factura modificada correctamente']
+def consultarFacturas(numeroFactura):
+    #Facturas cuyo número contiene el texto buscado
+    try:
+        return Facturas(None, numeroFactura, None, None).consultarFacturasModel(), [1, '']
+    except sqlite3.Error as ex:
+        return [], [0,f'Problemas con la conexión a la base de datos: {ex}']
 
-            except sqlite3.Error as ex:
-                mensageInserción = [0,f'Error al modificar factura: {ex}']
-        elif estado==0:
-            mensageInserción = [0, 'No se admiten campos vacíos. Por favor valide nuevamente']
-        elif estado==2:
-            mensageInserción = [2,'Solo se admiten caracteres númericos en el campo "Total Factura"']
 
-        return mensageInserción
-            
+def modificarFactura(facturaId, numeroFactura, valorTotalFactura, fechaFactura):
+    #Cambia número, total y fecha de una factura existente
+    estado = validarCamposFactura(numeroFactura, valorTotalFactura, fechaFactura)
+    if estado == 0:
+        return list(VACIOS)
+    if estado == 2:
+        return list(NO_NUMERICO)
 
+    try:
+        Facturas(facturaId
+                 ,numeroFactura.strip().upper()
+                 ,convertirNumero(valorTotalFactura)
+                 ,fechaFactura).modificarFacturas()
+        return [1,'Factura modificada correctamente']
+    except sqlite3.Error as ex:
+        return [0,f'Error al modificar factura: {ex}']

@@ -1,7 +1,7 @@
 import pytest
 
 from controller.validaciones import esNumero, convertirNumero, formatearNumero
-from controller.facturasController import FacturaController
+from controller import facturasController
 from controller.mercadoTempController import MercadoTempController
 
 
@@ -43,8 +43,7 @@ def test_formatear_numero_se_vuelve_a_leer_igual(valor, texto):
     ('A1', '12abc', '2026-10-15', 2),
 ])
 def test_validar_campos_facturas(numero, valor, fecha, esperado):
-    factura = FacturaController(None, numero, valor, fecha)
-    assert factura.validarCamposFacturas(numero, valor, fecha) == esperado
+    assert facturasController.validarCamposFactura(numero, valor, fecha) == esperado
 
 
 def mercado_temp(precioUnidad, precioTotal, compraId=1):

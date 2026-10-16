@@ -6,7 +6,7 @@ from views.configuracionesGenerales import dicConfiguracionGeneralColores as con
 from views.configuracionesGenerales import dicConfiguracionGeneralFuentes as conFuente
 from views.configuracionesGenerales import dicConfig as conMaus
 from  views.vwImgConfig import leerImagen
-from controller.facturasController import FacturaController
+from controller import facturasController
 from views.messagebox import mensajesEmergentes as mss
 
 class RegistrarFactura(CTkToplevel):
@@ -77,12 +77,9 @@ class RegistrarFactura(CTkToplevel):
         self.destroy()
 
     def btnGuardar(self):
-        insertarFactura = FacturaController(None
-                                            ,self.etNumeroFactura.get()
-                                            ,self.etIngresarTotalFactura.get()
-                                            ,self.etFechaSeleccionadavp.get()
-                                            )
-        insertarFactura=insertarFactura.insertarFacturas()
+        insertarFactura=facturasController.insertarFactura(self.etNumeroFactura.get()
+                                                           ,self.etIngresarTotalFactura.get()
+                                                           ,self.etFechaSeleccionadavp.get())
 
         if insertarFactura[0]==0 or insertarFactura[0]==2:
             mss.mensajeError(insertarFactura[1])

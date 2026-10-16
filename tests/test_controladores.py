@@ -1,7 +1,7 @@
 """Pruebas de controladores y modelos contra una base SQLite temporal."""
 from controller import productosController
 from controller import comerciosController
-from controller.facturasController import FacturaController
+from controller import facturasController
 from controller.comprasController import ComprasController
 from controller.mercadoTempController import MercadoTempController, fnCargarCompraController
 from controller.mercadosController import MercadosController
@@ -14,7 +14,7 @@ def registrar_datos_base():
     assert productosController.insertarProducto("D'onofrio")[0] == 1
     assert productosController.insertarProducto('Arroz')[0] == 1
     assert comerciosController.insertarComercio("Tienda D'Luis", 'Calle 5 #3-2')[0] == 1
-    assert FacturaController(None, "fe'001", '12500', '2026-10-15').insertarFacturas()[0] == 1
+    assert facturasController.insertarFactura("fe'001", '12500', '2026-10-15')[0] == 1
     assert ComprasController(None, "Mercado 'quincena'", '2026-10-15').insertarCompras()[0] == 1
 
 
@@ -42,7 +42,7 @@ def test_registro_y_busqueda_con_apostrofes(bd):
 
     assert productosController.consultarProductos("d'on") == ([(1, "D'Onofrio")], [1])
     assert comerciosController.consultarComercios("d'l")[0] == [(1, "Tienda D'Luis", 'Calle 5 #3-2')]
-    assert FacturaController(None, "FE'", None, None).consultarFacturasController()[0] == [(1, "FE'001", 12500.0, '2026-10-15')]
+    assert facturasController.consultarFacturas("FE'")[0] == [(1, "FE'001", 12500.0, '2026-10-15')]
     assert ComprasController(None, "'quin", None).consultarCompra()[0] == [(1, "Mercado 'Quincena'", '2026-10-15')]
 
 
@@ -56,7 +56,7 @@ def test_modificar_registros(bd, consultar):
 
     assert productosController.editarProducto(1, "pan d'bono")[0] == 1
     assert comerciosController.modificarComercio(1, 'Otro', 'Calle 1')[0] == 1
-    assert FacturaController(1, 'fe002', '9900', '2026-10-16').modificarFacturas()[0] == 1
+    assert facturasController.modificarFactura(1, 'fe002', '9900', '2026-10-16')[0] == 1
     assert ComprasController(1, 'mercado mes', None).modificarCompra()[0] == 1
 
     assert consultar("SELECT nombreProducto FROM productos WHERE productoId=1") == [("Pan D'Bono",)]
@@ -134,7 +134,7 @@ def test_actualizar_mercado_rechaza_precios_invalidos(bd, consultar):
 
 def test_precios_con_separador_de_miles_se_guardan_bien(bd, consultar):
     registrar_datos_base()
-    assert FacturaController(None, 'fe002', '1.250.000', '2026-10-16').insertarFacturas()[0] == 1
+    assert facturasController.insertarFactura('fe002', '1.250.000', '2026-10-16')[0] == 1
     assert mercado_temp(precioUnidad='12.500', precioTotal='25.000').insertarMercadosTempController()[0] == 1
     assert fnCargarCompraController()[0] == 1
     assert mercados(1, '13.500,50', '27.001').actualizarProductosController() == [1, '']
@@ -148,7 +148,7 @@ def test_precios_con_separador_de_miles_se_guardan_bien(bd, consultar):
 def test_campos_vacios(bd):
     assert productosController.insertarProducto('   ') == [0, 'No se admiten campos vacíos']
     assert ComprasController(None, '', None).insertarCompras()[0] == 0
-    assert FacturaController(None, 'A1', '12abc', '2026-10-15').insertarFacturas()[0] == 2
+    assert facturasController.insertarFactura('A1', '12abc', '2026-10-15')[0] == 2
     assert comerciosController.insertarComercio(' ', 'Calle 1') == [0, 'No se admiten campos vacíos']
     assert comerciosController.modificarComercio(1, 'Otro', '') == [0, 'No se admiten campos vacíos']
 
@@ -166,7 +166,7 @@ def test_listados_completos(bd):
     registrar_datos_base()
 
     assert comerciosController.consultarListaComercios() == ([(1, "Tienda D'Luis", 'Calle 5 #3-2')], [1, ''])
-    assert FacturaController(None, None, None, None).consultarListaFacturas()[1] == [1, '']
+    assert facturasController.consultarListaFacturas()[1] == [1, '']
     assert ComprasController(None, None, None).consultarComprasRegistradasController()[1] == [1, '']
 
 
@@ -177,7 +177,7 @@ def test_listados_devuelven_error_de_bd(bd, consultar):
     consultar("DROP TABLE compras")
 
     assert comerciosController.consultarListaComercios() == ([], [0, 'No se pudo consultar los comercios: no such table: comercios'])
-    assert FacturaController(None, None, None, None).consultarListaFacturas() == ([], [0, 'No se pudo obtener información de las facturas: no such table: facturas'])
+    assert facturasController.consultarListaFacturas() == ([], [0, 'No se pudo obtener información de las facturas: no such table: facturas'])
     assert ComprasController(None, None, None).consultarComprasRegistradasController() == ([], [0, 'Error al consultar compras registradas: no such table: compras'])
 
 
