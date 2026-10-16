@@ -53,7 +53,7 @@ class RegistrarFactura(CTkToplevel):
         self.clFechaFactura=Calendar(self.venCalendario)
         self.clFechaFactura.config(selectmode='day'
                                    ,locale='es_ES'
-                                   ,date_pattern="yyyy/MM/dd"
+                                   ,date_pattern="yyyy-MM-dd"
                                    )
         self.clFechaFactura.pack()
 

@@ -14,8 +14,8 @@ def registrar_datos_base():
     assert ProductosController(None, "D'onofrio").insertarProducto()[0] == 1
     assert ProductosController(None, 'Arroz').insertarProducto()[0] == 1
     assert ComerciosController(None, "Tienda D'Luis", 'Calle 5 #3-2').insertarComercios()[0] == 1
-    assert FacturaController(None, "fe'001", '12500', '2026/10/15').insertarFacturas()[0] == 1
-    assert ComprasController(None, "Mercado 'quincena'", '2026/10/15').insertarCompras()[0] == 1
+    assert FacturaController(None, "fe'001", '12500', '2026-10-15').insertarFacturas()[0] == 1
+    assert ComprasController(None, "Mercado 'quincena'", '2026-10-15').insertarCompras()[0] == 1
 
 
 def mercado_temp(mercadoId=None, productoId=1, cantidad='2 kg', precioUnidad='3500', precioTotal='7000'):
@@ -42,8 +42,8 @@ def test_registro_y_busqueda_con_apostrofes(bd):
 
     assert ProductosController(None, "d'on").consultarProductos() == ([(1, "D'Onofrio")], [1])
     assert ComerciosController(None, "d'l", None).consultarComerciosController()[0] == [(1, "Tienda D'Luis", 'Calle 5 #3-2')]
-    assert FacturaController(None, "FE'", None, None).consultarFacturasController()[0] == [(1, "FE'001", 12500.0, '2026/10/15')]
-    assert ComprasController(None, "'quin", None).consultarCompra()[0] == [(1, "Mercado 'Quincena'", '2026/10/15')]
+    assert FacturaController(None, "FE'", None, None).consultarFacturasController()[0] == [(1, "FE'001", 12500.0, '2026-10-15')]
+    assert ComprasController(None, "'quin", None).consultarCompra()[0] == [(1, "Mercado 'Quincena'", '2026-10-15')]
 
 
 def test_busqueda_con_comodin_no_rompe(bd):
@@ -56,11 +56,11 @@ def test_modificar_registros(bd, consultar):
 
     assert ProductosController(1, "pan d'bono").editarProductos()[0] == 1
     assert ComerciosController(1, 'Otro', 'Calle 1').modificarComerciosController()[0] == 1
-    assert FacturaController(1, 'fe002', '9900', '2026/10/16').modificarFacturas()[0] == 1
+    assert FacturaController(1, 'fe002', '9900', '2026-10-16').modificarFacturas()[0] == 1
     assert ComprasController(1, 'mercado mes', None).modificarCompra()[0] == 1
 
     assert consultar("SELECT nombreProducto FROM productos WHERE productoId=1") == [("Pan D'Bono",)]
-    assert consultar("SELECT * FROM facturas") == [(1, 'FE002', 9900.0, '2026/10/16')]
+    assert consultar("SELECT * FROM facturas") == [(1, 'FE002', 9900.0, '2026-10-16')]
     assert consultar("SELECT descripcion FROM compras") == [('Mercado Mes',)]
 
 
@@ -85,7 +85,7 @@ def test_cargar_compra_pasa_temporal_a_mercados(bd, consultar):
     assert consultar("SELECT COUNT(*) FROM mercados") == [(2,)]
     mensaje, filas = mercados().consultarUltimosMercadosController()
     assert mensaje == [1]
-    assert filas[0] == (2, 'Arroz', '1', 1200.0, 1200.0, "FE'001", '2026/10/15', "Tienda D'Luis", "Mercado 'Quincena'")
+    assert filas[0] == (2, 'Arroz', '1', 1200.0, 1200.0, "FE'001", '2026-10-15', "Tienda D'Luis", "Mercado 'Quincena'")
 
 
 def test_cargar_compra_reinicia_ids_temporales(bd, consultar):
@@ -134,7 +134,7 @@ def test_actualizar_mercado_rechaza_precios_invalidos(bd, consultar):
 
 def test_precios_con_separador_de_miles_se_guardan_bien(bd, consultar):
     registrar_datos_base()
-    assert FacturaController(None, 'fe002', '1.250.000', '2026/10/16').insertarFacturas()[0] == 1
+    assert FacturaController(None, 'fe002', '1.250.000', '2026-10-16').insertarFacturas()[0] == 1
     assert mercado_temp(precioUnidad='12.500', precioTotal='25.000').insertarMercadosTempController()[0] == 1
     assert fnCargarCompraController()[0] == 1
     assert mercados(1, '13.500,50', '27.001').actualizarProductosController() == [1, '']
@@ -148,7 +148,7 @@ def test_precios_con_separador_de_miles_se_guardan_bien(bd, consultar):
 def test_campos_vacios(bd):
     assert ProductosController(None, '   ').insertarProducto() == [0, 'No se admiten campos vacíos']
     assert ComprasController(None, '', None).insertarCompras()[0] == 0
-    assert FacturaController(None, 'A1', '12abc', '2026/10/15').insertarFacturas()[0] == 2
+    assert FacturaController(None, 'A1', '12abc', '2026-10-15').insertarFacturas()[0] == 2
     assert ComerciosController(None, ' ', 'Calle 1').insertarComercios() == [0, 'No se admiten campos vacíos']
     assert ComerciosController(1, 'Otro', '').modificarComerciosController() == [0, 'No se admiten campos vacíos']
 

@@ -75,6 +75,35 @@ def test_migracion_conserva_datos_y_borra_filas_basura(bd_v0):
     assert consultar(bd_v0, 'PRAGMA foreign_key_check') == []
 
 
+def test_migracion_unifica_fechas_de_facturas(bd_v0):
+    crearBdController.existeBase()
+
+    assert consultar(bd_v0, 'SELECT fechaFactura FROM facturas') == [('2024-09-07',)]
+
+
+def test_migracion_2_solo_cambia_fechas_con_formato_esperado(tmp_path, monkeypatch):
+    #Base ya en la versión 1 (instalaciones de la 1.8) con fechas en varios formatos
+    monkeypatch.chdir(tmp_path)
+    crearBdController.existeBase()
+    ruta = ruta_base_datos()
+    conexion = sqlite3.connect(ruta)
+    conexion.executescript("""
+        PRAGMA user_version = 1;
+        INSERT INTO facturas VALUES (NULL, 'A', 1.0, '2026/10/15');
+        INSERT INTO facturas VALUES (NULL, 'B', 1.0, '2026-10-16');
+        INSERT INTO facturas VALUES (NULL, 'C', 1.0, '15/10/2026');
+    """)
+    conexion.commit()
+    conexion.close()
+
+    crearBdController.existeBase()
+
+    assert consultar(ruta, 'SELECT fechaFactura FROM facturas ORDER BY numeroFactura') == [
+        ('2026-10-15',), ('2026-10-16',), ('15/10/2026',)]
+    assert consultar(ruta, 'PRAGMA user_version') == [(2,)]
+    assert consultar(f'{ruta}.respaldo-v1', 'SELECT fechaFactura FROM facturas WHERE numeroFactura = \'A\'') == [('2026/10/15',)]
+
+
 def test_migracion_crea_respaldo_con_los_datos_originales(bd_v0):
     crearBdController.existeBase()
 

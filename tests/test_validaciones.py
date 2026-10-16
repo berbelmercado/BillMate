@@ -36,11 +36,11 @@ def test_formatear_numero_se_vuelve_a_leer_igual(valor, texto):
 
 
 @pytest.mark.parametrize('numero, valor, fecha, esperado', [
-    ('A1', '12500', '2026/10/15', 1),
-    ('', '12500', '2026/10/15', 0),
-    ('A1', '   ', '2026/10/15', 0),
+    ('A1', '12500', '2026-10-15', 1),
+    ('', '12500', '2026-10-15', 0),
+    ('A1', '   ', '2026-10-15', 0),
     ('A1', '12500', '', 0),
-    ('A1', '12abc', '2026/10/15', 2),
+    ('A1', '12abc', '2026-10-15', 2),
 ])
 def test_validar_campos_facturas(numero, valor, fecha, esperado):
     factura = FacturaController(None, numero, valor, fecha)

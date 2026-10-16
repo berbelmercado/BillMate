@@ -44,7 +44,15 @@ def migracion1(conexion):
     conexion.execute('ALTER TABLE compras RENAME COLUMN describcion TO descripcion')
 
 
-MIGRACIONES = [migracion1]
+def migracion2(conexion):
+    #Fechas de factura en AAAA-MM-DD, como compras.fechaCreacion (antes el calendario guardaba AAAA/MM/DD).
+    #Solo se tocan los valores con la forma exacta AAAA/MM/DD
+    conexion.execute("""UPDATE facturas
+                        SET fechaFactura = REPLACE(fechaFactura, '/', '-')
+                        WHERE fechaFactura GLOB '[0-9][0-9][0-9][0-9]/[0-9][0-9]/[0-9][0-9]'""")
+
+
+MIGRACIONES = [migracion1, migracion2]
 
 
 def versionEsquema(conexion):

@@ -34,7 +34,7 @@ class RegistrarCompras(CTkToplevel):
     def fnGuardarCompra(self):
         #Función botón guardar
         
-        fecha=date.today() #Se optiene fecha actual
+        fecha=date.today().isoformat() #Se optiene fecha actual en AAAA-MM-DD
 
         #Se crea objeto para inserción de información
         objGuardarCompra= ComprasController(None
