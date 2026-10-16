@@ -2,6 +2,7 @@
 from views import ventanaPrincipal as vp
 from views import frameMenu as fm
 from views import frameListasTreview as trv
+from views.messagebox import mensajesEmergentes
 from controller import crearBdController
 
 
@@ -26,6 +27,8 @@ def main():
         raiz.mainloop()
     except Exception as e:
         print(f"Error al iniciar la aplicación: {e}")
+        #En el ejecutable no hay consola: el error también se muestra en pantalla
+        mensajesEmergentes.mensajeError(f"Error al iniciar la aplicación: {e}")
 
 
 if __name__ == "__main__":

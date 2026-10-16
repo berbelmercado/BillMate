@@ -61,7 +61,7 @@ def test_modificar_registros(bd, consultar):
 
     assert consultar("SELECT nombreProducto FROM productos WHERE productoId=1") == [("Pan D'Bono",)]
     assert consultar("SELECT * FROM facturas") == [(1, 'FE002', 9900.0, '2026/10/16')]
-    assert consultar("SELECT describcion FROM compras") == [('Mercado Mes',)]
+    assert consultar("SELECT descripcion FROM compras") == [('Mercado Mes',)]
 
 
 # --- Flujo de compra: mercadosTemp -> mercados ---

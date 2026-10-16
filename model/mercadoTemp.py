@@ -50,7 +50,7 @@ class MercadoTemp ():
                             ,mercadosTemp.precioTotalTemp
                             ,facturas.numeroFactura
                             ,comercios.nombreComercio
-                            ,compras.describcion
+                            ,compras.descripcion
                     FROM mercadosTemp 
                             INNER JOIN productos
                                 ON mercadosTemp.productoIdTemp = productos.productoId

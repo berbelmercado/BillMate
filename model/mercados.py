@@ -31,7 +31,7 @@ class Mercados():
 
         self.sqlOpciones = ['productos.nombreProducto'
                         ,'facturas.numeroFactura'
-                        ,'compras.describcion'
+                        ,'compras.descripcion'
                       ]
         self.sqlCampo =[self.nombreProducto
                    ,self.numeroFactura
@@ -53,7 +53,7 @@ class Mercados():
                             ,facturas.numeroFactura
                             ,facturas.fechaFactura
                             ,comercios.nombreComercio
-                            ,compras.describcion
+                            ,compras.descripcion
                     FROM mercados
                             INNER JOIN productos
                                 ON mercados.productoId = productos.productoId
@@ -141,7 +141,7 @@ class Mercados():
                             ,facturas.numeroFactura
                             ,facturas.fechaFactura
                             ,comercios.nombreComercio
-                            ,compras.describcion
+                            ,compras.descripcion
                     FROM mercados 
                             INNER JOIN productos
                                 ON mercados.productoId = productos.productoId

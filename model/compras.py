@@ -44,7 +44,7 @@ class Compras:
         conexion = conn()  # Abrimos la conexión a la bd
 
         # Consulta SQL
-        sql = """ SELECT * FROM compras WHERE describcion LIKE ?
+        sql = """ SELECT * FROM compras WHERE descripcion LIKE ?
               """
 
         conexion.cursor.execute(sql, (f'%{self.describcionCompra}%',))
@@ -60,7 +60,7 @@ class Compras:
         conexion = conn()  # Abrimos conexión
 
         sql = """ UPDATE compras
-                   SET describcion = ?
+                   SET descripcion = ?
                    WHERE idCompra = ?
                    """
         conexion.cursor.execute(sql, (self.describcionCompra, self.idCompra))  # Ejecutamos consulta sql

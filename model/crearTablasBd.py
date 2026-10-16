@@ -2,6 +2,8 @@ from model.conexionDb import ConexionDb as con
 from model.rutas import ruta_base_datos
 import os
 
+#Crea el esquema versión 0 (el original). No se modifica: los cambios de esquema
+#se hacen con una nueva función en model/migraciones.py
 class CreacionBbBillMate:
         
         def __init__(self):

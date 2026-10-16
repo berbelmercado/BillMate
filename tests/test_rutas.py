@@ -3,7 +3,7 @@ import sqlite3
 from controller import crearBdController
 from model.rutas import ruta_base_datos
 
-TABLAS = ['comercios', 'compras', 'estado', 'facturas', 'mercados', 'mercadosTemp', 'productos']
+TABLAS = ['comercios', 'compras', 'facturas', 'mercados', 'mercadosTemp', 'productos']
 
 
 def tablas_de(ruta):
