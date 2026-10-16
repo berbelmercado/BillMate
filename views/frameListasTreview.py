@@ -1,138 +1,188 @@
+"""Pantalla de inicio: encabezado, tarjetas de resumen y detalle de la última compra cargada"""
+from datetime import date
+import tkinter
 from tkinter import ttk
-from customtkinter import CTkLabel,CTkFrame,set_appearance_mode,set_default_color_theme,CTkScrollbar,CTkScrollableFrame
-from views import configuracionesGenerales as conGen
+from customtkinter import CTkFrame,CTkLabel,CTkScrollbar
+from views.configuracionesGenerales import dicTemaInicio as tema
+from views.configuracionesGenerales import dicConfigInicio as conIni
 from controller import mercadosController
-from views.frameTotal import WidgetsDatos
+from controller.validaciones import formatearMoneda
+from views.messagebox import mensajesEmergentes as mss
 
-class TreviewUltimoMercado(CTkFrame):
-    """
-    Clase que representa el Treeview del último mercado.
-    """
+MESES = ('enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre'
+         ,'noviembre', 'diciembre')
+DIAS = ('lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo')
 
-    def __init__(self,master=None):
-        super().__init__(master)
-        self.master=master
-        #Apariencia
-        self._fg_color =conGen.dicConfiguracionGeneralColores['bgGeneral']
-        self.place(x=conGen.dicConfigFrameUltimoMercado["fmXFramePrincipal"]
-                   ,y=conGen.dicConfigFrameUltimoMercado["fmyFramePrincipal"]
-                  )      
-        self.estiloTreview()
-        self.crearTreview()
-        WidgetsDatos(self.master,conGen.dicConfigFrameUltimoMercado["fmDatosX"],conGen.dicConfigFrameUltimoMercado["fmDatosY"],self.listaProductos)#Calcula el total y cantidad de productos agregados
+#Evento que emiten las ventanas que cambian compras (cargar, editar, borrar) para que el inicio se actualice
+EVENTO_DATOS_CAMBIADOS = '<<DatosCambiados>>'
 
-    def estiloTreview(self):
-        #Configuracion del treeview
-        self.tvResultadosStyle=ttk.Style()
-        
-        self.tvResultadosStyle.theme_use("clam")
-        #cCambia el estilo del encabezado
-        self.tvResultadosStyle.configure("Treeview.Heading"
-                                         ,background = conGen.dicConfiguracionGeneralColores["bgLabels"]
-                                         ,foreground = conGen.dicConfiguracionGeneralColores["colorLetrasLabel"]
-                                         
-                                         )
 
-        #Cambia el estilo de letras y tamaño de letra del treeview
-        self.tvResultadosStyle.configure("Treeview", font=(conGen.dicConfiguracionGeneralFuentes["Fuente"],10)
-                                         ,background=conGen.dicConfiguracionGeneralColores["bgGeneral"]
-                                         ,fieldbackground = conGen.dicConfiguracionGeneralColores["fg_color"]#cambia el fondo de la tabla
-                                         )
+def recortar(texto, largo):
+    #Acorta textos largos para que no se salgan de las tarjetas
+    texto = str(texto)
+    return texto if len(texto) <= largo else texto[:largo - 1] + '…'
 
-        #Cambia el estilo de la fila seleccionada
-        self.tvResultadosStyle.map('Treeview'
-                                   , background=[('selected',conGen.dicConfiguracionGeneralColores["ColorLetras"])]
-                                   , foreground=[('selected',conGen.dicConfiguracionGeneralColores["bgGeneral"])])
 
-    def crearTreview(self): 
-        self.listaProductos, mensaje = mercadosController.consultarUltimoMercado()
-        
-        self.fmPrincipal=CTkFrame(self
-                                  ,fg_color=conGen.dicConfiguracionGeneralColores["fg_color"]
-                                  ,width=1000#conGen.dicConfigFrameUltimoMercado["fmWidthFramePrincipal"]
-                                  ,height=1000#conGen.dicConfigFrameUltimoMercado["fmHeightFramePrincipal"]
-                                  )
-        self.fmPrincipal.pack(anchor='nw')
+def avisarDatosCambiados(widget):
+    #Pide a la pantalla de inicio que vuelva a leer los datos (ver PanelInicio)
+    widget.event_generate(EVENTO_DATOS_CAMBIADOS)
 
-        self.label1=CTkLabel(self.fmPrincipal
-                            ,fg_color=conGen.dicConfiguracionGeneralColores["bgLabels"]
-                            ,text='Ultimo Mercado Registrado'
-                            ,text_color=conGen.dicConfiguracionGeneralColores["colorLetrasLabel"]
-                            ,font=(conGen.dicConfiguracionGeneralFuentes["Fuente"],14)
-                            #,fg=conGen.dicConfiguracionGeneralColores["ColorLetras"]
-                            ,justify='center'    
-                            ,corner_radius=8      
-                            )
-        self.label1.pack(pady=conGen.dicConfigFrameUltimoMercado["lbPady"])
-        
-        #Creación de Tabla
-        self.tvResultados=ttk.Treeview(self.fmPrincipal,
-                                       style="Treeview",
-                                       columns=('Producto'
-                                                ,'cantidad'
-                                                ,'precioUnidad'
-                                                ,'precioTotal'
-                                                ,'numeroFactura'
-                                                ,'fechaFactura'
-                                                ,'comercio'
-                                                ,'descMercado' 
-                                                )
-                                        ,)
 
-        #Cambia el estilo para las columnas insertadas
-        self.tvResultados.tag_configure('evenrow'
-                                        ,background=conGen.dicConfiguracionGeneralColores["bgGeneral"]
-                                        
-                                        ,foreground=conGen.dicConfiguracionGeneralColores["ColorLetras"]
-                                        )
+class PanelInicio(CTkFrame):
+    """Contenido de la ventana principal (columna 1 del contenedor), a la derecha de la barra lateral."""
 
-        # #Indicamos el titulo de las columnas
-        self.tvResultados.heading("#0", text='Id',)
-        self.tvResultados.heading("#1", text='Producto',)
-        self.tvResultados.heading("#2", text='Cantidad',)
-        self.tvResultados.heading("#3", text='Precio Unidad',) 
-        self.tvResultados.heading("#4", text='Precio Total',)
-        self.tvResultados.heading("#5", text='Numero de Factura',)
-        self.tvResultados.heading("#6", text='Fecha Factura',)
-        self.tvResultados.heading("#7", text='Comercio',)
-        self.tvResultados.heading("#8", text='Desc. Mercado',)
-        
-        # #configuramos las columnas
-        self.tvResultados.column("#0",width=50, anchor='center',)
-        self.tvResultados.column("#1",width=160, anchor='center',)
-        self.tvResultados.column("#2",width=60,  anchor='center')
-        self.tvResultados.column("#3",width=90, anchor='center')
-        self.tvResultados.column("#4",width=85, anchor='center')
-        self.tvResultados.column("#5",width=120, anchor='center')
-        self.tvResultados.column("#6",width=100, anchor='center')
-        self.tvResultados.column("#7",width=160, anchor='center')
-        self.tvResultados.column("#8",width=100, anchor='center')
+    def __init__(self, master=None):
+        super().__init__(master, fg_color=tema["fondo"], corner_radius=0)
+        self.master = master
+        self.grid(row=0, column=1, sticky='nsew')
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(3, weight=1)
 
-        self.tvResultados.pack(side='left',fill='y', expand=True)
+        self.estiloTabla()
+        self.crearEncabezado()
+        self.crearTarjetas()
+        self.crearTabla()
+        self.refrescar()
 
-        for i in self.listaProductos:
-            self.tvResultados.insert(""
-                                    ,"end"
-                                    ,text=i[0]
-                                    ,values=(i[1]
-                                            ,i[2]
-                                            ,i[3]
-                                            ,i[4]
-                                            ,i[5]
-                                            ,i[6]
-                                            ,i[7]
-                                            ,i[8]
-                                            )
-                                    ,tags ='evenrow'
-                                    )
-        
-        #scroll bar
-        self.scrollBarr=CTkScrollbar(self.fmPrincipal
-                     #,hover=True
-                     ,command=self.tvResultados.yview
-                     ,orientation='vertical'
-                     ,bg_color=conGen.dicConfiguracionGeneralColores["bgLabels"]
-                     ,button_color=conGen.dicConfiguracionGeneralColores["fg_color"]
-                     )
-        self.scrollBarr.pack(side='right', fill="y")
-        self.tvResultados.configure(yscrollcommand=self.scrollBarr.set)
+        #Cualquier ventana que cargue, edite o borre compras emite este evento. CustomTkinter bloquea bind_all
+        #en sus widgets, así que se usa el de tkinter: la etiqueta 'all' recibe el evento desde cualquier ventana
+        tkinter.Misc.bind_all(self, EVENTO_DATOS_CAMBIADOS, lambda evento: self.refrescar(), '+')
+
+    def fuente(self, tamano, peso='normal'):
+        return (conIni["fuente"], tamano, peso)
+
+    # --- Encabezado ---
+
+    def crearEncabezado(self):
+        marco = CTkFrame(self, fg_color='transparent')
+        marco.grid(row=0, column=0, sticky='ew', padx=conIni["padX"] * 2, pady=(conIni["padX"] * 2, conIni["padY"]))
+        marco.grid_columnconfigure(0, weight=1)
+        CTkLabel(marco, text='Inicio', font=self.fuente(conIni["tamanoTitulo"], 'bold'), text_color=tema["texto"]
+                 ,anchor='w').grid(row=0, column=0, sticky='w')
+        hoy = date.today()
+        CTkLabel(marco, text=f'{DIAS[hoy.weekday()]} {hoy.day} de {MESES[hoy.month - 1]} de {hoy.year}'
+                 ,font=self.fuente(conIni["tamanoSubtitulo"]), text_color=tema["textoSuave"]
+                 ,anchor='e').grid(row=0, column=1, sticky='e')
+
+    # --- Tarjetas de resumen ---
+
+    def crearTarjetas(self):
+        marco = CTkFrame(self, fg_color='transparent')
+        marco.grid(row=1, column=0, sticky='ew', padx=conIni["padX"] * 2 - conIni["padY"] // 2, pady=conIni["padY"])
+        self.tarjetas = {}
+        for columna, (clave, titulo) in enumerate((('compra', 'ÚLTIMA COMPRA'), ('total', 'TOTAL')
+                                                   ,('productos', 'PRODUCTOS'), ('mes', 'ESTE MES'))):
+            marco.grid_columnconfigure(columna, weight=1, uniform='tarjetas')
+            tarjeta = CTkFrame(marco, fg_color=tema["tarjeta"], corner_radius=conIni["radioTarjeta"]
+                               ,border_width=1, border_color=tema["borde"])
+            tarjeta.grid(row=0, column=columna, sticky='nsew', padx=conIni["padY"] // 2)
+            tarjeta.grid_columnconfigure(0, weight=1)
+            CTkLabel(tarjeta, text=titulo, font=self.fuente(conIni["tamanoTarjetaTitulo"], 'bold')
+                     ,text_color=tema["textoSuave"], anchor='w').grid(row=0, column=0, sticky='ew'
+                                                                       ,padx=conIni["padTarjeta"], pady=(conIni["padTarjeta"], 0))
+            valor = CTkLabel(tarjeta, text='—', font=self.fuente(conIni["tamanoTarjetaValor"], 'bold')
+                             ,text_color=tema["texto"], anchor='w')
+            valor.grid(row=1, column=0, sticky='ew', padx=conIni["padTarjeta"])
+            detalle = CTkLabel(tarjeta, text='', font=self.fuente(conIni["tamanoTarjetaDetalle"])
+                               ,text_color=tema["textoSuave"], anchor='w')
+            detalle.grid(row=2, column=0, sticky='ew', padx=conIni["padTarjeta"], pady=(0, conIni["padTarjeta"]))
+            self.tarjetas[clave] = (valor, detalle)
+
+    def ponerTarjeta(self, clave, valor, detalle=''):
+        etiquetaValor, etiquetaDetalle = self.tarjetas[clave]
+        etiquetaValor.configure(text=valor)
+        etiquetaDetalle.configure(text=detalle)
+
+    # --- Tabla de la última compra ---
+
+    def estiloTabla(self):
+        estilo = ttk.Style()
+        estilo.configure('Inicio.Treeview'
+                         ,background=tema["tarjeta"]
+                         ,fieldbackground=tema["tarjeta"]
+                         ,foreground=tema["texto"]
+                         ,font=self.fuente(conIni["tamanoTabla"])
+                         ,rowheight=conIni["altoFilaTabla"]
+                         ,borderwidth=0)
+        estilo.configure('Inicio.Treeview.Heading'
+                         ,background=tema["encabezadoTabla"]
+                         ,foreground=tema["textoSuave"]
+                         ,font=self.fuente(conIni["tamanoTabla"], 'bold')
+                         ,relief='flat'
+                         ,borderwidth=0)
+        estilo.map('Inicio.Treeview'
+                   ,background=[('selected', tema["acento"])]
+                   ,foreground=[('selected', 'white')])
+        estilo.map('Inicio.Treeview.Heading', background=[('active', tema["botonHover"])])
+        #Sin borde alrededor de la tabla
+        estilo.layout('Inicio.Treeview', [('Inicio.Treeview.treearea', {'sticky': 'nswe'})])
+
+    def crearTabla(self):
+        self.lbDetalle = CTkLabel(self, text='Detalle de la última compra', font=self.fuente(conIni["tamanoSubtitulo"] + 2, 'bold')
+                                  ,text_color=tema["texto"], anchor='w')
+        self.lbDetalle.grid(row=2, column=0, sticky='ew', padx=conIni["padX"] * 2, pady=(conIni["padX"], conIni["padY"] // 2))
+
+        marco = CTkFrame(self, fg_color=tema["tarjeta"], corner_radius=conIni["radioTarjeta"]
+                         ,border_width=1, border_color=tema["borde"])
+        marco.grid(row=3, column=0, sticky='nsew', padx=conIni["padX"] * 2, pady=(0, conIni["padX"] * 2))
+        marco.grid_columnconfigure(0, weight=1)
+        marco.grid_rowconfigure(0, weight=1)
+
+        columnas = (('producto', 'Producto', conIni["colProductoWidth"], 'w', True)
+                    ,('cantidad', 'Cant', conIni["colCantidadWidth"], 'center', False)
+                    ,('precio', 'Precio unidad', conIni["colPrecioWidth"], 'e', False)
+                    ,('total', 'Total', conIni["colTotalWidth"], 'e', False)
+                    ,('factura', 'Factura', conIni["colFacturaWidth"], 'center', False)
+                    ,('fecha', 'Fecha', conIni["colFechaWidth"], 'center', False)
+                    ,('comercio', 'Comercio', conIni["colComercioWidth"], 'w', True))
+        self.tabla = ttk.Treeview(marco, columns=[c[0] for c in columnas], show='headings', style='Inicio.Treeview'
+                                  ,selectmode='browse')
+        for clave, titulo, ancho, alineacion, crece in columnas:
+            self.tabla.heading(clave, text=titulo, anchor=alineacion)
+            self.tabla.column(clave, width=ancho, minwidth=ancho // 2, anchor=alineacion, stretch=crece)
+        self.tabla.tag_configure('par', background=tema["filaPar"])
+        self.tabla.tag_configure('impar', background=tema["filaImpar"])
+        self.tabla.grid(row=0, column=0, sticky='nsew', padx=(conIni["padY"], 0), pady=conIni["padY"])
+
+        barra = CTkScrollbar(marco, command=self.tabla.yview, fg_color='transparent'
+                             ,button_color=tema["borde"], button_hover_color=tema["textoSuave"])
+        barra.grid(row=0, column=1, sticky='ns', padx=(0, conIni["padY"] // 2), pady=conIni["padY"])
+        self.tabla.configure(yscrollcommand=barra.set)
+
+        self.lbVacio = CTkLabel(marco, text='Aún no hay compras cargadas.\nUsa "Agregar Mercados" para registrar la primera.'
+                                ,font=self.fuente(conIni["tamanoSubtitulo"]), text_color=tema["textoSuave"])
+
+    # --- Datos ---
+
+    def refrescar(self):
+        #Vuelve a leer la última compra y el gasto del mes, y actualiza tarjetas y tabla
+        filas, mensaje = mercadosController.consultarUltimoMercado()
+        if mensaje[0] == 0:
+            mss.mensajeError(mensaje[1])
+        hoy = date.today()
+        gastoMes, mensajeMes = mercadosController.gastoDelMes(hoy.strftime('%Y-%m'))
+        if mensajeMes[0] == 0:
+            mss.mensajeError(mensajeMes[1])
+
+        self.tabla.delete(*self.tabla.get_children())
+        #Cada fila: id, producto, cantidad, precio unidad, total, número de factura, fecha factura, comercio, compra
+        for indice, (mercadoId, producto, cantidad, precioUnidad, precioTotal, factura, fecha, comercio, compra) in enumerate(filas):
+            self.tabla.insert('', 'end', iid=str(mercadoId), tags=('par' if indice % 2 == 0 else 'impar',)
+                              ,values=(producto, cantidad, formatearMoneda(precioUnidad), formatearMoneda(precioTotal)
+                                       ,factura, fecha, comercio))
+
+        if filas:
+            self.lbVacio.place_forget()
+            facturas = {fila[5] for fila in filas}
+            comercios = sorted({fila[7] for fila in filas})
+            textoFacturas = f'{len(facturas)} factura' + ('s' if len(facturas) != 1 else '')
+            self.ponerTarjeta('compra', recortar(filas[0][8], conIni["largoTextoTarjeta"])
+                              ,recortar(f'{" · ".join(comercios)} · {textoFacturas}', conIni["largoDetalleTarjeta"]))
+            self.ponerTarjeta('total', formatearMoneda(sum(fila[4] for fila in filas)), textoFacturas)
+            self.ponerTarjeta('productos', str(len(filas)), 'ítems en la compra')
+        else:
+            self.lbVacio.place(relx=0.5, rely=0.5, anchor='center')
+            self.ponerTarjeta('compra', '—', 'sin compras cargadas')
+            self.ponerTarjeta('total', '—')
+            self.ponerTarjeta('productos', '—')
+        self.ponerTarjeta('mes', formatearMoneda(gastoMes), f'{MESES[hoy.month - 1]} de {hoy.year}')

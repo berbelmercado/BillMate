@@ -1,5 +1,5 @@
 import sqlite3
-from model.mercados import Mercados
+from model.mercados import Mercados, gastoDelMesModel
 from controller.validaciones import esNumero, convertirNumero
 
 #Opciones de búsqueda de Consultar Mercados (índices de Mercados.sqlOpciones)
@@ -29,6 +29,14 @@ def consultarUltimoMercado():
         return mercado().consultarUltimoMercado(), [1]
     except sqlite3.Error as ex:
         return [], [0, f'No fue posible realizar la consulta: {ex}']
+
+
+def gastoDelMes(anioMes):
+    #Total comprado en el mes 'AAAA-MM' (por fecha de factura), para la pantalla de inicio
+    try:
+        return gastoDelMesModel(anioMes), [1]
+    except sqlite3.Error as ex:
+        return 0, [0, f'No fue posible calcular el gasto del mes: {ex}']
 
 
 def actualizarMercado(mercadoId, compraId, facturaId, productoId, comercioId, cantidad, precioUnidad, precioTotal):

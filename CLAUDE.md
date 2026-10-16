@@ -42,16 +42,22 @@ Both configs contain absolute `D:/BillMate/...` paths.
 
 MVC layout with three packages; the flow is always **view → controller → model → SQLite**.
 
-- `main.py` — calls `crearBdController.existeBase()` (creates the DB if missing and applies pending schema migrations), then builds `VentanaPrincipal` with `FrameMenu` (left menu) and `TreviewUltimoMercado` (main table of the latest purchase). Startup errors are also shown in a message box, since the packaged exe has no console.
+- `main.py` — calls `crearBdController.existeBase()` (creates the DB if missing and applies pending schema migrations), then builds `VentanaPrincipal` with `FrameMenu` (left sidebar) and `PanelInicio` (home screen: summary cards and the latest purchase). Startup errors are also shown in a message box, since the packaged exe has no console.
 - `model/` — one class per table, plus `conexionDb.ConexionDb`. Every model method opens a fresh `ConexionDb()` (which enables `PRAGMA foreign_keys`), runs parameterized SQL (`?`), and calls `desconectar()` (which commits and closes). If a statement fails, the cursor (`CursorSeguro`) rolls back and closes the connection before re-raising, so a failed write never leaves the DB locked. `UML/Modelo relacional.png` shows the relational model.
 - **Schema and migrations** — `model/crearTablasBd.CreacionBbBillMate` creates the original schema (version 0) and must not be edited. `model/migraciones.MIGRACIONES` holds one function per version; `aplicarMigraciones()` tracks the version in `PRAGMA user_version`, backs up an existing DB to `BillMate.db.respaldo-v<N>` first, and runs each migration in a transaction that is rolled back on failure. To change the schema, append a new function to `MIGRACIONES` (never edit a released one) and add a test in `tests/test_migraciones.py`. The original schema and migration 1 still say `describcion` (the old column name); everywhere else it is `descripcion`.
 - `controller/` — one module of plain functions per entity (no classes), imported as a module: `from controller import productosController` → `productosController.insertarProducto(nombre)`. Each function takes only the values it needs, validates input, instantiates the model, and returns a result list `mensaje = [status, text]` where `1` = success and `0` = error (query functions return `(rows, mensaje)`; the `insertar*` functions return `[1, text, newId]` on success, using `cursor.lastrowid` from the model). Views check `mensaje[0]` and show `mensajesEmergentes.mensajeInformativo` / `mensajeError`.
 - Price input is parsed by `controller/validaciones.convertirNumero` (Colombian format: `.` thousands separator, `,` decimal; `1.500` → 1500, `12.5` → 12.5) and written back with `formatearNumero`. Use these instead of `float()` on user input.
-- `views/` — `ventanaPrincipal`, `frameMenu`, `frameListasTreview`, `frameTotal` (running total widget). Each register/query screen is a `CTkToplevel` in `views/ventanasSecundarias/`. Layout uses absolute `place()` coordinates.
+- `views/` — the main window uses `grid`:
+  - `ventanaPrincipal`: the window, plus `estiloTablas()`, the global `ttk.Treeview` style that the secondary screens inherit;
+  - `frameMenu`: the sidebar;
+  - `frameListasTreview.PanelInicio`: the home screen; it has its own `Inicio.Treeview` style;
+  - `frameTotal`: the running total widget used by `consultarMercados`.
+
+  Each register/query screen is a `CTkToplevel` in `views/ventanasSecundarias/`. The older ones use absolute `place()` coordinates; `nuevaCompra` uses `grid`. Screens that change purchases call `frameListasTreview.avisarDatosCambiados(self)`, which emits `<<DatosCambiados>>`; `PanelInicio` listens on the `all` tag (via `tkinter.Misc.bind_all`, since CustomTkinter blocks `bind_all`) and refreshes.
 
 ### Styling and layout config
 
-Colors, fonts, and widget sizes/positions are not hard-coded in widgets; they come from dictionaries in `views/configuracionesGenerales.py` (main window) and `views/ventanasSecundarias/configuracionVentanasSecundarias.py` (secondary windows). Icon paths are mapped by name in `views/vwImgConfig.py` (`leerImagen("Guardar")`, etc.). Add new values to these dicts rather than inlining them.
+Colors, fonts, and widget sizes/positions are not hard-coded in widgets; they come from dictionaries in `views/configuracionesGenerales.py` (main window: `dicTemaInicio` colors and `dicConfigInicio` sizes; `dicConfig` keeps `cursor`/`compound`/`corner_radius` shared by every screen) and `views/ventanasSecundarias/configuracionVentanasSecundarias.py` (secondary windows). Icon paths are mapped by name in `views/vwImgConfig.py` (`leerImagen("Guardar")`, etc.). Add new values to these dicts rather than inlining them.
 
 ### Purchase workflow (mercadosTemp → mercados)
 

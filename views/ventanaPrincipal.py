@@ -1,31 +1,44 @@
+from tkinter import ttk
 from customtkinter import CTk,CTkFrame
-from views.vwImgConfig import leerImagen as img
+from views.vwImgConfig import leerImagen
 from views import configuracionesGenerales as conGen
+from views.configuracionesGenerales import dicTemaInicio as tema
+from views.configuracionesGenerales import dicConfigInicio as conIni
+
+
+def estiloTablas():
+    #Estilo de las tablas (ttk.Treeview) de las ventanas secundarias; la de inicio usa 'Inicio.Treeview'
+    estilo = ttk.Style()
+    estilo.theme_use("clam")
+    estilo.configure("Treeview.Heading"
+                     ,background=conGen.dicConfiguracionGeneralColores["bgLabels"]
+                     ,foreground=conGen.dicConfiguracionGeneralColores["colorLetrasLabel"])
+    estilo.configure("Treeview"
+                     ,font=(conGen.dicConfiguracionGeneralFuentes["Fuente"],10)
+                     ,background=conGen.dicConfiguracionGeneralColores["bgGeneral"]
+                     ,fieldbackground=conGen.dicConfiguracionGeneralColores["fg_color"])
+    estilo.map('Treeview'
+               ,background=[('selected',conGen.dicConfiguracionGeneralColores["ColorLetras"])]
+               ,foreground=[('selected',conGen.dicConfiguracionGeneralColores["bgGeneral"])])
+
 
 class VentanaPrincipal(CTk):
-    #Creamos la ventana principal
+    #Ventana principal: barra lateral (FrameMenu) en la columna 0 y pantalla de inicio (PanelInicio) en la 1
     def __init__ (self):
 
-        super().__init__()
-        #calculamos el ancho y alto de la ventana de la máquina
-        self.__anchoDePantalla=self.winfo_screenwidth()
-        self.__altoDePantalla=self.winfo_screenheight()
-        self.geometry(f"{self.__anchoDePantalla-190}x{self.__altoDePantalla-160}+100+30")
-        
-        #Frame PrincipalGlobal
-        self.frameGlogal = CTkFrame(self
-                                    ,fg_color='#202020'
-                                    ,width=self.__anchoDePantalla-192
-                                    ,height=self.__altoDePantalla-162
-                                    )
-        self.frameGlogal.place(x=0
-                               ,y=0)
-        #Titulo de la ventana principal
+        super().__init__(fg_color=tema["fondo"])
+        ancho = self.winfo_screenwidth() - conIni["margenAncho"]
+        alto = self.winfo_screenheight() - conIni["margenAlto"]
+        self.geometry(f'{ancho}x{alto}+{conIni["vnX"]}+{conIni["vnY"]}')
+        self.minsize(conIni["vnMinWidth"], conIni["vnMinHeight"])
         self.title("Bill Mate")
-        #configuraciones de color general
-        #self._set_appearance_mode("dark")
-        
+        self.iconbitmap(leerImagen("Logo"))
+        estiloTablas()
 
-
-
-
+        #Contenedor que llena la ventana; es el master de la barra lateral, del inicio y de las ventanas secundarias
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        self.frameGlogal = CTkFrame(self, fg_color=tema["fondo"], corner_radius=0)
+        self.frameGlogal.grid(row=0, column=0, sticky='nsew')
+        self.frameGlogal.grid_columnconfigure(1, weight=1)
+        self.frameGlogal.grid_rowconfigure(0, weight=1)

@@ -10,89 +10,83 @@ dicConfiguracionGeneralColores={"bgGeneral":'#202020'   #'#75B3FA'#''#75DCFA #20
 }
 
 #En este diccionario se guardan los tipos de fuentes que se usa en todo el sistema
-dicConfiguracionGeneralFuentes={"Fuente":'Helvetica' 
+dicConfiguracionGeneralFuentes={"Fuente":'Helvetica'
                                 ,"tamano":14
                                 }
 
-"""
-Diccionario con los valores de las posiciones de los labels,entrys, frames
-x al inicio es para los place 
-lb=label
-construcción del nombre:
-x argumento de posición ya sea x o y para place, lb para indicar label nombre del botrón
-"""
-
-#En este diccionario están las configuraciones de posiciones los botones del modulo frameMenu
+#Configuración común de los botones de todas las ventanas
 dicConfig={
-           #configuración FrameMenu
-             "fmYPrincipal":30
-            ,"fmWidthPrincipal":215 
-            ,"fmHeightPrincipal":450
-            ,"anchorFmPrincipal":'nw'
-
-           #configuracion frame de registro
-            ,"anchoFrameRegistrar":195
-            ,"altoFrameRegistrar":245
-            ,"padyyFmRegistrar":30
-            ,"fmpadx":10
-            ,"fmpady":5
-            ,"anchorFmRegistro":'nw'
-         
            #Cursor en botones
-            ,"cursor":"hand2"#plus
+            "cursor":"hand2"#plus
 
            #ubicación de la imagen dentro del botón
             ,"compound":'left'
-           #configuracion botones registro 
-            ,"xbtGeneralRegistro":0  
-            ,"btwidthGeneral":185
-            ,"btRegistrarMercadoWidth":195
-            ,"btRegistrarCompraWidth":195
-            ,"ybtRegistrarFactura":0
-            ,"ybtRegistrarComercio":50
-            ,"ybtRegistrarProducto":100
-            ,"ybtRegistrarMercado":150
-            ,"ybtRegistrarCompra":200
-
-            #configuración Frame Consultar 
-            ,"anchoFrameConsultar":195
-            ,"altoFrameConsultar":245
-            ,"fmpadx":10
-            ,"fmpady":5
-            ,"anchorFmConsultar":'nw'
-
-             #configuracion Botones Consultas
-            ,"xbtGeneralConsulta":0  
-            ,"ybtConsultarProducto":0
-            ,"ybtConsultarFactura":50
-            ,"ybtConsultarComercio":100
-            ,"ybtConsultarMercado":150
-            ,"ybtConsultarCompras":200
-
-            ,"btConsultarWidthGeneral":195
-
-            #configuración Frame y botón Carpeta de datos
-            ,"anchoFrameDatos":195
-            ,"altoFrameDatos":50
-            ,"anchorFmDatos":'nw'
-            ,"xbtCarpetaDatos":0
-            ,"ybtCarpetaDatos":0
-            ,"btCarpetaDatosWidth":195
 
             ,"corner_radius":8
         }
-#Este diccionario guarda la configuración de posición para los widgets en el modulo frameListasTreview
-dicConfigFrameUltimoMercado={
-                              #Configuración Frame Principal
-                              "fmXFramePrincipal":220
-                              ,"fmyFramePrincipal":32
-                              ,"fmWidthFramePrincipal":1090
-                              ,"fmHeightFramePrincipal":960
-                              #Configuración Label titulo de la tabla
-                              ,"lbPady":5 
-                              ,"fmDatosX":550
-                              ,"fmDatosY":310
 
+#Colores de la pantalla de inicio (barra lateral, tarjetas y tabla de la última compra)
+dicTemaInicio={
+            "fondo":'#141322'            #área de contenido
+            ,"lateral":'#1B1A2E'         #barra lateral
+            ,"tarjeta":'#232238'
+            ,"borde":'#2F2D4A'
+            ,"acento":'#576CBC'          #botón principal y fila seleccionada
+            ,"acentoHover":'#6B80D4'
+            ,"botonHover":'#2A2944'      #botones de la barra lateral al pasar el mouse
+            ,"texto":'#ECECF4'
+            ,"textoSuave":'#9A98B5'
+            ,"filaPar":'#1C1B30'
+            ,"filaImpar":'#232238'
+            ,"encabezadoTabla":'#2A2944'
+}
 
+#Tamaños y fuentes de la pantalla de inicio
+dicConfigInicio={
+            #Ventana: tamaño inicial = pantalla menos estos márgenes; tamaño mínimo
+            "margenAncho":190
+            ,"margenAlto":160
+            ,"vnX":100
+            ,"vnY":30
+            ,"vnMinWidth":1000
+            ,"vnMinHeight":560
 
+            #Barra lateral
+            ,"anchoLateral":230
+            ,"logoTamano":40
+            ,"iconoTamano":18
+            ,"altoBoton":32
+            ,"altoBotonPrincipal":40
+            ,"radioBoton":8
+            ,"altoSeccion":20
+
+            #Espaciado
+            ,"padX":16
+            ,"padY":10
+            ,"padTarjeta":14
+
+            #Fuentes
+            ,"fuente":'Helvetica'
+            ,"tamanoNombreApp":20
+            ,"tamanoTitulo":24
+            ,"tamanoSubtitulo":13
+            ,"tamanoSeccion":11
+            ,"tamanoBoton":14
+            ,"tamanoTarjetaTitulo":12
+            ,"tamanoTarjetaValor":22
+            ,"tamanoTarjetaDetalle":12
+            ,"tamanoTabla":12
+
+            #Tarjetas y tabla
+            ,"radioTarjeta":12
+            ,"largoTextoTarjeta":18      #caracteres antes de recortar con "…"
+            ,"largoDetalleTarjeta":30
+            ,"altoFilaTabla":30
+            ,"colProductoWidth":260
+            ,"colCantidadWidth":70
+            ,"colPrecioWidth":110
+            ,"colTotalWidth":110
+            ,"colFacturaWidth":110
+            ,"colFechaWidth":100
+            ,"colComercioWidth":170
 }

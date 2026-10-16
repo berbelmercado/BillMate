@@ -190,6 +190,17 @@ def test_cuadre_por_factura(bd):
                                                        ,(2, 'FE2', 5000.0, 5000.0, 0.0)], [1, ''])
 
 
+def test_gasto_del_mes_por_fecha_de_factura(bd):
+    cargar_una_compra()  #factura del 2026-10-15: 7.000 + 1.200
+    assert facturasController.insertarFactura('fe2', '500', '2026-09-30')[0] == 1
+    assert mercadoTempController.insertarMercadoTemp(1, 2, 1, 1, '1', '500', '500')[0] == 1
+    assert mercadoTempController.cargarCompra()[0] == 1
+
+    assert mercadosController.gastoDelMes('2026-10') == (8200.0, [1])
+    assert mercadosController.gastoDelMes('2026-09') == (500.0, [1])
+    assert mercadosController.gastoDelMes('2026-11') == (0, [1])
+
+
 def test_cuadre_sin_items(bd):
     assert mercadoTempController.cuadreFacturas() == ([], [1, ''])
 

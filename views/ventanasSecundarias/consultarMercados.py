@@ -13,7 +13,7 @@ from views.frameTotal import WidgetsDatos
 from views.messagebox import mensajesEmergentes as msbx
 from controller import mercadosController
 from views.vwImgConfig import  leerImagen
-from views.frameListasTreview import TreviewUltimoMercado
+from views.frameListasTreview import avisarDatosCambiados
 
 class ConsultarMercados(CTkToplevel):
 
@@ -341,6 +341,7 @@ class ConsultarMercados(CTkToplevel):
 
             self.limpiarentrys()
             self.fnConsultas()
+            avisarDatosCambiados(self)
         if mensaje[0]==0:
             msbx.mensajeError(mensaje[1])
 
@@ -352,10 +353,8 @@ class ConsultarMercados(CTkToplevel):
             msbx.mensajeInformativo(mensaje[1])
             self.limpiarentrys()
             self.fnConsultas()
-            #Actualizamos frame ultimo mercado en la ventana principal
-            objActualizarUltimoMercado = TreviewUltimoMercado(self.master)
-            objActualizarUltimoMercado.destroy()
-            TreviewUltimoMercado(self.master)
+            #La pantalla de inicio vuelve a leer la última compra
+            avisarDatosCambiados(self)
         if mensaje[0]==0:
             msbx.mensajeError(mensaje[1])
 

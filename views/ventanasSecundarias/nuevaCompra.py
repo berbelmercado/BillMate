@@ -16,7 +16,7 @@ from controller import productosController, comerciosController, facturasControl
 from controller.validaciones import convertirNumero, formatearNumero, formatearMoneda, cantidadNumerica
 from views.messagebox import mensajesEmergentes as mss
 from views.vwImgConfig import leerImagen
-from views.frameListasTreview import TreviewUltimoMercado
+from views.frameListasTreview import avisarDatosCambiados
 
 
 class NuevaCompra(CTkToplevel):
@@ -560,5 +560,5 @@ class NuevaCompra(CTkToplevel):
         mss.mensajeInformativo(mensaje[1])
         self.limpiarLinea()
         self.refrescarTabla()
-        #Actualizamos la tabla del último mercado en la ventana principal
-        TreviewUltimoMercado(self.master)
+        #La pantalla de inicio vuelve a leer la última compra
+        avisarDatosCambiados(self)

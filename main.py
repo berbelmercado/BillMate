@@ -19,9 +19,9 @@ def main():
         # Inicializa la ventana principal
         raiz = vp.VentanaPrincipal()
 
-        # Añade el menú y la vista de lista a la ventana principal
+        # Añade la barra lateral y la pantalla de inicio a la ventana principal
         fm.FrameMenu(master=raiz.frameGlogal)
-        trv.TreviewUltimoMercado(master=raiz.frameGlogal)
+        trv.PanelInicio(master=raiz.frameGlogal)
 
         # Inicia el bucle principal de la interfaz gráfica
         raiz.mainloop()

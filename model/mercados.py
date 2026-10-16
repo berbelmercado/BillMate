@@ -160,3 +160,20 @@ class Mercados():
         conexion.desconectar()
 
         return listaMercado
+
+
+def gastoDelMesModel(anioMes):
+    #Suma de lo comprado en un mes ('AAAA-MM'), según la fecha de la factura (en AAAA-MM-DD desde la migración 2)
+    conexion = conn()
+
+    sql = """ SELECT COALESCE(SUM(mercados.precioTotal), 0)
+              FROM mercados
+                     INNER JOIN facturas
+                         ON mercados.facturaId = facturas.facturaId
+              WHERE substr(facturas.fechaFactura, 1, 7) = ?
+          """
+    conexion.cursor.execute(sql, (anioMes,))
+    total = conexion.cursor.fetchone()[0]
+    conexion.desconectar()
+
+    return total

@@ -1,7 +1,9 @@
-"""Modul para crear los frame que contienen el menú"""
-from customtkinter import CTkFrame,CTkButton,CTkImage
+"""Barra lateral de la ventana principal: logo, acción principal y accesos a registros y consultas"""
+from customtkinter import CTkFrame,CTkButton,CTkImage,CTkLabel
 from PIL import Image
 from views import configuracionesGenerales as conGen
+from views.configuracionesGenerales import dicTemaInicio as tema
+from views.configuracionesGenerales import dicConfigInicio as conIni
 from views.vwImgConfig import leerImagen
 from views.ventanasSecundarias import registrarFactura as rf
 from views.ventanasSecundarias import registrarComercio as rc
@@ -17,18 +19,17 @@ from views.messagebox import mensajesEmergentes as mss
 from controller.crearBdController import abrirCarpetaDatosController
 
 class FrameMenu(CTkFrame):
-    
-    #Este frame contrendrá el menú de nuestra aplicación
+
+    #Barra lateral; se ubica en la columna 0 del contenedor de la ventana principal
     def __init__(self,master):
-        super().__init__(master)
+        super().__init__(master
+                         ,fg_color=tema["lateral"]
+                         ,corner_radius=0
+                         ,width=conIni["anchoLateral"])
         self.master=master
-        #Apariencia general
-        self._fg_color =fg_color=conGen.dicConfiguracionGeneralColores['bgGeneral']
-        self.place(y=conGen.dicConfig["fmYPrincipal"])#Empaquetamieno frame
-        #Importación de imagenes
-        self.imagenRegistrar=CTkImage(dark_image=Image.open(leerImagen("Registrar")),size=(35,35))
-        self.imagenConsultar=CTkImage(dark_image=Image.open(leerImagen("Consultar")),size=(35,35))
-        self.imagenCarpetaDatos=CTkImage(dark_image=Image.open(leerImagen("Guardar")),size=(35,35))
+        self.grid(row=0, column=0, sticky='ns')
+        self.grid_propagate(False)
+        self.grid_columnconfigure(0, weight=1)
         self.crearWidgets()
 
     def mostrarVentanaRegistrarFactura(self):
@@ -50,7 +51,6 @@ class FrameMenu(CTkFrame):
     def mostrarVentanaconsultarProductos(self):
         #ventana secundaria consultar productos
         ventanaConsultarProducto=cp.ConsultarProductos(self.master)
-        #ventanaConsultarProducto=cpv2.ConsultarFacturas(self)
 
     def mostrarVentanaConsultarFacturas(self):
         ventanaConsultarFacturas= cf.ConsultarFacturas(self.master)
@@ -66,7 +66,7 @@ class FrameMenu(CTkFrame):
     def mostrarVentanaRegistrarCompras(self):
         #Ventana secundaria registrar compra
         ventanaRegistrarCompras = rcp.RegistrarCompras(self.master)
-    
+
     def mostrarVentanaConsultarCompras(self):
         #Ventana secundaria registrar compra
         ventanaConsultarCompras = conCom.ConsultarCompras(self.master)
@@ -77,222 +77,83 @@ class FrameMenu(CTkFrame):
         if mensaje[0] == 0:
             mss.mensajeError(mensaje[1])
 
+    def icono(self, nombre, tamano):
+        imagen = Image.open(leerImagen(nombre))
+        return CTkImage(light_image=imagen, dark_image=imagen, size=(tamano, tamano))
+
+    def fuente(self, tamano, peso='normal'):
+        return (conIni["fuente"], tamano, peso)
+
+    def botonLateral(self, fila, texto, comando, imagen):
+        #Botón plano alineado a la izquierda, que se resalta al pasar el mouse
+        boton = CTkButton(self
+                          ,text=texto
+                          ,command=comando
+                          ,image=imagen
+                          ,compound='left'
+                          ,anchor='w'
+                          ,fg_color='transparent'
+                          ,hover_color=tema["botonHover"]
+                          ,text_color=tema["texto"]
+                          ,font=self.fuente(conIni["tamanoBoton"])
+                          ,height=conIni["altoBoton"]
+                          ,corner_radius=conIni["radioBoton"]
+                          ,cursor=conGen.dicConfig["cursor"])
+        boton.grid(row=fila, column=0, sticky='ew', padx=conIni["padY"], pady=1)
+        return boton
+
+    def seccion(self, fila, texto):
+        CTkLabel(self
+                 ,text=texto
+                 ,text_color=tema["textoSuave"]
+                 ,font=self.fuente(conIni["tamanoSeccion"], 'bold')
+                 ,height=conIni["altoSeccion"]
+                 ,anchor='w').grid(row=fila, column=0, sticky='ew', padx=conIni["padX"] + 4, pady=(conIni["padY"], 2))
 
     def crearWidgets(self):
-        #Lectura de imagenes
+        iconoRegistrar = self.icono("Registrar", conIni["iconoTamano"])
+        iconoConsultar = self.icono("Consultar", conIni["iconoTamano"])
 
-        self.fmVentanaPrincipal= CTkFrame(self
-                                          ,fg_color=conGen.dicConfiguracionGeneralColores['fg_color']
-                                          )
-        self.fmVentanaPrincipal.pack()
-        
-#========Creacion Frame de Registros
-        fmRegistro=CTkFrame(self.fmVentanaPrincipal
-                            ,fg_color= conGen.dicConfiguracionGeneralColores["fg_color"]
-                            ,width=conGen.dicConfig["anchoFrameRegistrar"]
-                            ,height=conGen.dicConfig["altoFrameRegistrar"]
-                            )
-        fmRegistro.pack(padx=conGen.dicConfig["fmpadx"]
-                        ,pady=conGen.dicConfig["fmpady"]
-                        ,anchor=conGen.dicConfig["anchorFmRegistro"])
+        #Logo y nombre
+        CTkLabel(self
+                 ,text='  BillMate'
+                 ,image=self.icono("imgLogo", conIni["logoTamano"])
+                 ,compound='left'
+                 ,text_color=tema["texto"]
+                 ,font=self.fuente(conIni["tamanoNombreApp"], 'bold')
+                 ,anchor='w').grid(row=0, column=0, sticky='ew', padx=conIni["padX"], pady=(conIni["padX"] - 2, conIni["padY"] // 2))
 
-        #Boton Registrar factura 
-        self.btRegistrarFactura=CTkButton(fmRegistro
-                                       ,fg_color=conGen.dicConfiguracionGeneralColores["bgBotones"]
-                                       #,bg_color='red'
-                                       ,image=self.imagenRegistrar
-                                       ,cursor=conGen.dicConfig["cursor"]
-                                       ,text=' Registrar Facturas    '
-                                       ,compound=conGen.dicConfig["compound"]
-                                       ,font=(conGen.dicConfiguracionGeneralFuentes["Fuente"],14)
-                                       #,text_color=conGen.dicConfiguracionGeneralColores["ColorLetras"]
-                                       ,command=self.mostrarVentanaRegistrarFactura
-                                       ,width=conGen.dicConfig["btwidthGeneral"]
-                                       )
-        self.btRegistrarFactura.place(x=conGen.dicConfig["xbtGeneralRegistro"]
-                                      ,y=conGen.dicConfig["ybtRegistrarFactura"]
-                                      )
-        
-        
-        #boton Registrar Comercio
-        self.btRegistrarComercio=CTkButton(fmRegistro
-                                        ,fg_color=conGen.dicConfiguracionGeneralColores["bgBotones"]
-                                        ,image=self.imagenRegistrar
-                                        ,cursor=conGen.dicConfig["cursor"]
-                                        ,text=' Registrar Comercios '
-                                        ,compound=conGen.dicConfig["compound"]
-                                        ,font=(conGen.dicConfiguracionGeneralFuentes["Fuente"],14)
-                                        #,fg_color=conGen.dicConfiguracionGeneralColores["ColorLetras"]
-                                        ,command=self.mostrarVentanaRegistrarComercio
-                                        ,width=conGen.dicConfig["btwidthGeneral"]
-                                        )
-        self.btRegistrarComercio.place(x=conGen.dicConfig["xbtGeneralRegistro"]
-                                       ,y=conGen.dicConfig["ybtRegistrarComercio"]
-                                       )
+        #Acción principal
+        CTkButton(self
+                  ,text='Agregar Mercados'
+                  ,command=self.mostrarVentanaAgregarMercado
+                  ,image=self.icono("Agregar", conIni["iconoTamano"])
+                  ,compound='left'
+                  ,fg_color=tema["acento"]
+                  ,hover_color=tema["acentoHover"]
+                  ,text_color='white'
+                  ,font=self.fuente(conIni["tamanoBoton"], 'bold')
+                  ,height=conIni["altoBotonPrincipal"]
+                  ,corner_radius=conIni["radioBoton"]
+                  ,cursor=conGen.dicConfig["cursor"]).grid(row=1, column=0, sticky='ew', padx=conIni["padX"], pady=conIni["padY"] // 2)
 
-        #Boton Registrar producto
-        self.btRegistrarProducto=CTkButton(fmRegistro
-                                        ,fg_color=conGen.dicConfiguracionGeneralColores["bgBotones"]
-                                        ,image=self.imagenRegistrar
-                                        ,text=' Registrar Productos  '
-                                        ,cursor=conGen.dicConfig["cursor"]
-                                        ,compound=conGen.dicConfig["compound"]
-                                        ,font=(conGen.dicConfiguracionGeneralFuentes["Fuente"],14)
-                                        #,fg=conGen.dicConfiguracionGeneralColores["ColorLetras"]
-                                        ,command=self.mostrarVentanaRegistrarProducto
-                                        ,width=conGen.dicConfig["btwidthGeneral"]
-                                        )
-        self.btRegistrarProducto.place(x=conGen.dicConfig["xbtGeneralRegistro"]
-                                       ,y=conGen.dicConfig["ybtRegistrarProducto"]
-                                       )
-        
-        #Boton Registrar Meracdo
-        self.btRegistrarMercado=CTkButton(fmRegistro
-                                          ,fg_color= conGen.dicConfiguracionGeneralColores["bgBotones"]
-                                        ,image=self.imagenRegistrar
-                                        ,text=' Agregar Mercados '
-                                        ,cursor=conGen.dicConfig["cursor"]
-                                        ,compound=conGen.dicConfig["compound"]
-                                        ,font=(conGen.dicConfiguracionGeneralFuentes["Fuente"],15)
-                                        #,fg=conGen.dicConfiguracionGeneralColores["ColorLetras"]
-                                        ,command=self.mostrarVentanaAgregarMercado
-                                        ,width=conGen.dicConfig["btRegistrarMercadoWidth"]
-                                        )
-        self.btRegistrarMercado.place(x=conGen.dicConfig["xbtGeneralRegistro"]
-                                       ,y=conGen.dicConfig["ybtRegistrarMercado"]
-                                       )
-        
-        #Boton registrar compras
-        self.btRegistraCompra=CTkButton(fmRegistro
-                                          ,fg_color= conGen.dicConfiguracionGeneralColores["bgBotones"]
-                                        ,image=self.imagenRegistrar
-                                        ,text=' Registrar Compras '
-                                        ,cursor=conGen.dicConfig["cursor"]
-                                        ,compound=conGen.dicConfig["compound"]
-                                        ,font=(conGen.dicConfiguracionGeneralFuentes["Fuente"],15)
-                                        #,fg=conGen.dicConfiguracionGeneralColores["ColorLetras"]
-                                        ,command=self.mostrarVentanaRegistrarCompras
-                                        ,width=conGen.dicConfig["btRegistrarCompraWidth"]
-                                        )
-        self.btRegistraCompra.place(x=conGen.dicConfig["xbtGeneralRegistro"]
-                                    ,y=conGen.dicConfig["ybtRegistrarCompra"]
-                                    )
-        
+        fila = 2
+        for titulo, icono, botones in (('REGISTRAR', iconoRegistrar, (('Facturas', self.mostrarVentanaRegistrarFactura)
+                                                                      ,('Comercios', self.mostrarVentanaRegistrarComercio)
+                                                                      ,('Productos', self.mostrarVentanaRegistrarProducto)
+                                                                      ,('Compras', self.mostrarVentanaRegistrarCompras)))
+                                       ,('CONSULTAR', iconoConsultar, (('Mercados', self.mostrarVentanaConsultarMercados)
+                                                                       ,('Productos', self.mostrarVentanaconsultarProductos)
+                                                                       ,('Facturas', self.mostrarVentanaConsultarFacturas)
+                                                                       ,('Comercios', self.mostrarVentanaConsultarComercios)
+                                                                       ,('Compras', self.mostrarVentanaConsultarCompras)))):
+            self.seccion(fila, titulo)
+            fila += 1
+            for texto, comando in botones:
+                self.botonLateral(fila, f'  {texto}', comando, icono)
+                fila += 1
 
-#========Creación de frames de Consultas
-        fmConsulta=CTkFrame(self.fmVentanaPrincipal
-                            ,fg_color=conGen.dicConfiguracionGeneralColores["fg_color"]
-                            ,width=conGen.dicConfig["anchoFrameConsultar"]
-                            ,height=conGen.dicConfig["altoFrameConsultar"]
-                        )
-        fmConsulta.pack(padx=conGen.dicConfig["fmpadx"]
-                        ,pady=conGen.dicConfig["fmpady"]
-                        ,anchor=conGen.dicConfig["anchorFmConsultar"])
-#------------------------------------
-        #Boton consultar producto
-        self.btConsultarProducto=CTkButton(fmConsulta
-                                           ,fg_color= conGen.dicConfiguracionGeneralColores["bgBotones"]
-                                        ,image=self.imagenConsultar
-                                        ,cursor=conGen.dicConfig["cursor"]
-                                        ,text=' Consultar Productos'
-                                        ,compound=conGen.dicConfig["compound"]
-                                        ,font=(conGen.dicConfiguracionGeneralFuentes["Fuente"],14)
-                                        #,fg=conGen.dicConfiguracionGeneralColores["ColorLetras"]
-                                        ,command= self.mostrarVentanaconsultarProductos
-                                        ,width=conGen.dicConfig["btConsultarWidthGeneral"]
-                                       )
-        self.btConsultarProducto.place(x=conGen.dicConfig["xbtGeneralConsulta"]
-                                     ,y=conGen.dicConfig["ybtConsultarProducto"]
-                                     )
- #------------------------------------      
-        #Boton consultar factura
-        self.btConsultarFactura=CTkButton(fmConsulta
-                                       ,fg_color=conGen.dicConfiguracionGeneralColores["bgBotones"]
-                                       ,image=self.imagenConsultar
-                                       ,cursor=conGen.dicConfig["cursor"]
-                                       ,text=' Consultar Facturas  '
-                                       ,compound=conGen.dicConfig["compound"]
-                                       ,font=(conGen.dicConfiguracionGeneralFuentes["Fuente"],14)
-                                       #,fg=conGen.dicConfiguracionGeneralColores["ColorLetras"]
-                                       ,width=conGen.dicConfig["btConsultarWidthGeneral"]
-                                       ,command=self.mostrarVentanaConsultarFacturas
-                                       )
-        self.btConsultarFactura.place(x=conGen.dicConfig["xbtGeneralConsulta"]
-                                     ,y=conGen.dicConfig["ybtConsultarFactura"]
-                                     )
-
- #------------------------------------      
-        #Boton consultar comercio
-        self.btConsultarComercio=CTkButton(fmConsulta
-                                           ,fg_color= conGen.dicConfiguracionGeneralColores["bgBotones"]
-                                        ,image=self.imagenConsultar,cursor=conGen.dicConfig["cursor"]
-                                        ,text=' Consultar Comercios'
-                                        ,compound=conGen.dicConfig["compound"]
-                                        ,font=(conGen.dicConfiguracionGeneralFuentes["Fuente"],14)
-                                        #,fg=conGen.dicConfiguracionGeneralColores["ColorLetras"]
-                                        ,width=conGen.dicConfig["btConsultarWidthGeneral"]
-                                        ,command=self.mostrarVentanaConsultarComercios
-                                        )
-        self.btConsultarComercio.place(x=conGen.dicConfig["xbtGeneralConsulta"]
-                                       ,y=conGen.dicConfig["ybtConsultarComercio"]
-                                       )
-        ##Boton consultar Mercado
-        self.btConsultarMercado=CTkButton(fmConsulta
-                                          ,fg_color= conGen.dicConfiguracionGeneralColores["bgBotones"]
-                                        ,image=self.imagenConsultar
-                                        ,text=' Consultar Mercados'
-                                        ,compound=conGen.dicConfig["compound"]
-                                        ,font=(conGen.dicConfiguracionGeneralFuentes["Fuente"],14)
-                                        #,fg=conGen.dicConfiguracionGeneralColores["ColorLetras"]
-                                        ,width=conGen.dicConfig["btConsultarWidthGeneral"]
-                                        ,command=self.mostrarVentanaConsultarMercados
-                                        )
-        self.btConsultarMercado.place(x=conGen.dicConfig["xbtGeneralConsulta"]
-                                       ,y=conGen.dicConfig["ybtConsultarMercado"]
-                                       )
-        
-        ##Boton consultar Compras
-        self.btConsultarCompras=CTkButton(fmConsulta
-                                          ,fg_color= conGen.dicConfiguracionGeneralColores["bgBotones"]
-                                          ,image=self.imagenConsultar
-                                          ,text=' Consultar Compras'
-                                          ,compound=conGen.dicConfig["compound"]
-                                          ,font=(conGen.dicConfiguracionGeneralFuentes["Fuente"],14)
-                                          #,fg=conGen.dicConfiguracionGeneralColores["ColorLetras"]
-                                          ,width=conGen.dicConfig["btConsultarWidthGeneral"]
-                                          ,command=self.mostrarVentanaConsultarCompras
-                                          )
-        self.btConsultarCompras.place(x=conGen.dicConfig["xbtGeneralConsulta"]
-                                       ,y=conGen.dicConfig["ybtConsultarCompras"]
-                                       )
-
-#========Creación de frame Carpeta de datos
-        fmDatos=CTkFrame(self.fmVentanaPrincipal
-                         ,fg_color=conGen.dicConfiguracionGeneralColores["fg_color"]
-                         ,width=conGen.dicConfig["anchoFrameDatos"]
-                         ,height=conGen.dicConfig["altoFrameDatos"]
-                        )
-        fmDatos.pack(padx=conGen.dicConfig["fmpadx"]
-                     ,pady=conGen.dicConfig["fmpady"]
-                     ,anchor=conGen.dicConfig["anchorFmDatos"])
-
-        #Boton abrir carpeta de datos
-        self.btCarpetaDatos=CTkButton(fmDatos
-                                      ,fg_color=conGen.dicConfiguracionGeneralColores["bgBotones"]
-                                      ,image=self.imagenCarpetaDatos
-                                      ,cursor=conGen.dicConfig["cursor"]
-                                      ,text=' Carpeta de datos'
-                                      ,compound=conGen.dicConfig["compound"]
-                                      ,font=(conGen.dicConfiguracionGeneralFuentes["Fuente"],14)
-                                      ,width=conGen.dicConfig["btCarpetaDatosWidth"]
-                                      ,command=self.abrirCarpetaDatos
-                                      )
-        self.btCarpetaDatos.place(x=conGen.dicConfig["xbtCarpetaDatos"]
-                                  ,y=conGen.dicConfig["ybtCarpetaDatos"]
-                                  )
-        
-
-
-       
-        
-                
+        #La fila vacía empuja "Carpeta de datos" al pie de la barra
+        self.grid_rowconfigure(fila, weight=1)
+        carpeta = self.botonLateral(fila + 1, '  Carpeta de datos', self.abrirCarpetaDatos, self.icono("Guardar", conIni["iconoTamano"]))
+        carpeta.grid_configure(pady=(0, conIni["padY"]))
