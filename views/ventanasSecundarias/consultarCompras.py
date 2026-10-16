@@ -6,7 +6,7 @@ from views.configuracionesGenerales import dicConfig as conMaus
 from views.ventanasSecundarias.configuracionVentanasSecundarias  import dicConfigPosicion as conPos
 from views.configuracionesGenerales import dicConfiguracionGeneralColores as conColores
 from views.configuracionesGenerales import dicConfiguracionGeneralFuentes as conFuentes
-from controller.comprasController import ComprasController
+from controller import comprasController
 from views.messagebox import mensajesEmergentes as msx
 
 from views.vwImgConfig import  leerImagen
@@ -51,14 +51,7 @@ class ConsultarCompras(CTkToplevel):
     
     def btnConsultarCompras(self):
          #Funcionalidad botón consultar
-         listadoCompras = []
-         
-         #Creamos objeto
-         objConsultaCompras = ComprasController(None
-                                                ,self.etBuscarCompras.get()
-                                                ,None)
-         
-         listadoCompras,mensaje = objConsultaCompras.consultarCompra()
+         listadoCompras,mensaje = comprasController.consultarCompras(self.etBuscarCompras.get())
         
          if mensaje[0]==1:
               
@@ -76,16 +69,11 @@ class ConsultarCompras(CTkToplevel):
                                                                 ,tags='evenrow')
          if mensaje[0]==0:
               #Mostramos error
-              msx.mensajeError(mensaje)
+              msx.mensajeError(mensaje[1])
                                 
     def fnModificarCompra(self):
-         #Creamos objeto
-          objModificarCompra= ComprasController(self.compraId
-                                               ,self.etModificacionesDescripcionCompra.get()
-                                               ,None
-                                               )
-          
-          mensaje=objModificarCompra.modificarCompra()
+          mensaje=comprasController.modificarCompra(self.compraId
+                                                    ,self.etModificacionesDescripcionCompra.get())
 
           if mensaje[0]==1:
               #ejecutamos nuevamente la lista
@@ -240,11 +228,7 @@ class ConsultarCompras(CTkToplevel):
             
     def twConsultarCompras(self):
        
-       listadoComprasRegistradas = []
-       objConsultaComprasRegistradas = ComprasController (None
-                                               ,None
-                                               ,None)
-       listadoComprasRegistradas, mensaje = objConsultaComprasRegistradas.consultarComprasRegistradasController()
+       listadoComprasRegistradas, mensaje = comprasController.consultarListaCompras()
        if mensaje[0]==0:
             msx.mensajeError(mensaje[1])
 

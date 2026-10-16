@@ -2,7 +2,7 @@
 from controller import productosController
 from controller import comerciosController
 from controller import facturasController
-from controller.comprasController import ComprasController
+from controller import comprasController
 from controller.mercadoTempController import MercadoTempController, fnCargarCompraController
 from controller.mercadosController import MercadosController
 
@@ -15,7 +15,7 @@ def registrar_datos_base():
     assert productosController.insertarProducto('Arroz')[0] == 1
     assert comerciosController.insertarComercio("Tienda D'Luis", 'Calle 5 #3-2')[0] == 1
     assert facturasController.insertarFactura("fe'001", '12500', '2026-10-15')[0] == 1
-    assert ComprasController(None, "Mercado 'quincena'", '2026-10-15').insertarCompras()[0] == 1
+    assert comprasController.insertarCompra("Mercado 'quincena'", '2026-10-15')[0] == 1
 
 
 def mercado_temp(mercadoId=None, productoId=1, cantidad='2 kg', precioUnidad='3500', precioTotal='7000'):
@@ -43,7 +43,7 @@ def test_registro_y_busqueda_con_apostrofes(bd):
     assert productosController.consultarProductos("d'on") == ([(1, "D'Onofrio")], [1])
     assert comerciosController.consultarComercios("d'l")[0] == [(1, "Tienda D'Luis", 'Calle 5 #3-2')]
     assert facturasController.consultarFacturas("FE'")[0] == [(1, "FE'001", 12500.0, '2026-10-15')]
-    assert ComprasController(None, "'quin", None).consultarCompra()[0] == [(1, "Mercado 'Quincena'", '2026-10-15')]
+    assert comprasController.consultarCompras("'quin")[0] == [(1, "Mercado 'Quincena'", '2026-10-15')]
 
 
 def test_busqueda_con_comodin_no_rompe(bd):
@@ -57,7 +57,7 @@ def test_modificar_registros(bd, consultar):
     assert productosController.editarProducto(1, "pan d'bono")[0] == 1
     assert comerciosController.modificarComercio(1, 'Otro', 'Calle 1')[0] == 1
     assert facturasController.modificarFactura(1, 'fe002', '9900', '2026-10-16')[0] == 1
-    assert ComprasController(1, 'mercado mes', None).modificarCompra()[0] == 1
+    assert comprasController.modificarCompra(1, 'mercado mes')[0] == 1
 
     assert consultar("SELECT nombreProducto FROM productos WHERE productoId=1") == [("Pan D'Bono",)]
     assert consultar("SELECT * FROM facturas") == [(1, 'FE002', 9900.0, '2026-10-16')]
@@ -147,7 +147,8 @@ def test_precios_con_separador_de_miles_se_guardan_bien(bd, consultar):
 
 def test_campos_vacios(bd):
     assert productosController.insertarProducto('   ') == [0, 'No se admiten campos vacíos']
-    assert ComprasController(None, '', None).insertarCompras()[0] == 0
+    assert comprasController.insertarCompra('', None)[0] == 0
+    assert comprasController.modificarCompra(1, '   ') == [0, 'No se permite enviar la descripción en blanco']
     assert facturasController.insertarFactura('A1', '12abc', '2026-10-15')[0] == 2
     assert comerciosController.insertarComercio(' ', 'Calle 1') == [0, 'No se admiten campos vacíos']
     assert comerciosController.modificarComercio(1, 'Otro', '') == [0, 'No se admiten campos vacíos']
@@ -167,7 +168,7 @@ def test_listados_completos(bd):
 
     assert comerciosController.consultarListaComercios() == ([(1, "Tienda D'Luis", 'Calle 5 #3-2')], [1, ''])
     assert facturasController.consultarListaFacturas()[1] == [1, '']
-    assert ComprasController(None, None, None).consultarComprasRegistradasController()[1] == [1, '']
+    assert comprasController.consultarListaCompras()[1] == [1, '']
 
 
 def test_listados_devuelven_error_de_bd(bd, consultar):
@@ -178,7 +179,7 @@ def test_listados_devuelven_error_de_bd(bd, consultar):
 
     assert comerciosController.consultarListaComercios() == ([], [0, 'No se pudo consultar los comercios: no such table: comercios'])
     assert facturasController.consultarListaFacturas() == ([], [0, 'No se pudo obtener información de las facturas: no such table: facturas'])
-    assert ComprasController(None, None, None).consultarComprasRegistradasController() == ([], [0, 'Error al consultar compras registradas: no such table: compras'])
+    assert comprasController.consultarListaCompras() == ([], [0, 'Error al consultar compras registradas: no such table: compras'])
 
 
 def test_error_de_bd_se_devuelve_como_mensaje(bd, consultar):

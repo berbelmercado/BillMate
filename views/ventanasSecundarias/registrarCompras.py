@@ -6,7 +6,7 @@ from views.ventanasSecundarias.configuracionVentanasSecundarias import dicConfig
 from views.configuracionesGenerales import dicConfiguracionGeneralColores as color
 from views.configuracionesGenerales import dicConfiguracionGeneralFuentes as fuente
 from views.configuracionesGenerales import dicConfig as maus
-from controller.comprasController import ComprasController
+from controller import comprasController
 from views.messagebox import mensajesEmergentes as mss
 from views.vwImgConfig import leerImagen
 
@@ -36,12 +36,7 @@ class RegistrarCompras(CTkToplevel):
         
         fecha=date.today().isoformat() #Se optiene fecha actual en AAAA-MM-DD
 
-        #Se crea objeto para inserción de información
-        objGuardarCompra= ComprasController(None
-                                            ,self.etDescripcionCompra.get()
-                                            ,fecha)
-        #Se optiene el status de inserción
-        control = objGuardarCompra.insertarCompras()
+        control = comprasController.insertarCompra(self.etDescripcionCompra.get(), fecha)
 
         if control[0]==1:
             #Se muestra mensaje de inserción
