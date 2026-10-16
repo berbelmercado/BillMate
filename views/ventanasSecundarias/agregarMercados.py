@@ -1,4 +1,4 @@
-"""Modulo para cerar la ventana de agregar mercados"""
+"""Modulo para crear la ventana de agregar mercados"""
 from tkinter import ttk,IntVar
 from PIL import Image
 from customtkinter import CTkToplevel,CTkFrame,CTkButton,CTkLabel,CTkEntry,CTkCheckBox,CTkImage,CTkScrollbar
@@ -19,10 +19,14 @@ from views.vwImgConfig import leerImagen
 from views.frameListasTreview import TreviewUltimoMercado
 
 class AgregarMercados(CTkToplevel):
+    """
+    Clase para crear la ventana de agregar mercados
+    Esta clase hereda de CTkToplevel y se encarga de crear la ventana
+    """
     #Crea la ventana secundaria donde se ingresarán los mercados
     def __init__(self,master):
         super().__init__(master)
-        self.master=master 
+        self.master=master
         self.geometry(f"{conSec.dicConfigAgregarMercado["vpWidth"]}x{conSec.dicConfigAgregarMercado["vpHeight"]}+{conSec.dicConfigPosicion["vnagregarMercadoX"]}+{conSec.dicConfigPosicion["vnagregarMercadoY"]}")
         self.imagenGuardar=CTkImage(dark_image=Image.open(leerImagen("Guardar")),size=(28,28))
         self.imagenCancelar=CTkImage(dark_image=Image.open(leerImagen("Cancelar")),size=(28,28))
@@ -33,12 +37,14 @@ class AgregarMercados(CTkToplevel):
         self.imagenCargar = CTkImage(dark_image =Image.open(leerImagen("cargar")),size=(28,28))
         self.title("Agregar Mercados")
         self.resizable(False,False)
-        self.grab_set()
+        self.lift()  
+        self.attributes("-topmost", True)
+        #self.after(10, lambda: self.attributes("-topmost", False))
         self.crearWidget()
         self.productosAgregados()
         self.definiciónVariables()
-        WidgetsDatos(self,conSec.dicConfigAgregarMercado["fmDatosX"],conSec.dicConfigAgregarMercado["fmDatosY"],self.listaProductos)#Calcula el total y cantidad de productos agregados
-        
+        self.obj_frame_total = WidgetsDatos(self.FramePrincipal,conSec.dicConfigAgregarMercado["fmDatosX"],conSec.dicConfigAgregarMercado["fmDatosY"],self.listaProductos)#Calcula el total y cantidad de productos agregados
+
     def definiciónVariables(self):
         self.compraId = None
         self.idFactura = None
@@ -132,11 +138,13 @@ class AgregarMercados(CTkToplevel):
         
         if mensaje[0]==1:
             #Modificamos los checks buttons para que se limpien todos los campos 
+            self.obj_frame_total.destruirFrameTotal()
             self.cbFijarFactura.deselect()
             self.cbFijarCompra.deselect()
             self.cbNFijarComercio.deselect()
             self.fnLimpiar()
             self.productosAgregados()
+            self.obj_frame_total = WidgetsDatos(self.FramePrincipal,conSec.dicConfigAgregarMercado["fmDatosX"],conSec.dicConfigAgregarMercado["fmDatosY"],self.listaProductos)#Calcula el total y cantidad de productos agregados
         
         if mensaje[0]==0:
             mss.mensajeError(mensaje[1])
@@ -144,7 +152,10 @@ class AgregarMercados(CTkToplevel):
 
     def execAgregarProductos(self):
         self.objConsultarProductos = conPro.ConsultarProductos(self)
-        
+        self.objConsultarProductos.lift()
+        self.objConsultarProductos.attributes("-topmost", True)
+        self.objConsultarProductos.grab_set()  # Da el foco a la ventana
+
         def fnfnImportarDatosProductos():
             self.idProducto = int(self.objConsultarProductos.productoId)
 
@@ -152,8 +163,8 @@ class AgregarMercados(CTkToplevel):
             self.etNombreProducto.delete(0,'end')
             self.etNombreProducto.insert (0,self.objConsultarProductos.etNombreProducto.get())
             self.etNombreProducto.configure(state='disabled')
-            self.grab_set()
-            self.focus()
+            # self.grab_set()
+            # self.focus()
             self.objConsultarProductos.destroy()
 
 
@@ -175,11 +186,15 @@ class AgregarMercados(CTkToplevel):
                                         ,padx=conSec.dicConfigConsultarProducto["padXFmModificaciones"]
                                         ,pady=conSec.dicConfigConsultarProducto["padXFmModificaciones"]
                                         )
-    
+        WidgetsDatos(self.FramePrincipal,conSec.dicConfigAgregarMercado["fmDatosX"],conSec.dicConfigAgregarMercado["fmDatosY"],self.listaProductos)
+
     def execAgregarFacturas(self):
         
         #declaramos objeto que muestra la ventana de consultas
         self.objConsultarFacura = conFacturas.ConsultarFacturas(self)
+        self.objConsultarFacura.lift()
+        self.objConsultarFacura.attributes("-topmost", True)
+        self.objConsultarFacura.grab_set()
 
         def fnImportarDatosFacturas():
             #Importamos los datos desde la vista consultar facturas
@@ -220,6 +235,9 @@ class AgregarMercados(CTkToplevel):
 
     def execAgregarComercios(self):
         self.objConsutarComercios = conCom.ConsultarComercios(self)
+        self.objConsutarComercios.lift()
+        self.objConsutarComercios.attributes("-topmost", True)
+        self.objConsutarComercios.grab_set()
 
         def fnImportarDatosComercios():
             #Importamos los datos desde la vista consultar comercios
@@ -256,8 +274,11 @@ class AgregarMercados(CTkToplevel):
                                     )
         
     def execAgregarCompras(self):
-    
+       
         self.objConsutarCompras = conComp.ConsultarCompras(self)
+        self.objConsutarCompras.lift()
+        self.objConsutarCompras.attributes("-topmost", True)
+        self.objConsutarCompras.grab_set()
 
         def fnImportarDatosComercios():
             #Importamos los datos desde la vista consultar compras
@@ -270,8 +291,8 @@ class AgregarMercados(CTkToplevel):
             self.etDescribcionMercado.delete(0, 'end')
             self.etDescribcionMercado.insert(0, self.describcionCompra)
             self.etDescribcionMercado.configure(state='disabled')
-            self.grab_set()
-            self.focus()
+            # self.grab_set()
+            # self.focus()
             self.objConsutarCompras.destroy()#se destruye la ventana
 
         self.btnCargarFacturas=CTkButton(self.objConsutarCompras.fmFrameModificacionCompras
@@ -295,6 +316,7 @@ class AgregarMercados(CTkToplevel):
 
     def execInsertarProductos(self):
         #Agrega la compra a tabla mercado temporal
+        
         mensaje= []
         #print(f"compra {self.compraId} \n Factura {self.idFactura} \n producto {self.idProducto} \n comercio {self.comercioId}")
         objInsertarProducto = MercadoTempController(None
@@ -309,8 +331,12 @@ class AgregarMercados(CTkToplevel):
         mensaje = objInsertarProducto.insertarMercadosTempController()
 
         if mensaje[0]==1:
+            self.obj_frame_total.destruirFrameTotal()
             self.fnLimpiar()
             self.productosAgregados()
+            self.obj_frame_total = WidgetsDatos(self.FramePrincipal,conSec.dicConfigAgregarMercado["fmDatosX"],conSec.dicConfigAgregarMercado["fmDatosY"],self.listaProductos)#Calcula el total y cantidad de productos agregados
+            self.lift()  
+            self.attributes("-topmost", True)
         if mensaje[0]==0:
             mss.mensajeError(mensaje[1])
     
@@ -332,8 +358,10 @@ class AgregarMercados(CTkToplevel):
         if mensaje[0] == 0:
             mss.mensajeError(mensaje[1])
         if mensaje[0] == 1:
+            self.obj_frame_total.destruirFrameTotal()
             self.fnLimpiar()
             self.productosAgregados()
+            self.obj_frame_total = WidgetsDatos(self.FramePrincipal,conSec.dicConfigAgregarMercado["fmDatosX"],conSec.dicConfigAgregarMercado["fmDatosY"],self.listaProductos)#Calcula el total y cantidad de productos agregados
 
 
     def execCargarCompra(self):
@@ -341,19 +369,31 @@ class AgregarMercados(CTkToplevel):
         estado = fnCargarCompraController()
         if estado[0] ==1:
             mss.mensajeInformativo(estado[1])
+            self.obj_frame_total.destruirFrameTotal()
             self.fnLimpiar
             self.productosAgregados()
 
+            #Actualizamos frame ultimo mercado en la ventana principal
             objActualizarUltimoMercado = TreviewUltimoMercado(self.master)
-            objActualizarUltimoMercado.crearTreview()
+            objActualizarUltimoMercado.destroy()
+            self.obj_frame_total = WidgetsDatos(self.FramePrincipal,conSec.dicConfigAgregarMercado["fmDatosX"],conSec.dicConfigAgregarMercado["fmDatosY"],self.listaProductos)#Calcula el total y cantidad de productos agregados
+            TreviewUltimoMercado(self.master)
 
         if estado[0] == 0:
             mss.mensajeError(estado[1])
 
-
     def crearWidget(self):
+
+        #Frame principal
+        self.FramePrincipal = CTkFrame(self
+                                       ,fg_color=conColor["bgGeneral"]
+                                       ,width=1343
+                                       ,height=588)
+        self.FramePrincipal.place(x=0
+                                  ,y=0)
+
         #Frame 
-        self.fmMenu=CTkFrame(self
+        self.fmMenu=CTkFrame(self.FramePrincipal
                              ,fg_color=conColor["fg_color"]
                              ,width=conSec.dicConfigAgregarMercado["fmWidht"]
                              ,height=conSec.dicConfigAgregarMercado["fmHeight"])
@@ -426,7 +466,7 @@ class AgregarMercados(CTkToplevel):
         
 
         #Frame Formulario
-        self.fmFormulario=CTkFrame(self
+        self.fmFormulario=CTkFrame(self.FramePrincipal
                                 ,fg_color=conColor['fg_color']
                                 ,width=conSec.dicConfigAgregarMercado["fmFormularioWidht"]
                                 ,height=conSec.dicConfigAgregarMercado["fmFormularioHeight"]
@@ -782,7 +822,7 @@ class AgregarMercados(CTkToplevel):
         if mensaje[0]==0:
             mss.mensajeError(mensaje[1])
 
-        self.fmListado = CTkFrame(self
+        self.fmListado = CTkFrame(self.FramePrincipal
                                   ,fg_color=conColor['fg_color']
                                   ,width=conSec.dicConfigAgregarMercado["fmListaWidht"]
                                   ,height=conSec.dicConfigAgregarMercado["fmListaHeight"])

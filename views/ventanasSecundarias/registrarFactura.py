@@ -22,7 +22,10 @@ class RegistrarFactura(CTkToplevel):
         self.imagenCalendario=CTkImage(dark_image=Image.open(leerImagen("Calendario")),size=(28,28))
         self.imagenCancelar=CTkImage(dark_image=Image.open(leerImagen("Cancelar")),size=(28,28))
         self.resizable(False,False)
-        self.grab_set()
+        # Ponerla encima de las demás
+        self.lift()  
+        self.attributes("-topmost", True)
+        #self.after(10, lambda: self.attributes("-topmost", False))
         self.crearWidget()
     
     def capturarFechaFactura(self):

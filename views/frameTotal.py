@@ -18,7 +18,7 @@ class WidgetsDatos():
                 self.posY = posY
                 self.listadoProductos = listadoProductos
                 self.crearFrameTotal()
-               
+
         def crearFrameTotal(self):
                 """dibuja los widgets"""
 
@@ -29,7 +29,7 @@ class WidgetsDatos():
                 self.fmDatos.place(x=self.posX
                                 ,y=self.posY
                                 )
-    
+
                 #Label total productos cargados
                 lbTotalCompra = CTkLabel(self.fmDatos
                                                 ,text='Total'
@@ -44,7 +44,7 @@ class WidgetsDatos():
                                    ,pady=5
                                    ,padx=5
                                    )
-                
+
                 #Entry total productos cargados
                 etTotalCompra = CTkEntry(self.fmDatos
                                          ,fg_color=conColor["bgEntrys"]
@@ -109,6 +109,6 @@ class WidgetsDatos():
                         contador+=1
                 
                 return total,contador
-    
-                
         
+        def destruirFrameTotal(self):
+                self.fmDatos.destroy()

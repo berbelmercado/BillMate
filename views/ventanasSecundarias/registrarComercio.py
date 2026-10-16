@@ -10,18 +10,20 @@ from  views.vwImgConfig import leerImagen
 
 class RegistrarComercio(CTkToplevel):
    def __init__(self,master):
-      super().__init__(master)
-      self.fg_color=conColor["fg_color"]
-      self.geometry(f"{conSec.dicConfigRegistrarComercio["vpWidth"]}x{conSec.dicConfigRegistrarComercio["vpHeight"]}+{conSec.dicConfigPosicion["vnregistrarComercioX"]}+{conSec.dicConfigPosicion["vnRegistrarComercioY"]}")
-      self.title("Registrar Comercios")
-      #se importan las imagenes que se insertan en los botones
-      self.imagenGuardar=CTkImage(dark_image=Image.open(leerImagen("Guardar")),size=(28,28))
-      self.imagenCancelar=CTkImage(dark_image=Image.open(leerImagen("Cancelar")),size=(28,28))
-      #self.imagenCancelar=CTkImage(Image.open(imagen.leerImagen("Cancelar")))
-      self.resizable(False,False)
-      self.master=master
-      self.grab_set()
-      self.crearWidget()
+        super().__init__(master)
+        self.fg_color=conColor["fg_color"]
+        self.geometry(f"{conSec.dicConfigRegistrarComercio["vpWidth"]}x{conSec.dicConfigRegistrarComercio["vpHeight"]}+{conSec.dicConfigPosicion["vnregistrarComercioX"]}+{conSec.dicConfigPosicion["vnRegistrarComercioY"]}")
+        self.title("Registrar Comercios")
+        #se importan las imagenes que se insertan en los botones
+        self.imagenGuardar=CTkImage(dark_image=Image.open(leerImagen("Guardar")),size=(28,28))
+        self.imagenCancelar=CTkImage(dark_image=Image.open(leerImagen("Cancelar")),size=(28,28))
+        #self.imagenCancelar=CTkImage(Image.open(imagen.leerImagen("Cancelar")))
+        self.resizable(False,False)
+        self.master=master
+        self.lift()  
+        self.attributes("-topmost", True)
+        #self.after(10, lambda: self.attributes("-topmost", False))
+        self.crearWidget()
 
    def btnCancelar(self):
         #Funcionalidad botóon cancelar
@@ -111,7 +113,7 @@ class RegistrarComercio(CTkToplevel):
                                        ,y=conSec.dicConfigRegistrarComercio["etDireccionComercioY"]
                                        )      
       
-      #Boton Guardar   
+      #Boton Guardar
       self.btnGuardarFactura=CTkButton(self.fmPrincipalRegistrarComercio
                                        ,text='Guardar'
                                        ,fg_color=conColor["bgBotones"]

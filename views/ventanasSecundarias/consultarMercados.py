@@ -13,13 +13,15 @@ from views.frameTotal import WidgetsDatos
 from views.messagebox import mensajesEmergentes as msbx
 from controller.mercadosController import MercadosController
 from views.vwImgConfig import  leerImagen
-
+from views.frameListasTreview import TreviewUltimoMercado
 
 class ConsultarMercados(CTkToplevel):
 
     def __init__(self,master):
         super().__init__(master)
+        self.master=master
         self.geometry(f"{conSec.dicConfigConsultarMercado["vpConsultarMercadoWidth"]}x{conSec.dicConfigConsultarMercado["vpConsultarMercadoHeight"]}+{conSec.dicConfigPosicion["vnConsultarMercadosX"]}+{conSec.dicConfigPosicion["vnConsultarMercadosY"]}")
+        self._fg_color= conColores['bgGeneral']
         self.title("Consultas")
         self.imagenConsultar = CTkImage(dark_image=Image.open(leerImagen("Consultar")),size=(28,28))
         self.imagenCancelar = CTkImage(dark_image=Image.open(leerImagen("Cancelar")),size=(28,28))
@@ -28,12 +30,24 @@ class ConsultarMercados(CTkToplevel):
         self.imagenAgregar=CTkImage(dark_image=Image.open(leerImagen("Agregar")),size=(28,28))
         self.imagenCargar = CTkImage(dark_image =Image.open(leerImagen("cargar")),size=(28,28))
         self.resizable(False,False)
-        self.grab_set()
+        self.lift()  
+        self.attributes("-topmost", True)
+        #self.after(10, lambda: self.attributes("-topmost", False))
+        self.fmGlobal()
         self.buscarProducto()
         self.fmCargaItems()
         self.modificaciones()
         self.twConsultarProducto()
         self.definiciónVariables()
+
+    def fmGlobal(self):
+        self.frmGlobal=CTkFrame(self
+                                ,fg_color=conColores['bgGeneral']
+                                ,width=1270
+                                ,height=610
+                                )
+        self.frmGlobal.place(x=0
+                            ,y=0)
 
     def definiciónVariables(self):
         #Definimos variables para que sean reconocidas en otras funciones
@@ -371,6 +385,10 @@ class ConsultarMercados(CTkToplevel):
             msbx.mensajeInformativo(mensaje[1])
             self.limpiarentrys
             self.fnConsultas()
+            #Actualizamos frame ultimo mercado en la ventana principal
+            objActualizarUltimoMercado = TreviewUltimoMercado(self.master)
+            objActualizarUltimoMercado.destroy()
+            TreviewUltimoMercado(self.master)
         if mensaje[0]==0:
             msbx.mensajeError(mensaje[1])
 

@@ -1,5 +1,5 @@
 """Modul para crear los frame que contienen el menú"""
-from customtkinter import CTkFrame,CTkButton,set_appearance_mode,set_default_color_theme,CTkImage
+from customtkinter import CTkFrame,CTkButton,CTkImage
 from PIL import Image
 from views import configuracionesGenerales as conGen
 from views.vwImgConfig import leerImagen
@@ -20,8 +20,8 @@ class FrameMenu(CTkFrame):
     def __init__(self,master):
         super().__init__(master)
         self.master=master
-        #Apariencia general 
-        self._set_appearance_mode("dark")
+        #Apariencia general
+        self._fg_color =fg_color=conGen.dicConfiguracionGeneralColores['bgGeneral']
         self.place(y=conGen.dicConfig["fmYPrincipal"])#Empaquetamieno frame
         #Importación de imagenes
         self.imagenRegistrar=CTkImage(dark_image=Image.open(leerImagen("Registrar")),size=(35,35))
@@ -30,43 +30,43 @@ class FrameMenu(CTkFrame):
 
     def mostrarVentanaRegistrarFactura(self):
         #muestra la ventana secundaria para registrar factura
-        ventanaRegistrarFactura=rf.RegistrarFactura(self)
+        ventanaRegistrarFactura=rf.RegistrarFactura(self.master)
 
     def mostrarVentanaRegistrarComercio(self):
         #muestra la ventana secundaria para registrar comercio
-        ventanaRegistrarComercio=rc.RegistrarComercio(self)
+        ventanaRegistrarComercio=rc.RegistrarComercio(self.master)
 
     def mostrarVentanaRegistrarProducto(self):
         #ventana secundaria registrar producto
-        ventanaRegistrarProducto=rp.RegistrarProductos(self)
+        ventanaRegistrarProducto=rp.RegistrarProductos(self.master)
 
     def mostrarVentanaAgregarMercado(self):
         #ventana secundaria registrar mercado
-        ventanaAgregarMercado=am.AgregarMercados(self)
+        ventanaAgregarMercado=am.AgregarMercados(self.master)
 
     def mostrarVentanaconsultarProductos(self):
         #ventana secundaria consultar productos
-        ventanaConsultarProducto=cp.ConsultarProductos(self)
+        ventanaConsultarProducto=cp.ConsultarProductos(self.master)
         #ventanaConsultarProducto=cpv2.ConsultarFacturas(self)
 
     def mostrarVentanaConsultarFacturas(self):
-        ventanaConsultarFacturas= cf.ConsultarFacturas(self)
+        ventanaConsultarFacturas= cf.ConsultarFacturas(self.master)
 
     def mostrarVentanaConsultarMercados(self):
         #ventana secundaria consultar mercados
-        ventanaConsultarMercados=cm.ConsultarMercados(self)
+        ventanaConsultarMercados=cm.ConsultarMercados(self.master)
 
     def mostrarVentanaConsultarComercios(self):
         #ventana secundaria consultar comercios
-        ventanaConsultarComercios=cc.ConsultarComercios(self)
+        ventanaConsultarComercios=cc.ConsultarComercios(self.master)
 
     def mostrarVentanaRegistrarCompras(self):
         #Ventana secundaria registrar compra
-        ventanaRegistrarCompras = rcp.RegistrarCompras(self)
+        ventanaRegistrarCompras = rcp.RegistrarCompras(self.master)
     
     def mostrarVentanaConsultarCompras(self):
         #Ventana secundaria registrar compra
-        ventanaConsultarCompras = conCom.ConsultarCompras(self)
+        ventanaConsultarCompras = conCom.ConsultarCompras(self.master)
         
 
     def crearWidgets(self):

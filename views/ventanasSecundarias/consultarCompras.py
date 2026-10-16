@@ -22,11 +22,22 @@ class ConsultarCompras(CTkToplevel):
         self.imagenCancelar=CTkImage(dark_image=Image.open(leerImagen("Cancelar")),size=(28,28))
         self.imagenActualizar=CTkImage(dark_image=Image.open(leerImagen("Actualizar")),size=(28,28))
         self.resizable(False,False)   
+        self.fmGlobal()
         self.widgetsBusquedaCompras()
         self.frameModificacionesCompras()
         self.twConsultarCompras()
-        self.grab_set()
-
+        self.lift()  
+        self.attributes("-topmost", True)
+        #self.after(10, lambda: self.attributes("-topmost", False))
+    
+    def fmGlobal(self):
+        self.frmGlobal=CTkFrame(self
+                                ,fg_color=conColores['bgGeneral']
+                                ,width=1270
+                                ,height=610
+                                )
+        self.frmGlobal.place(x=0
+                            ,y=0)
 
     def btnCancelar(self):
          #Boton cancelar
@@ -94,7 +105,7 @@ class ConsultarCompras(CTkToplevel):
 
     def widgetsBusquedaCompras(self):
         #Vista para frame de busquedas
-        self.fmBusquedaCompras=CTkFrame(self
+        self.fmBusquedaCompras=CTkFrame(self.frmGlobal
                                          ,fg_color=conColores["fg_color"]
                                          )
         self.fmBusquedaCompras.place(x=conCom["fmBusquedaComprasX"]
@@ -173,7 +184,7 @@ class ConsultarCompras(CTkToplevel):
         
     def frameModificacionesCompras(self):
             #Frame modificaciones
-            self.fmFrameModificacionCompras=CTkFrame(self
+            self.fmFrameModificacionCompras=CTkFrame(self.frmGlobal
                                                       ,fg_color=conColores['fg_color']
                                                       )
             self.fmFrameModificacionCompras.place(x=conCom["fmFrameModificacionComprasX"]
@@ -237,7 +248,7 @@ class ConsultarCompras(CTkToplevel):
        listadoComprasRegistradas=objConsultaComprasRegistradas.consultarComprasRegistradasController()
 
        #creación frame para treeview
-       self.fmTreviewConsultarCompras= CTkFrame(self
+       self.fmTreviewConsultarCompras= CTkFrame(self.frmGlobal
                                                   ,fg_color=conColores["fg_color"]
                                                  )
        self.fmTreviewConsultarCompras.place(x=conCom["fmTreviewConsultarComprasX"]

@@ -5,12 +5,15 @@ from controller.mercadosController import MercadosController
 from views.frameTotal import WidgetsDatos
 
 class TreviewUltimoMercado(CTkFrame):
+    """
+    Clase que representa el Treeview del último mercado.
+    """
 
     def __init__(self,master=None):
         super().__init__(master)
         self.master=master
         #Apariencia
-        self._set_appearance_mode("dark")
+        self._fg_color =conGen.dicConfiguracionGeneralColores['bgGeneral']
         self.place(x=conGen.dicConfigFrameUltimoMercado["fmXFramePrincipal"]
                    ,y=conGen.dicConfigFrameUltimoMercado["fmyFramePrincipal"]
                   )      

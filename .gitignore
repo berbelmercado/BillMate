@@ -1,0 +1,8 @@
+.qodo/
+.env
+envBillMate/
+output/
+database/
+config_setup/
+__pycache__/
+*.pyc
