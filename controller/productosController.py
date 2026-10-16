@@ -1,3 +1,4 @@
+import sqlite3
 from model.productos import  Productos
 
 class ProductosController:
@@ -32,8 +33,8 @@ class ProductosController:
                                            ,self.nombreProducto)
                 nombreProducto.insertarProductos()#llamamos función desde el modelo
                 mensajeInsersion = [1,'Se insertó el producto correctamente']
-            except:
-                mensajeInsersion =[0, 'No se insertó el producto']
+            except sqlite3.Error as ex:
+                mensajeInsersion =[0, f'No se insertó el producto: {ex}']
         else:
             mensajeInsersion=[0,'No se admiten campos vacíos']
        
@@ -49,10 +50,10 @@ class ProductosController:
             
             listadoProductos=listaProductos.consultarListaProductos()#llamamos función desde el modelo
             mensajeconsulta=[1]
-        except:
+        except sqlite3.Error as ex:
             #Devolvemos mensaje a la vista en caso de error
             mensajeconsulta= [0
-                              ,'No fue posible consultar lista de productos']
+                              ,f'No fue posible consultar lista de productos: {ex}']
 
         return listadoProductos,mensajeconsulta
     
@@ -70,10 +71,10 @@ class ProductosController:
             listadoProductos=listaProductos.consultarProductos()#llamamos la función consultar desde del modelo
 
             mensajeconsulta=[1]
-        except:
+        except sqlite3.Error as ex:
             #En caso de error enviamos a la vista  mensaje
             mensajeconsulta= [0
-                              ,'No fue posible consultar lista de productos']
+                              ,f'No fue posible consultar productos: {ex}']
 
         return listadoProductos,mensajeconsulta
     
@@ -92,9 +93,9 @@ class ProductosController:
                 nombreProducto = Productos(self.productoId
                                            ,self.nombreProducto)
                 nombreProducto.editarProductos()#llamamos la función editar del modelo
-                mensajeInsersion = [1,'Se insertó el producto correctamente']
-            except :
-                mensajeInsersion =[0, 'No se insertó el producto']
+                mensajeInsersion = [1,'Se modificó el producto correctamente']
+            except sqlite3.Error as ex:
+                mensajeInsersion =[0, f'No se modificó el producto: {ex}']
                 
         else:
             mensajeInsersion=[0,'No se admiten campos vacíos']

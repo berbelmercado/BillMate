@@ -1,3 +1,4 @@
+import sqlite3
 from model.mercadoTemp import MercadoTemp
 from model.mercadoTemp import cargarCompraModel
 
@@ -31,13 +32,13 @@ class MercadoTempController():
             #Si se envía uno o más campos vacíos no se hará la inserción
             estado = 0
 
-        if self.precioUnidadTemp.isspace() or self.precioUnidadTemp == '' or self.precioUnidadTemp.isalpha() == True:
-            #valida si el campo precio unidad está vacio o con espacio o con letras
+        if not esNumero(self.precioUnidadTemp):
+            #valida si el campo precio unidad está vacio, con espacios o no es un número
             estado = 2
 
 
-        if self.precioTotalTemp == None or self.precioTotalTemp== '' or self.precioTotalTemp.isalpha() == True:
-            #valida si el campo precio total es vacío o se llena con espacio o con letras
+        if not esNumero(self.precioTotalTemp):
+            #valida si el campo precio total está vacio, con espacios o no es un número
             estado = 3
 
         return estado
@@ -67,8 +68,8 @@ class MercadoTempController():
 
                 mensaje = [1,'Producto agregado']
 
-            except NameError as ex:
-                mensaje = [0, 'No fue posible insertar el producto Error: {ex}']
+            except sqlite3.Error as ex:
+                mensaje = [0, f'No fue posible insertar el producto Error: {ex}']
         if estado ==0:
             mensaje = [0,'No se permiten campos vacíos']
 
@@ -98,7 +99,7 @@ class MercadoTempController():
                                                     )
             listaMercadosTemp = objConsultarMercadosTemp.consultarMercadosTemporal()
             mensaje=[1]
-        except NameError as ex:
+        except sqlite3.Error as ex:
 
             mensaje = [0,f'No se pudo conectar a la bd error: {ex}']
 
@@ -122,9 +123,9 @@ class MercadoTempController():
 
             mensaje = [1,'Producto Modificado']
 
-        except NameError as ex:
+        except sqlite3.Error as ex:
 
-            mensaje=[0,'No fue posible modificar el producto Error: {ex}']
+            mensaje=[0,f'No fue posible modificar el producto Error: {ex}']
 
         return mensaje
     
@@ -150,7 +151,7 @@ class MercadoTempController():
             
             mensaje= [1,'']
 
-        except NameError as ex:
+        except sqlite3.Error as ex:
 
             mensaje= [0,f'Error al consultar llaves: {ex}']
         
@@ -173,9 +174,9 @@ class MercadoTempController():
             objEliminarPoroductoTempController.eliminarMercadoTemporal()
 
             mensaje = [1]
-        except NameError as ex:
+        except sqlite3.Error as ex:
 
-            mensaje = [0,'No se pudo eliminar el producto error: {ex}']
+            mensaje = [0,f'No se pudo eliminar el producto error: {ex}']
         
         return mensaje
     
@@ -186,7 +187,15 @@ def fnCargarCompraController():
     try:    
         cargarCompraModel()
         mensaje = [1, 'Se ha cargado la compra correctamente']
-    except NameError as ex:
+    except sqlite3.Error as ex:
         mensaje = [0,f'No fue posible cargar la compra Error: {ex}']
-    
+
     return mensaje
+
+def esNumero(texto):
+    #Devuelve True si el texto se puede convertir a número (vacío, espacios o letras no)
+    try:
+        float(texto)
+        return True
+    except (TypeError, ValueError):
+        return False

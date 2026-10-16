@@ -1,3 +1,4 @@
+import sqlite3
 from model.comercios import Comercios
 
 class ComerciosController:
@@ -42,9 +43,9 @@ class ComerciosController:
                 comercio.insertarComercios()
                 messagebox = [1,
                               'Se insertó correctamente el comercio']
-            except:
-                messagebox = [0, 
-                              'No se pudo insertar el comercio )']
+            except sqlite3.Error as ex:
+                messagebox = [0,
+                              f'No se pudo insertar el comercio: {ex}']
         if estado==0:
             messagebox = [0, 
                           'No se permiten campos vacíos... ponga bien esa mondá >.<']
@@ -60,8 +61,8 @@ class ComerciosController:
                                         ,None
                                         ,None)
             listaComercio = listadoComercio.consultarComercios()
-        except:
-            mesagebox = [0,'Error al consultar comercios en la base de datos']
+        except sqlite3.Error as ex:
+            print(f'Error al consultar comercios en la base de datos: {ex}')
         
         return listaComercio
     
@@ -78,8 +79,8 @@ class ComerciosController:
             #instanciamos la clase
             listaComrercio = objComercios.consultarComercioModel()
             messagebox = [1,'']
-        except:
-            messagebox =[0,"No se pudo consultar "]
+        except sqlite3.Error as ex:
+            messagebox =[0,f"No se pudo consultar los comercios: {ex}"]
         return listaComrercio, messagebox
     
     def modificarComerciosController(self):
@@ -98,9 +99,9 @@ class ComerciosController:
                 comercio.modificarComerciosModel()
                 messagebox = [1,
                               'Se actualizó el comercio']
-            except:
-                messagebox = [0, 
-                              'No se pudo actualizar el comercio )']
+            except sqlite3.Error as ex:
+                messagebox = [0,
+                              f'No se pudo actualizar el comercio: {ex}']
         if estado==0:
             messagebox = [0, 
                           'No se permiten campos vacíos... ponga bien esa mondá >.<']

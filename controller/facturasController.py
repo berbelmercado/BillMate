@@ -1,3 +1,4 @@
+import sqlite3
 from model.facturas import Facturas
 
 class FacturaController:
@@ -21,23 +22,17 @@ class FacturaController:
                               ,valorTotalFactura
                               ,fechaFactura
                               ):
-            estado=None 
-            try:
-                        self.valorTotalFactura=float(self.valorTotalFactura)
-            except:
-                 estado=2
-            #Validamos si se envía datos vacíos o letras en el campo de "Valor total factura"
-            if numeroFactura.isspace()==True or numeroFactura=='' or valorTotalFactura.isspace()==True or valorTotalFactura=='' or fechaFactura.isspace()==True or fechaFactura=='' and  valorTotalFactura.isdecimal()==True:
-                estado=0
-            else:
-                estado=1
+            #Validamos si se envía datos vacíos
+            if numeroFactura.strip()=='' or valorTotalFactura.strip()=='' or fechaFactura.strip()=='':
+                return 0
 
+            #Validamos que "Valor total factura" sea numérico
             try:
-                    self.valorTotalFactura=float(valorTotalFactura)
-            except:
-                 estado=2
+                self.valorTotalFactura=float(valorTotalFactura)
+            except ValueError:
+                return 2
 
-            return estado
+            return 1
          
     def insertarFacturas(self):
         #Método para insertar facturas a la BD
@@ -55,9 +50,8 @@ class FacturaController:
                                   )
                 insertar.insertarFacturas()
                 mensageInserción = [1,'Factura ingresada correctamente']
-            except NameError as ex :
-                print (ex)
-                mensageInserción = [0,'Error al insertar factura']
+            except sqlite3.Error as ex:
+                mensageInserción = [0,f'Error al insertar factura: {ex}']
         elif estado==0:
             mensageInserción = [0, 'No se admiten campos vacíos. Por favor valide nuevamente']
         elif estado==2:
@@ -75,8 +69,8 @@ class FacturaController:
                                      ,None
                                      ,None)
             listadoFacturas = listaFacturas.consultarListaFacturas()
-        except:
-            messageConsulta = [0,'No se pudo obtener información de las facturas']
+        except sqlite3.Error as ex:
+            print(f'No se pudo obtener información de las facturas: {ex}')
 
         return listadoFacturas
     
@@ -91,8 +85,8 @@ class FacturaController:
                                   ,None)
             listadoConsutaFactura = objFactura.consultarFacturasModel()
             mensajeConsulta = [1, '']
-        except:
-            mensajeConsulta = [0,'Problemas con la conexión a la base de datos']
+        except sqlite3.Error as ex:
+            mensajeConsulta = [0,f'Problemas con la conexión a la base de datos: {ex}']
 
         return listadoConsutaFactura, mensajeConsulta
     
@@ -111,10 +105,10 @@ class FacturaController:
                                           ,self.fechaFactura
                                           )
                 objmodificarFactura.modificarFacturas()
-                mensageInserción = [1,'Factura ingresada correctamente']
-                
-            except:
-                mensageInserción = [0,'Error al insertar factura']
+                mensageInserción = [1,'Factura modificada correctamente']
+
+            except sqlite3.Error as ex:
+                mensageInserción = [0,f'Error al modificar factura: {ex}']
         elif estado==0:
             mensageInserción = [0, 'No se admiten campos vacíos. Por favor valide nuevamente']
         elif estado==2:

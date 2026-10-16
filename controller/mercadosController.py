@@ -1,3 +1,4 @@
+import sqlite3
 from model.mercados import Mercados
 
 class MercadosController():
@@ -51,8 +52,8 @@ class MercadosController():
                                             )
                 listaMercado = objMercadosModel.consultarMercadosModel()
                 mensaje =[1]
-            except:
-                mensaje = [0, 'No se pudo realizar la consulta']
+            except sqlite3.Error as ex:
+                mensaje = [0, f'No se pudo realizar la consulta: {ex}']
         else:
             mensaje = [0, 'Por favor seleccione una opción']
         return mensaje, listaMercado 
@@ -80,9 +81,9 @@ class MercadosController():
 
             mensaje =[1,'']
 
-        except:
-            
-            mensaje = [0,'No se pudo actualizar el producto :c']
+        except sqlite3.Error as ex:
+
+            mensaje = [0,f'No se pudo actualizar el producto: {ex}']
 
         return mensaje
 
@@ -113,9 +114,9 @@ class MercadosController():
             mensaje= [1,'']
             
 
-        except:
+        except sqlite3.Error as ex:
 
-            mensaje= [0,f'Error al consultar llaves']
+            mensaje= [0,f'Error al consultar llaves: {ex}']
         
         return listaLaves, mensaje
     
@@ -137,8 +138,8 @@ class MercadosController():
             objEliminarProductosController.eliminarProductosModel()
 
             mensaje = [1,'Fue eliminado el producto']
-        except:
-            mensae = [0,'No se es posible eliminar el producto']
+        except sqlite3.Error as ex:
+            mensaje = [0,f'No es posible eliminar el producto: {ex}']
         return mensaje
     
     
@@ -164,6 +165,6 @@ class MercadosController():
                                         )
             listaMercado = objMercadosModel.consultarUltimoMercado()
             mensaje =[1]
-        except:
-            mensaje = [0, 'No fue posible realizar la consulta']
+        except sqlite3.Error as ex:
+            mensaje = [0, f'No fue posible realizar la consulta: {ex}']
         return mensaje, listaMercado 

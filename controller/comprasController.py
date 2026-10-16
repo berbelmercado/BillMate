@@ -1,3 +1,4 @@
+import sqlite3
 from model.compras import Compras
 
 class ComprasController():
@@ -43,9 +44,8 @@ class ComprasController():
                                             ,self.fechaCreacionCompra)
                 objInsertarCompras.insertarCompras()
                 mensaje=[1,'Se insertó correctamente la compra']
-            except NameError as ex:
-                print(ex)
-                mensaje=[0,'Error al insertar la compra']
+            except sqlite3.Error as ex:
+                mensaje=[0,f'Error al insertar la compra: {ex}']
         if estado==0:
             mensaje=[0,'No se permite enviar la describción en blanco']
         
@@ -62,8 +62,8 @@ class ComprasController():
             #Ejecutamos la consulta select y guardamos los registros en una lista
             listadoComprasRegistradas = objComprasRegistradas.buscarComprasRegistradas()
 
-        except NameError as ex:
-            print(ex)
+        except sqlite3.Error as ex:
+            print(f'Error al consultar compras registradas: {ex}')
 
         return listadoComprasRegistradas
     
@@ -80,9 +80,8 @@ class ComprasController():
             listadoCompra = objConsultarCompra.consultarCompras() #Ejecutamos la consultas 
 
             mensaje=[1]
-        except NameError as ex:
-            mensaje=[0,'Error al consutlar compra']
-            print(ex) #Imprimimos error
+        except sqlite3.Error as ex:
+            mensaje=[0,f'Error al consultar la compra: {ex}']
 
         return listadoCompra,mensaje
     
@@ -100,8 +99,7 @@ class ComprasController():
 
             mensaje = [1,'Se modificó la compra corectamente']
 
-        except NameError as ex:
-            print(ex)
-            mensaje=[0,'Error al modificar la compra']
+        except sqlite3.Error as ex:
+            mensaje=[0,f'Error al modificar la compra: {ex}']
 
         return mensaje
